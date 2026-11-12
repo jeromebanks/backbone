@@ -16,6 +16,8 @@ import sqlite3
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
+from .reconcile import THERAPY_TYPES
+
 INF = float("inf")
 
 
@@ -139,17 +141,26 @@ def plan_in_effect(reqs: list[dict], day: date) -> list[dict]:
 
 
 def _req_sig(r: dict) -> tuple:
-    return (r["metric"], r["comparator"], r["threshold"], tuple(sorted(r["counted_types"])))
+    """Full identity of a requirement: two rows with the same signature are restatements of one goal."""
+    return (r["metric"], r["comparator"], r["threshold"], tuple(sorted(r["counted_types"])),
+            r.get("period", "week_mon_sun"), bool(r.get("requires_patient_present", 1)))
+
+
+def _source(r: dict) -> str:
+    """The document a requirement row came from. Claim ids are `<sha256 prefix>:<kind>:<n>` (ingest.py), so they
+    identify the document even when two documents share a label (#38); rows without claims fall back to the label."""
+    return r["claim_ids"][0].split(":", 1)[0] if r.get("claim_ids") else r["doc_label"]
 
 
 def requirement_sets_on(reqs: list[dict], day: date) -> tuple[list[list[dict]], list[str]]:
     """The requirement set(s) in effect on `day` (R9).
 
-    - Identical requirements restated by several documents count once.
-    - For each metric, the requirement whose effective period started most recently is in effect (a revision
+    - For each metric, the requirements whose effective period started most recently are in effect (a revision
       supersedes an earlier plan from its effective date; precedence is by effective date, never document date).
-    - If several DIFFERENT requirements for one metric share that latest start date, the record conflicts: every
-      alternative is returned, so callers evaluate each and report UNDETERMINED when they disagree.
+    - Requirements for one metric from ONE document apply together (e.g. >= 2 individual and >= 1 group sessions).
+    - Identical requirement sets restated by several documents count once.
+    - If several documents state DIFFERENT requirement sets for one metric from that latest start date, the record
+      conflicts: every alternative is returned, so callers evaluate each and report UNDETERMINED when they disagree.
     """
     active = plan_in_effect(reqs, day)
     notes: list[str] = []
@@ -164,16 +175,19 @@ def requirement_sets_on(reqs: list[dict], day: date) -> tuple[list[list[dict]], 
         if superseded:
             notes.append(f"{metric}: requirement effective {latest} ({sorted({r['doc_label'] for r in current})}) "
                          f"supersedes {superseded}")
-        distinct: dict[tuple, dict] = {}
+        per_doc: dict[str, dict[tuple, dict]] = {}
         for r in sorted(current, key=lambda r: r["requirement_key"]):
-            distinct.setdefault(_req_sig(r), r)
+            per_doc.setdefault(_source(r), {}).setdefault(_req_sig(r), r)
+        distinct: dict[tuple, list[dict]] = {}          # one alternative per distinct document requirement set
+        for reqs_of_doc in per_doc.values():
+            distinct.setdefault(tuple(sorted(reqs_of_doc)), list(reqs_of_doc.values()))
         if len(distinct) > 1:
             notes.append(f"{metric}: conflicting requirements in effect on {day} from "
                          f"{sorted({r['doc_label'] for r in current})}; each alternative evaluated")
         choices.append(list(distinct.values()))
     sets: list[list[dict]] = [[]]
     for alts in choices:
-        sets = [s + [a] for s in sets for a in alts]
+        sets = [s + a for s in sets for a in alts]
     return ([s for s in sets if s] or []), notes
 
 
@@ -181,19 +195,59 @@ _OPS = {">=": operator.ge, ">": operator.gt, "<=": operator.le, "<": operator.lt
 _METRIC = {"therapy_days": "therapy_days", "patient_present_minutes": "minutes", "sessions": "sessions"}
 
 
+def _lower_bound_only(req: dict) -> str | None:
+    """Why the projected total is only a LOWER bound for this requirement, if it is. The projection counts eligible
+    sessions (R5: psychotherapy, attended, patient present), so it undercounts a goal that also counts other service
+    types, or that counts sessions or days without requiring the patient's presence (#7)."""
+    other = sorted(set(req.get("counted_types") or ()) - THERAPY_TYPES)
+    if other:
+        return f"counts {other}, which the projection does not count (only psychotherapy)"
+    if not req.get("requires_patient_present", 1) and req["metric"] in ("sessions", "therapy_days"):
+        return "does not require patient presence; only patient-present sessions are counted"
+    return None
+
+
+def _verdict(comparator: str, threshold: float, lo, hi) -> str:
+    """Three-valued: MET if the goal holds for every value in [lo, hi], NOT_MET if for none, else UNDETERMINED."""
+    if comparator == "==":                        # not monotone: an interior value can equal the threshold (#18)
+        if lo == hi == threshold:
+            return "MET"
+        return "NOT_MET" if threshold < lo or threshold > hi else "UNDETERMINED"
+    op = _OPS[comparator]                         # monotone: the endpoints decide
+    at_lo, at_hi = op(lo, threshold), op(hi, threshold)
+    return "MET" if (at_lo and at_hi) else "NOT_MET" if not (at_lo or at_hi) else "UNDETERMINED"
+
+
 def evaluate_requirement(req: dict, totals: dict) -> dict:
     metric = _METRIC.get(req["metric"])
     if metric is None:
         return {"requirement": req["requirement_key"], "status": "UNDETERMINED", "reason": f"unsupported metric {req['metric']}"}
     b = totals[metric]
+    if "counted_types" in req and not req["counted_types"]:
+        return {"requirement": req["requirement_key"], "metric": req["metric"],
+                "goal": f"{req['comparator']} {req['threshold']:g}", "value": bound(0, 0), "status": "UNDETERMINED",
+                "reason": "unsupported: the requirement counts no service type (all of its types are excluded)"}
+    partial = _lower_bound_only(req)
+    if partial:
+        b = {"low": b["low"], "high": None, "status": "bounded"}
     lo, hi = b["low"], INF if b["high"] is None else b["high"]
-    op = _OPS[req["comparator"]]
-    at_lo, at_hi = op(lo, req["threshold"]), op(hi, req["threshold"])
-    status = "MET" if (at_lo and at_hi) else "NOT_MET" if not (at_lo or at_hi) else "UNDETERMINED"
+    status = _verdict(req["comparator"], req["threshold"], lo, hi)
     shown = lo if lo == hi else f"{lo}–{'∞' if hi == INF else hi}"
     return {"requirement": req["requirement_key"], "metric": req["metric"], "goal": f"{req['comparator']} {req['threshold']:g}",
             "value": b, "status": status,
-            "reason": f"{req['metric']} {shown} vs goal {req['comparator']} {req['threshold']:g}"}
+            "reason": f"{req['metric']} {shown} vs goal {req['comparator']} {req['threshold']:g}"
+                      + (f" (lower bound only: the requirement {partial})" if partial else "")}
+
+
+def _evaluate_weekly(req: dict, totals: dict) -> dict:
+    """A Mon–Sun week's totals can only judge a Mon–Sun requirement; any other period is UNDETERMINED (#7)."""
+    ev = evaluate_requirement(req, totals)
+    period = req.get("period", "week_mon_sun")
+    if period != "week_mon_sun" and "metric" in ev:
+        ev["status"] = "UNDETERMINED"
+        ev["reason"] = (f"unsupported: the requirement's period is '{period}', not a Monday–Sunday week, so a weekly "
+                        f"total cannot judge it ({ev['reason']})")
+    return ev
 
 
 def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope_cls) -> list[dict]:
@@ -236,9 +290,16 @@ def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope
                 sub = scope_cls(patients=[mrn], start=ev_lo, end=ev_hi, service_types=counted,
                                 include_excluded=False, include_evidence=False)
                 encs = [e for e in select_encounters(conn, sub, log, include_excluded=False)
-                        if e["service_date"] in covered_set]
+                        if e["service_date"] in covered_set] if counted else []   # [] would mean "no type filter"
                 totals = aggregate(encs)
-                evals = [evaluate_requirement(r, totals) for r in s]
+                evals = []
+                for r in s:                       # each requirement is counted over its OWN service types (#6)
+                    own = sorted(r["counted_types"])
+                    if own == counted:
+                        evals.append(_evaluate_weekly(r, totals))
+                    else:
+                        own_totals = aggregate([e for e in encs if e["service_type"] in own])
+                        evals.append({**_evaluate_weekly(r, own_totals), "counted_service_types": own})
                 st = ("NOT_MET" if any(e["status"] == "NOT_MET" for e in evals)
                       else "MET" if all(e["status"] == "MET" for e in evals) else "UNDETERMINED")
                 ev = {"plan_days": f"{ev_lo}..{ev_hi}", "plan_documents": sorted({r['doc_label'] for r in s}),

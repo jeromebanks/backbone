@@ -379,27 +379,70 @@ def _overlap_checks(encs: list[dict], res: Result) -> None:
 
 # --------------------------------------------------------------------------------------------- other subjects
 
+def _counted_types(p: dict) -> list[str]:
+    """Service types a requirement counts: the stated list (all psychotherapy if none is stated) minus the stated
+    exclusions. Folding the exclusions in here keeps them from being discarded (#7)."""
+    return sorted(set(p["counted_service_types"] or THERAPY_TYPES) - set(p.get("excluded_service_types") or ()))
+
+
 def _plans(plan_claims: list[Claim], res: Result) -> None:
+    """Plan requirements, one row per (source document, requirement).
+
+    - Requirements from a draft document are not operative (R2, mirroring `_classify`); the claims stay as evidence.
+    - Rows are grouped per document (sha256, never the non-unique label) and full requirement identity, so a plan
+      with several goals for one metric keeps them all. Restatements across documents are separate rows, and
+      `project.requirement_sets_on` counts identical ones once.
+    - The key keeps the readable `mrn|plan|label|metric|start` form; only when that collides (two goals for one
+      metric and start, or two documents sharing a label) is a hash of the document and full identity appended.
+    """
     groups: dict[tuple, list[Claim]] = defaultdict(list)
     for c in plan_claims:
         p = c.payload
-        k = (p["metric"], p["comparator"], p["threshold"], p["period"], p.get("effective_start"),
-             p.get("effective_end"), tuple(sorted(p["counted_service_types"])))
+        if c.doc.get("finality") == "draft":
+            res.decide(f"{res.mrn}|plan|{c.doc_label}", "R2", "plan_not_operative",
+                       f"{c.doc_label} is a draft; its {p['metric']} {p['comparator']} {p['threshold']:g} requirement "
+                       "is kept as evidence but does not take effect", [c.claim_id])
+            continue
+        k = (c.sha256, p["metric"], p["comparator"], p["threshold"], p["period"], p.get("effective_start"),
+             p.get("effective_end"), tuple(_counted_types(p)), bool(p["requires_patient_present"]))
         groups[k].append(c)
+    rows = []
     for k, cs in sorted(groups.items(), key=lambda kv: str(kv[0])):
         c0 = sorted(cs, key=lambda c: c.claim_id)[0]
         p = c0.payload
-        rk = f"{res.mrn}|plan|{c0.doc_label}|{p['metric']}|{p.get('effective_start')}"
-        res.plans.append({
-            "requirement_key": rk, "mrn": res.mrn, "doc_label": c0.doc_label, "metric": p["metric"],
+        base = f"{res.mrn}|plan|{c0.doc_label}|{p['metric']}|{p.get('effective_start')}"
+        counted = _counted_types(p)
+        rows.append((base, hashlib.sha1(repr(k).encode()).hexdigest()[:10], {
+            "mrn": res.mrn, "doc_label": c0.doc_label, "metric": p["metric"],
             "comparator": p["comparator"], "threshold": p["threshold"], "period": p["period"],
-            "counted_types": sorted(p["counted_service_types"]) or sorted(THERAPY_TYPES),
+            "counted_types": counted,
             "requires_patient_present": int(p["requires_patient_present"]),
             "effective_start": p.get("effective_start"), "effective_end": p.get("effective_end"),
-            "signed_at": c0.doc.get("signed_at"), "claim_ids": sorted(c.claim_id for c in cs)})
+            "signed_at": c0.doc.get("signed_at"), "claim_ids": sorted(c.claim_id for c in cs)}, cs))
+    collisions = Counter(base for base, *_ in rows)
+    restated: dict[tuple, list[tuple[str, dict, list[Claim]]]] = defaultdict(list)
+    for base, h, row, cs in sorted(rows, key=lambda r: (r[0], r[1])):
+        rk = base if collisions[base] == 1 else f"{base}|{h}"
+        res.plans.append({"requirement_key": rk, **row})
+        p = cs[0].payload
+        restated[tuple(str(x) for x in (row["metric"], row["comparator"], row["threshold"], row["period"],
+                                        row["effective_start"], row["effective_end"], row["counted_types"],
+                                        row["requires_patient_present"]))].append((rk, row, cs))
+        excluded = sorted(set(p["counted_service_types"]) & set(p.get("excluded_service_types") or ()))
+        if excluded:
+            res.decide(rk, "R9", "excluded_types_removed", f"{row['doc_label']} both counts and excludes {excluded}; "
+                       f"the exclusion applies, counted types are {row['counted_types']}", [c.claim_id for c in cs])
+        if not row["counted_types"]:
+            res.decide(rk, "R9", "no_counted_types", f"{row['doc_label']}: every counted service type is excluded; "
+                       "the requirement cannot be evaluated", [c.claim_id for c in cs])
         if len(cs) > 1:
             res.decide(rk, "R3", "duplicate_plan_text", f"{len(cs)} records state the same requirement",
                        [c.claim_id for c in cs])
+    for same in restated.values():
+        if len({cs[0].sha256 for _, _, cs in same}) > 1:
+            res.decide(same[0][0], "R3", "plan_restated",
+                       f"{len(same)} documents ({', '.join(row['doc_label'] for _, row, _ in same)}) state the same "
+                       f"{same[0][1]['metric']} requirement; it counts once", [c.claim_id for _, _, cs in same for c in cs])
 
 
 def _assessments(acl: list[Claim], copy_docs: set[str], res: Result) -> None:
@@ -480,14 +523,17 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
     _overlap_checks(encs, res)
     res.encounters = encs
     _plans([c for c in claims if c.kind == "plan_requirement"], res)
-    # R9 note: care on a plan's first effective day that precedes its signature
+    # R9 note: care on a plan's first effective day that precedes its signature (once per encounter and signature,
+    # even when several documents restate the plan)
+    noted: set[tuple] = set()
     for p in res.plans:
         if not (p["signed_at"] and p["effective_start"]) or p["metric"] != "therapy_days":
             continue
         signed_min = to_min(p["signed_at"][11:16]) if len(p["signed_at"]) >= 16 else None
         for e in encs:
             if e["eligible"] != "no" and e["service_date"] == p["effective_start"] and e["_present_sets"] and signed_min:
-                if e["_present_sets"][0][0][0] < signed_min:
+                if e["_present_sets"][0][0][0] < signed_min and (e["encounter_key"], p["signed_at"]) not in noted:
+                    noted.add((e["encounter_key"], p["signed_at"]))
                     res.decide(e["encounter_key"], "R9", "counted_under_plan",
                                f"session began before the plan signature ({p['signed_at']}) on the plan's first "
                                f"effective day; counted because plan effectivity is by date", p["claim_ids"])

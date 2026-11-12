@@ -33,7 +33,15 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
 6. **R7** `_overlap_checks`: patient-present sets that overlap across a patient's encounters on one day are flagged.
    A *superseded* pre-correction value that would overlap another encounter is logged as
    `correction_consistent`.
-7. `_plans`: requirements are deduplicated by (metric, comparator, threshold, period, dates, counted types).
+7. `_plans`: one row per (source document sha256, full requirement identity: metric, comparator, threshold, period,
+   dates, counted types, patient presence).
+   - Requirements from a `draft` document are not operative: an R2 `plan_not_operative` decision, claims kept as evidence.
+   - Counted types = the stated list (all psychotherapy if empty) minus `excluded_service_types`. If a type is both
+     counted and excluded, the exclusion wins (R9 `excluded_types_removed`). If nothing is left, the result is R9
+     `no_counted_types` and the requirement evaluates UNDETERMINED.
+   - The same requirement stated by several documents keeps one row per document, plus an R3 `plan_restated` decision.
+   - The key stays `mrn|plan|label|metric|start`. Only on a collision (two goals for one metric and start, or two
+     documents sharing a label) is a hash of the full identity appended.
 8. **R9 note:** an eligible session on a plan's first effective day that started before the plan signature is
    counted and logged (effectivity is by date).
 9. **R8** `_assessments`: grouped by (instrument, completed date), split by distinct form IDs. Copies
@@ -43,14 +51,27 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
 
 ## Plan semantics (in `project.py`, because they are evaluated at query time)
 
-- `requirement_sets_on(reqs, day)`: active requirements per metric. The one with the **latest effective_start**
-  wins (a revision supersedes, by effective date). Identical restatements count once. Different requirements with
-  the same latest start date are a conflict: all alternatives are returned.
+- `requirement_sets_on(reqs, day)`: active requirements per metric. Those with the **latest effective_start**
+  win (a revision supersedes, by effective date).
+  - Requirements for one metric from one document apply together (e.g. ≥ 2 individual and ≥ 1 group sessions).
+  - Identical per-document sets restated by other documents count once.
+  - Different sets from different documents with the same latest start date are a conflict: every alternative is
+    returned. The document is identified by claim id (sha256 prefix), not by label.
 - `weekly_compliance`: whole-week totals (only days covered by some plan) are evaluated against **each** requirement
   set in effect that week. Agreement gives the verdict; disagreement gives UNDETERMINED with a note. A partial
   segment is never compared with a weekly goal.
-- `evaluate_requirement`: MET if the comparator holds at both bounds, NOT_MET at neither, else UNDETERMINED. An
-  unbounded high (`None`) is ∞.
+  - Each requirement is counted over its **own** `counted_types`. A requirement whose types differ from the set's
+    union carries its own `counted_service_types`.
+  - A period other than `week_mon_sun` is UNDETERMINED ("unsupported").
+- `evaluate_requirement`: for monotone comparators, MET if the goal holds at both bounds, NOT_MET at neither, else
+  UNDETERMINED. For `==`: MET only when low = high = threshold, NOT_MET when the threshold is outside [low, high],
+  else UNDETERMINED. An unbounded high (`None`) is ∞.
+  - The projection counts R5-eligible sessions only: psychotherapy, attended, patient present. So
+    `requires_patient_present = 1` is enforced by eligibility.
+  - When a goal also counts non-psychotherapy types, or counts sessions or days without requiring presence, the
+    projected total is only a lower bound. Its high becomes ∞, with a "lower bound only" reason.
+- `compliance` rejects `scope.service_types`: it returns an envelope with `totals.unsupported` and no weeks,
+  because the plan's own counting rules define what counts.
 - `consecutive_runs(weeks, n)`: `definite` uses NOT_MET weeks only; `possible` also counts UNDETERMINED weeks, which
   gives `depends_on_unresolved`.
 

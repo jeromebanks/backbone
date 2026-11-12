@@ -181,6 +181,12 @@ def care(conn, step: CareStep) -> dict:
 
 def compliance(conn, step: ComplianceStep) -> dict:
     log, sc = SqlLog(), step.scope
+    if sc.service_types:
+        # A plan's goals define which service types they count; judging them on a narrower selection would give a
+        # confident verdict the plan does not define. Refuse explicitly instead of ignoring the filter (#21).
+        reason = ("compliance does not accept scope.service_types: each treatment-plan requirement counts the service "
+                  "types the plan states. Drop service_types, or use care with service_types for delivered totals.")
+        return _envelope(step, log, totals={"unsupported": reason}, notes=[reason])
     patients = patients_in_scope(conn, sc, log)
     weeks_all, runs, facts, calc = [], [], [], []
     for p in patients:
@@ -190,7 +196,10 @@ def compliance(conn, step: ComplianceStep) -> dict:
             for ev in w["evaluations"]:
                 t = ev["totals"]
                 ev_lines.append(f"{ev['plan_days']}: days {_fmt_bound(t['therapy_days'])}, minutes "
-                                f"{_fmt_bound(t['minutes'])} -> " + "; ".join(f"{r['metric']} {r['status']}" for r in ev["requirements"]))
+                                f"{_fmt_bound(t['minutes'])} -> " + "; ".join(
+                                    f"{r['metric']} {r['status']}" + (f" ({_fmt_bound(r['value'])} over {r['counted_service_types']})"
+                                                                      if "counted_service_types" in r else "")
+                                    for r in ev["requirements"]))
             calc.append(f"{p['mrn']} week {w['week_start']}: " + (" | ".join(ev_lines) or "no plan in effect")
                         + f" => {w['status']}")
             weeks_all.append(w)
