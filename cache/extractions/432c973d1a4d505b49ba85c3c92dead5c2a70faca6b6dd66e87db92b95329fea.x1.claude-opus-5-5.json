@@ -1,0 +1,124 @@
+{
+  "sha256": "432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
+  "filename": "partner_collateral_jan16.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 14506,
+    "input_tokens": 8050,
+    "output_tokens": 1631,
+    "cost_usd": 0.043831600000000005,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D012",
+      "title": "Family collateral note (partner only), encounter HG-E109",
+      "signed": true,
+      "signed_at": "2026-01-16T16:08",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": null,
+          "quote": "I gathered information about daily routine and reviewed supportive responses previously practiced in the family appointment."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E109",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-16",
+        "service_type": "family_collateral",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "14:00",
+          "end": "14:40"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [
+          {
+            "start": "14:00",
+            "end": "14:40",
+            "kind": "patient_absent",
+            "quote": "Participant: Casey Mercer, partner. Rowan was absent for the entire contact."
+          }
+        ],
+        "stated_minutes": null,
+        "clinicians": [
+          "Mara Voss, LCSW"
+        ],
+        "quotes": [
+          "Encounter HG-E109 | Date 2026-01-16 | 14:00\u201314:40 local",
+          "Participant: Casey Mercer, partner. Rowan was absent for the entire contact.",
+          "Rowan did not join in person, by telephone, or by video.",
+          "No patient-present psychotherapy occurred during this contact."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-16",
+        "domain": "functioning",
+        "source": "collateral_report",
+        "statement": "Partner reports the patient has been going out for short walks and seems more willing to talk about the coming week.",
+        "quote": "Casey reported that Rowan had been getting out for short walks and seemed more willing to discuss the coming week."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "mood",
+        "source": "collateral_report",
+        "statement": "Partner says mornings are still difficult for the patient.",
+        "quote": "Mornings remain difficult, and Casey described Rowan becoming quiet when the conversation turns to work."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "avoidance",
+        "source": "collateral_report",
+        "statement": "Partner describes the patient going quiet when conversation turns to work.",
+        "quote": "Mornings remain difficult, and Casey described Rowan becoming quiet when the conversation turns to work."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "functioning",
+        "source": "collateral_report",
+        "statement": "Partner reports the scheduled evening check-in has cut down on unplanned reminders.",
+        "quote": "The scheduled evening check-in has reduced unplanned reminders."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "other",
+        "source": "collateral_report",
+        "statement": "Partner notices fewer arguments when asking the patient what kind of help they want.",
+        "quote": "Casey said it takes effort to resist offering multiple solutions but has noticed less argument when asking what kind of help Rowan wants."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "The patient told the office they could not take part and was absent for the whole contact.",
+        "quote": "Casey attended the arranged contact after Rowan advised the office that they could not participate."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

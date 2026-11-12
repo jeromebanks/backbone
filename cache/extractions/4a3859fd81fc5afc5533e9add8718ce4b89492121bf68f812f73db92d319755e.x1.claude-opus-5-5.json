@@ -1,0 +1,96 @@
+{
+  "sha256": "4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
+  "filename": "BH-D115_symptom_measure_review_2026-01-30.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 11519,
+    "input_tokens": 8013,
+    "output_tokens": 1320,
+    "cost_usd": 0.037315600000000004,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D115",
+      "title": "Symptom questionnaire (PHQ-9) and chart review",
+      "signed": true,
+      "signed_at": "2026-01-30T16:20",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [],
+    "assessments": [
+      {
+        "instrument": "PHQ-9",
+        "total_score": 10.0,
+        "item_scores": [
+          "Item 9: 0"
+        ],
+        "completed_date": "2026-01-30",
+        "completed_time": "12:42",
+        "form_id": null,
+        "is_copy_of_earlier": false,
+        "quote": "PHQ-9 total: 10. Item 9: 0."
+      }
+    ],
+    "observations": [
+      {
+        "date": "2026-01-30",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Patient continued to endorse sleep difficulty.",
+        "quote": "The patient continued to endorse sleep difficulty and trouble sustaining usual activities, with fewer days of pervasive low mood than reported at intake."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "mood",
+        "source": "patient_report",
+        "statement": "Patient reported fewer days of pervasive low mood than at intake.",
+        "quote": "The patient continued to endorse sleep difficulty and trouble sustaining usual activities, with fewer days of pervasive low mood than reported at intake."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "overall_progress",
+        "source": "clinician_assessment",
+        "statement": "Clinician judged partial improvement with persistent avoidance and functional impact around returning to work.",
+        "quote": "Rowan shows partial improvement, with persistent avoidance and meaningful functional impact around returning to work."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "avoidance",
+        "source": "clinician_assessment",
+        "statement": "Patient has taken initial steps such as sending a message but continues to delay follow-up and becomes anxious when tasks expand.",
+        "quote": "The patient has taken some initial steps, including drafting and sending a message, but continues to delay follow-up and becomes anxious when a task expands beyond a narrowly defined action."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "sleep",
+        "source": "clinician_assessment",
+        "statement": "Sleep disruption remains an intermittent barrier to a steadier daytime routine.",
+        "quote": "Sleep disruption remains an intermittent barrier to establishing a steadier daytime routine."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "functioning",
+        "source": "clinician_assessment",
+        "statement": "Continued treatment is appropriate given remaining difficulties with follow-through and work-related functioning.",
+        "quote": "Continued treatment is appropriate given the remaining difficulties with follow-through and work-related functioning."
+      },
+      {
+        "date": "2026-01-30",
+        "domain": "safety",
+        "source": "measurement",
+        "statement": "PHQ-9 item 9 was scored 0.",
+        "quote": "PHQ-9 total: 10. Item 9: 0."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

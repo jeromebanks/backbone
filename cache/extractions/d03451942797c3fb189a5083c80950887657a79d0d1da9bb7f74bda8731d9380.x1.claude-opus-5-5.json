@@ -1,0 +1,127 @@
+{
+  "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
+  "filename": "BH-D111_individual_second_record_2026-01-26.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 12744,
+    "input_tokens": 8088,
+    "output_tokens": 1612,
+    "cost_usd": 0.0437556,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D111",
+      "title": "Participating clinician psychotherapy record (second clinician record), individual psychotherapy, 2026-01-26",
+      "signed": true,
+      "signed_at": "2026-01-26T12:03",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "companion_record",
+          "encounter_id": "HG-E115",
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-26",
+          "quote": "Clinician: Nora Ellis, LCSW, participating with Mira Patel, LCSW"
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E115",
+        "related_encounter_id": null,
+        "appointment_id": "HG-A115",
+        "service_date": "2026-01-26",
+        "service_type": "individual_therapy",
+        "modality": "in_person",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": "09:10",
+        "patient_departure": "09:50",
+        "patient_contact_intervals": [
+          {
+            "start": "09:10",
+            "end": "09:50"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 40,
+        "clinicians": [
+          "Nora Ellis, LCSW",
+          "Mira Patel, LCSW"
+        ],
+        "quotes": [
+          "Encounter HG-E115 | Appointment HG-A115 | Service date January 26, 2026",
+          "Actual patient psychotherapy contact: 09:10\u201309:50, 40 minutes.",
+          "Rowan entered the treatment room at 09:10, when we began the session.",
+          "The session concluded with Rowan at 09:50."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-26",
+        "domain": "functioning",
+        "source": "patient_report",
+        "statement": "Patient described difficulty moving from a supervisor's reply to arranging the next conversation.",
+        "quote": "Rowan discussed difficulty moving from a supervisor's reply to arranging the next conversation."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Patient anticipated becoming overwhelmed if several work issues were raised at once.",
+        "quote": "The patient anticipated becoming overwhelmed if several work issues were raised at once."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "anxiety",
+        "source": "clinician_observation",
+        "statement": "Patient recognized a tendency to keep editing a message after the essential point was clear.",
+        "quote": "Rowan recognized a tendency to keep editing a message after the essential point was already clear."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient could use the grounding cue during rehearsal but was uncertain about using it independently when anxious.",
+        "quote": "The patient could use the cue during the rehearsal but remained uncertain about using it independently when anxious."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "sleep",
+        "source": "clinician_observation",
+        "statement": "Repetitive planning at night was discussed as affecting settling for sleep.",
+        "quote": "The discussion also addressed how repetitive planning at night affected settling for sleep."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "overall_progress",
+        "source": "clinician_assessment",
+        "statement": "Presentation remained consistent with ongoing anxiety, low mood, and functional difficulty around work demands.",
+        "quote": "Clinical presentation remained consistent with ongoing anxiety, low mood, and functional difficulty around work demands."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient was engaged with the treatment team and wished to resume a steadier routine.",
+        "quote": "Rowan was engaged with the treatment team and described a wish to resume a steadier routine."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

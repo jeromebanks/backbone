@@ -1,0 +1,108 @@
+{
+  "sha256": "95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
+  "filename": "medication_review_jan13.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 9023,
+    "input_tokens": 8025,
+    "output_tokens": 1120,
+    "cost_usd": 0.0334116,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D010",
+      "title": "Prescriber visit note - medication management",
+      "signed": true,
+      "signed_at": "2026-01-13T10:04",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E106",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-13",
+        "service_type": "medication_management",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended_full",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "09:00",
+            "end": "09:25"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 25,
+        "clinicians": [
+          "Elias Brenner, NP"
+        ],
+        "quotes": [
+          "Encounter HG-E106 | Date 2026-01-13",
+          "Actual visit 09:00\u201309:25 local; completed, 25 minutes",
+          "Rowan attended for medication management.",
+          "Service documented: medication review and management only. No separate psychotherapy component was provided or documented."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-13",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Patient reported continuing sleep interruption and daytime tiredness.",
+        "quote": "Rowan reported continuing sleep interruption and daytime tiredness."
+      },
+      {
+        "date": "2026-01-13",
+        "domain": "mood",
+        "source": "patient_report",
+        "statement": "Patient described mood as somewhat less heavy on days with a planned activity but remained concerned about work communication.",
+        "quote": "They described mood as somewhat less heavy on days with a planned activity but remained concerned about work communication."
+      },
+      {
+        "date": "2026-01-13",
+        "domain": "safety",
+        "source": "patient_report",
+        "statement": "Patient denied any new medication-related concern needing urgent intervention.",
+        "quote": "Rowan denied a new medication-related concern requiring urgent intervention."
+      },
+      {
+        "date": "2026-01-13",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient was attentive, asked questions about monitoring, and could restate next steps.",
+        "quote": "Rowan was attentive, asked questions about the monitoring plan, and could restate the next steps."
+      },
+      {
+        "date": "2026-01-13",
+        "domain": "mood",
+        "source": "clinician_assessment",
+        "statement": "Clinician assessed ongoing depressive and anxiety symptoms with sleep disruption.",
+        "quote": "Assessment: ongoing depressive and anxiety symptoms with sleep disruption."
+      },
+      {
+        "date": "2026-01-13",
+        "domain": "engagement",
+        "source": "clinician_assessment",
+        "statement": "Patient is engaged with the therapy program and intends to continue scheduled appointments.",
+        "quote": "Rowan is engaged with the therapy program and intends to continue the scheduled appointments."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

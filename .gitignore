@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.venv/
+# out/ and cache/ are committed on purpose: they are the persisted abstraction and the extraction cache
+build/
+*.egg-info/
+# duplicate of documents/ as downloaded
+documents-*.zip

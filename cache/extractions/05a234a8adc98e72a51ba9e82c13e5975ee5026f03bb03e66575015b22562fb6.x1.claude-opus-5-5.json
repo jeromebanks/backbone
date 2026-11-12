@@ -1,0 +1,134 @@
+{
+  "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
+  "filename": "BH-D101_group_content_2026-01-19.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 15552,
+    "input_tokens": 8012,
+    "output_tokens": 1800,
+    "cost_usd": 0.046907599999999994,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D101",
+      "title": "Skills group clinical record (group encounter HG-E110), January 19, 2026",
+      "signed": true,
+      "signed_at": "2026-01-19T12:08",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": "arrival",
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-19",
+          "quote": "Patient-specific arrival and departure are maintained on the attendance roster."
+        },
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-19",
+          "quote": "The facilitator offered grounding and arranged a same-day individual meeting with the treating clinician."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E110",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-19",
+        "service_type": "group_therapy",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [
+          {
+            "start": "10:45",
+            "end": "11:00",
+            "kind": "break",
+            "quote": "Nontherapeutic break: 10:45\u201311:00."
+          }
+        ],
+        "stated_minutes": null,
+        "clinicians": [
+          "Leah Chen, LCSW"
+        ],
+        "quotes": [
+          "Skills group clinical record | Service date: January 19, 2026",
+          "Scheduled group: 10:00\u201311:30. Nontherapeutic break: 10:45\u201311:00.",
+          "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern.",
+          "Patient-specific arrival and departure are maintained on the attendance roster."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-19",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient initially followed the group exercise.",
+        "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient identified postponing a message to a supervisor as a familiar avoidance pattern.",
+        "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "anxiety",
+        "source": "clinician_observation",
+        "statement": "Patient became visibly tense when discussion turned to returning to the workplace.",
+        "quote": "When discussion turned to returning to the workplace, Rowan became visibly tense and said the amount of discussion felt difficult to manage."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Patient said the amount of discussion felt difficult to manage.",
+        "quote": "When discussion turned to returning to the workplace, Rowan became visibly tense and said the amount of discussion felt difficult to manage."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "other",
+        "source": "clinician_observation",
+        "statement": "Facilitator offered grounding and arranged a same-day individual meeting with the treating clinician.",
+        "quote": "The facilitator offered grounding and arranged a same-day individual meeting with the treating clinician."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "functioning",
+        "source": "clinician_assessment",
+        "statement": "Clinician cautions that participation in a group exercise should not be assumed to reflect completion of the patient's own work task; plan to continue brief coping skills before approach tasks.",
+        "quote": "Coordinate with the individual clinician regarding the group experience so that future attendance can be supported without assuming that participation in a group exercise reflects completion of the patient's own work task."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

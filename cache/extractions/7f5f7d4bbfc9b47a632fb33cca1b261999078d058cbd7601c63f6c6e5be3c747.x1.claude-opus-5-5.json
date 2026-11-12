@@ -1,0 +1,143 @@
+{
+  "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
+  "filename": "intake_and_individual_jan05.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 11952,
+    "input_tokens": 8259,
+    "output_tokens": 1572,
+    "cost_usd": 0.044323600000000005,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D002",
+      "title": "Intake and individual therapy note, 2026-01-05",
+      "signed": true,
+      "signed_at": "2026-01-05T12:18",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": null,
+          "quote": "Treatment goals and the proposed weekly schedule will be recorded in a separate plan."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E101",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-05",
+        "service_type": "individual_therapy",
+        "modality": "in_person",
+        "evidence_type": "clinical_note",
+        "disposition": "attended_full",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "09:00",
+            "end": "09:50"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 50,
+        "clinicians": [
+          "Mara Voss, LCSW"
+        ],
+        "quotes": [
+          "Encounter HG-E101 | Service date 2026-01-05",
+          "Patient-present individual therapy: 09:00\u201309:50 local; completed, 50 minutes.",
+          "Rowan arrived independently and participated throughout the appointment."
+        ]
+      }
+    ],
+    "assessments": [
+      {
+        "instrument": "PHQ-9",
+        "total_score": 18.0,
+        "item_scores": [],
+        "completed_date": "2026-01-05",
+        "completed_time": null,
+        "form_id": null,
+        "is_copy_of_earlier": false,
+        "quote": "PHQ-9 completed by Rowan on 2026-01-05: total score 18."
+      }
+    ],
+    "observations": [
+      {
+        "date": "2026-01-05",
+        "domain": "mood",
+        "source": "patient_report",
+        "statement": "Patient reports several weeks of low mood, reduced interest, fragmented sleep, and difficulty starting tasks.",
+        "quote": "Rowan describes several weeks of low mood, reduced interest in usual activities, fragmented sleep, and difficulty beginning ordinary tasks."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient has been postponing emails, avoiding return-date conversations, and spending more time alone at home.",
+        "quote": "Rowan has been postponing email replies, avoiding conversations about the return date, and spending more time alone at home."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Worry increases when thinking about returning to work after leave.",
+        "quote": "Worry increases when thinking about returning to work after a recent leave."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "mood",
+        "source": "clinician_observation",
+        "statement": "Speech clear and organized; affect subdued but responsive.",
+        "quote": "Affect was subdued but responsive, especially when discussing their partner's support."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Patient wakes at night and repeatedly checks the time.",
+        "quote": "Rowan described waking in the night and then checking the time repeatedly."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "safety",
+        "source": "clinician_assessment",
+        "statement": "No immediate safety concern identified; patient could discuss support contacts and help-seeking.",
+        "quote": "No immediate safety concern was identified in today's assessment; Rowan was able to discuss support contacts and ways to seek additional help if needed."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "other",
+        "source": "clinician_assessment",
+        "statement": "Clinical impression of depressive symptoms with anxiety and behavioral avoidance.",
+        "quote": "Clinical impressions are depressive symptoms with anxiety and behavioral avoidance."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient participated throughout and selected a behavioral activation task.",
+        "quote": "Rowan selected opening their work inbox for five minutes without requiring an immediate reply."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

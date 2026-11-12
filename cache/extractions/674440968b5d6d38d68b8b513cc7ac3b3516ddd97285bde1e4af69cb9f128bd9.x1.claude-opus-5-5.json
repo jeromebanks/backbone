@@ -1,0 +1,112 @@
+{
+  "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
+  "filename": "BH-D103_attendance_correction_2026-01-20.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 16067,
+    "input_tokens": 7933,
+    "output_tokens": 1839,
+    "cost_usd": 0.0470556,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D103",
+      "title": "Attendance correction for group encounter HG-E110 (departure time)",
+      "signed": true,
+      "signed_at": "2026-01-20T08:42",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "corrects_field",
+          "encounter_id": "HG-E110",
+          "field": "departure",
+          "old_value": "11:30",
+          "new_value": "11:15",
+          "form_id": null,
+          "original_date": "2026-01-19",
+          "quote": "Correction: Patient departure for HG-E110 is 11:15, replacing the original roster value of 11:30."
+        },
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-19",
+          "quote": "The room-transfer record shows Rowan leaving skills room B at 11:15 and being received by the individual clinician at 11:15."
+        },
+        {
+          "type": "references",
+          "encounter_id": "HG-E110",
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-19",
+          "quote": "It does not change the group service date, scheduled opening or closing, the break recorded in the group clinical note, or the separate individual appointment."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E110",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-19",
+        "service_type": "group_therapy",
+        "modality": "in_person",
+        "evidence_type": "attendance_correction",
+        "disposition": "attended_partial",
+        "patient_present": "partial",
+        "scheduled": null,
+        "patient_arrival": "10:00",
+        "patient_departure": "11:15",
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [
+          "Leah Chen, LCSW"
+        ],
+        "quotes": [
+          "Applies to group encounter HG-E110, service date January 19, 2026",
+          "Correction: Patient departure for HG-E110 is 11:15, replacing the original roster value of 11:30. Patient arrival remains 10:00.",
+          "The group continued for other members until its scheduled close."
+        ]
+      },
+      {
+        "encounter_id": null,
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-19",
+        "service_type": "individual_therapy",
+        "modality": "in_person",
+        "evidence_type": "other",
+        "disposition": "unknown",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": "11:15",
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "The room-transfer record shows Rowan leaving skills room B at 11:15 and being received by the individual clinician at 11:15.",
+          "It does not change the group service date, scheduled opening or closing, the break recorded in the group clinical note, or the separate individual appointment."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [],
+    "plan_requirements": []
+  }
+}

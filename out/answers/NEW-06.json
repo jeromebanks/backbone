@@ -1,0 +1,40 @@
+{
+  "id": "NEW-06",
+  "question": "What was Rowan's blood pressure trend during the episode?",
+  "plan": {
+    "question": "What was Rowan's blood pressure trend during the episode?",
+    "steps": [],
+    "unsupported_reason": "Blood pressure and other vital signs aren't part of the records the available operations cover. Those operations cover therapy care delivered (sessions, therapy days, minutes), treatment-plan compliance, timelines of encounters, documents and reconciliation decisions, and behavioral-health assessments and observations. Observations cover mood, sleep, anxiety, avoidance, functioning, safety, engagement and overall progress. None of these operations can pull out a series of blood pressure readings for Rowan Mercer (HG-M042) for 2026-01-05 to 2026-01-30. As a result, a blood pressure trend can't be worked out reliably."
+  },
+  "plan_explain": "QueryPlan: What was Rowan's blood pressure trend during the episode?\n  UNSUPPORTED: Blood pressure and other vital signs aren't part of the records the available operations cover. Those operations cover therapy care delivered (sessions, therapy days, minutes), treatment-plan compliance, timelines of encounters, documents and reconciliation decisions, and behavioral-health assessments and observations. Observations cover mood, sleep, anxiety, avoidance, functioning, safety, engagement and overall progress. None of these operations can pull out a series of blood pressure readings for Rowan Mercer (HG-M042) for 2026-01-05 to 2026-01-30. As a result, a blood pressure trend can't be worked out reliably.",
+  "results": {
+    "question": "What was Rowan's blood pressure trend during the episode?",
+    "unsupported": "Blood pressure and other vital signs aren't part of the records the available operations cover. Those operations cover therapy care delivered (sessions, therapy days, minutes), treatment-plan compliance, timelines of encounters, documents and reconciliation decisions, and behavioral-health assessments and observations. Observations cover mood, sleep, anxiety, avoidance, functioning, safety, engagement and overall progress. None of these operations can pull out a series of blood pressure readings for Rowan Mercer (HG-M042) for 2026-01-05 to 2026-01-30. As a result, a blood pressure trend can't be worked out reliably.",
+    "results": []
+  },
+  "answer_markdown": "**Not answerable with the supported operations.** Blood pressure and other vital signs aren't part of the records the available operations cover. Those operations cover therapy care delivered (sessions, therapy days, minutes), treatment-plan compliance, timelines of encounters, documents and reconciliation decisions, and behavioral-health assessments and observations. Observations cover mood, sleep, anxiety, avoidance, functioning, safety, engagement and overall progress. None of these operations can pull out a series of blood pressure readings for Rowan Mercer (HG-M042) for 2026-01-05 to 2026-01-30. As a result, a blood pressure trend can't be worked out reliably.",
+  "unresolved": [],
+  "caveats": null,
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 5796,
+    "execute": 0.04,
+    "narrate_llm": 0,
+    "total": 5796
+  },
+  "llm": {
+    "calls": 1,
+    "input_tokens": 3632,
+    "output_tokens": 514,
+    "cost_usd": 0.0136504
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T12:01:15"
+}

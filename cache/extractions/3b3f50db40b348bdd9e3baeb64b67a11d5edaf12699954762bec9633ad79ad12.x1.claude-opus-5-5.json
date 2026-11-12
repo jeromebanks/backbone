@@ -1,0 +1,110 @@
+{
+  "sha256": "3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
+  "filename": "signed_treatment_plan_jan05.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 11276,
+    "input_tokens": 8202,
+    "output_tokens": 1335,
+    "cost_usd": 0.0391276,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D003",
+      "title": "Outpatient treatment plan (Harbor Grove Behavioral Health)",
+      "signed": true,
+      "signed_at": "2026-01-05T13:05",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-05",
+        "domain": "mood",
+        "source": "clinician_assessment",
+        "statement": "Presenting needs include depressed mood and sleep disruption.",
+        "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "anxiety",
+        "source": "clinician_assessment",
+        "statement": "Patient has anxiety about resuming work responsibilities.",
+        "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "avoidance",
+        "source": "clinician_assessment",
+        "statement": "Patient shows avoidance of tasks and communication.",
+        "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "engagement",
+        "source": "patient_report",
+        "statement": "Patient wishes to improve follow-through without waiting for anxiety to disappear.",
+        "quote": "Rowan wishes to improve follow-through without waiting for anxiety to disappear."
+      },
+      {
+        "date": "2026-01-05",
+        "domain": "other",
+        "source": "clinician_assessment",
+        "statement": "Partner support is available, though repeated reminders sometimes increase tension.",
+        "quote": "Partner support is available but repeated reminders sometimes increase tension."
+      }
+    ],
+    "plan_requirements": [
+      {
+        "metric": "therapy_days",
+        "threshold": 3.0,
+        "comparator": ">=",
+        "period": "week_mon_sun",
+        "counted_service_types": [
+          "individual_therapy",
+          "group_therapy",
+          "family_therapy"
+        ],
+        "excluded_service_types": [
+          "medication_management",
+          "family_collateral",
+          "care_coordination"
+        ],
+        "requires_patient_present": true,
+        "effective_start": "2026-01-05",
+        "effective_end": "2026-01-30",
+        "quote": "Local treatment participation goal: at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday\u2013Sunday week."
+      },
+      {
+        "metric": "patient_present_minutes",
+        "threshold": 150.0,
+        "comparator": ">=",
+        "period": "week_mon_sun",
+        "counted_service_types": [
+          "individual_therapy",
+          "group_therapy",
+          "family_therapy"
+        ],
+        "excluded_service_types": [
+          "medication_management",
+          "family_collateral",
+          "care_coordination"
+        ],
+        "requires_patient_present": true,
+        "effective_start": "2026-01-05",
+        "effective_end": "2026-01-30",
+        "quote": "Patient-present individual, group, and family therapy contribute to the minute goal."
+      }
+    ]
+  }
+}

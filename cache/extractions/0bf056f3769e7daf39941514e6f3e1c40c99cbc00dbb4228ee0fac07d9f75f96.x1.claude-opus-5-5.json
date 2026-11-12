@@ -1,0 +1,253 @@
+{
+  "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
+  "filename": "early_appointment_status_export.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 22711,
+    "input_tokens": 8046,
+    "output_tokens": 2972,
+    "cost_usd": 0.07061959999999999,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D006",
+      "title": "Appointment desk status export, January 5\u201316, 2026",
+      "signed": false,
+      "signed_at": null,
+      "received_at": null,
+      "finality": "unknown",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E101",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-05",
+        "service_type": "individual_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "09:00",
+          "end": "09:50"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E101   | Jan05 | Individual therapy     | 09:00\u201309:50    | Completed"
+        ]
+      },
+      {
+        "encounter_id": "HG-E102",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-06",
+        "service_type": "group_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended_partial",
+        "patient_present": "partial",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E102   | Jan06 | Coping skills group    | 10:00\u201311:30    | Attended part"
+        ]
+      },
+      {
+        "encounter_id": "HG-E103",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-08",
+        "service_type": "individual_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "no_show",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "11:00",
+          "end": "11:45"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E103   | Jan08 | Individual therapy     | 11:00\u201311:45    | No show",
+          "HG-E103 remained unarrived at close of its appointment slot on January 8."
+        ]
+      },
+      {
+        "encounter_id": "HG-E104",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-09",
+        "service_type": "family_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "14:00",
+          "end": "14:45"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E104   | Jan09 | Family therapy         | 14:00\u201314:45    | Completed"
+        ]
+      },
+      {
+        "encounter_id": "HG-E105",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-12",
+        "service_type": "group_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E105   | Jan12 | Coping skills group    | 10:00\u201311:30    | Completed"
+        ]
+      },
+      {
+        "encounter_id": "HG-E106",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-13",
+        "service_type": "medication_management",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "09:00",
+          "end": "09:25"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E106   | Jan13 | Medication management  | 09:00\u201309:25    | Completed"
+        ]
+      },
+      {
+        "encounter_id": "HG-E107",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-14",
+        "service_type": "individual_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "11:00",
+          "end": "11:45"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E107   | Jan14 | Individual therapy     | 11:00\u201311:45    | Completed"
+        ]
+      },
+      {
+        "encounter_id": "HG-E108",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-15",
+        "service_type": "group_therapy",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "clinic_cancelled",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E108   | Jan15 | Coping skills group    | 10:00\u201311:30    | Clinic cancelled",
+          "HG-E108 was removed from the active room schedule after staff illness was reported."
+        ]
+      },
+      {
+        "encounter_id": "HG-E109",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-16",
+        "service_type": "family_collateral",
+        "modality": "unknown",
+        "evidence_type": "schedule_listing",
+        "disposition": "attended",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "14:00",
+          "end": "14:40"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-E109   | Jan16 | Family collateral      | 14:00\u201314:40    | Completed",
+          "Appointment HG-E109 was retained as a partner collateral contact after Rowan could not attend."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [],
+    "plan_requirements": []
+  }
+}

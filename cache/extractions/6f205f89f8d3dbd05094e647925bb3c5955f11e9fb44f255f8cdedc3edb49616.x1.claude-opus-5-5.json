@@ -1,0 +1,106 @@
+{
+  "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
+  "filename": "early_group_attendance_roster.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 10748,
+    "input_tokens": 7967,
+    "output_tokens": 1246,
+    "cost_usd": 0.0354676,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D005",
+      "title": "Group desk attendance extract (patient entries) for 2026-01-06 and 2026-01-12",
+      "signed": false,
+      "signed_at": null,
+      "received_at": null,
+      "finality": "unknown",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": null,
+          "quote": "Prepared from the signed reception attendance sheet for the two dates listed."
+        },
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": null,
+          "quote": "Session activities and room breaks are documented in the facilitator's record."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E102",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-06",
+        "service_type": "group_therapy",
+        "modality": "in_person",
+        "evidence_type": "attendance_record",
+        "disposition": "attended_partial",
+        "patient_present": "partial",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": "10:15",
+        "patient_departure": "11:15",
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "2026-01-06 | HG-E102   | 10:00\u201311:30    | 10:15           | 11:15            | Attended part",
+          "Rowan advised the facilitator that they would need to leave early for a previously arranged ride.",
+          "Rowan did not re-enter the group room after departing."
+        ]
+      },
+      {
+        "encounter_id": "HG-E105",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-12",
+        "service_type": "group_therapy",
+        "modality": "in_person",
+        "evidence_type": "attendance_record",
+        "disposition": "attended_full",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": "10:00",
+        "patient_departure": "11:30",
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "2026-01-12 | HG-E105   | 10:00\u201311:30    | 10:00           | 11:30            | Attended full",
+          "Rowan checked in before the group began and remained until the group was released."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [],
+    "plan_requirements": []
+  }
+}

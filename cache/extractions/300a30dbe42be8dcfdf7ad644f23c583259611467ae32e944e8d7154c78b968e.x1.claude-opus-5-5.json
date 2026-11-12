@@ -1,0 +1,130 @@
+{
+  "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
+  "filename": "symptom_measure_review_jan16.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 14896,
+    "input_tokens": 7919,
+    "output_tokens": 1802,
+    "cost_usd": 0.046203600000000004,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D013",
+      "title": "PHQ-9 portal submission measurement review",
+      "signed": true,
+      "signed_at": "2026-01-16T09:10",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-05",
+          "quote": "The submitted score is lower than the intake score of 18 recorded on January 5."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": null,
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-16",
+        "service_type": "administrative",
+        "modality": "portal",
+        "evidence_type": "clinical_note",
+        "disposition": "unknown",
+        "patient_present": "no",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [
+          "Mara Voss, LCSW"
+        ],
+        "quotes": [
+          "Reviewed by Mara Voss, LCSW, 2026-01-16, 09:10 local",
+          "This entry records review of the portal submission; no clinical appointment occurred at the time of review."
+        ]
+      }
+    ],
+    "assessments": [
+      {
+        "instrument": "PHQ-9",
+        "total_score": 14.0,
+        "item_scores": [],
+        "completed_date": "2026-01-16",
+        "completed_time": "08:17",
+        "form_id": "HG-Q116",
+        "is_copy_of_earlier": false,
+        "quote": "Completed by patient: 2026-01-16, 08:17 local"
+      }
+    ],
+    "observations": [
+      {
+        "date": "2026-01-16",
+        "domain": "mood",
+        "source": "measurement",
+        "statement": "PHQ-9 total score was 14, lower than the intake score of 18.",
+        "quote": "The submitted score is lower than the intake score of 18 recorded on January 5."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient reported that leaving the apartment had become a little easier.",
+        "quote": "Rowan wrote that getting out of the apartment had become a little easier"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient reported that thinking about work still made them want to procrastinate.",
+        "quote": "thinking about work continued to make them want to put things off"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Patient described sleep as inconsistent.",
+        "quote": "Rowan also described sleep as inconsistent."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "overall_progress",
+        "source": "clinician_assessment",
+        "statement": "Clinician judged that the score and recent sessions suggest some improvement in depressive symptoms.",
+        "quote": "Clinician review: the score and recent individual-session material suggest some improvement in depressive symptoms."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "avoidance",
+        "source": "clinician_assessment",
+        "statement": "Clinician noted persistent avoidance, difficulty initiating work communication, and sleep disruption remain clinically relevant.",
+        "quote": "Persistent avoidance, difficulty initiating work communication, and sleep disruption remain clinically relevant."
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "engagement",
+        "source": "clinician_assessment",
+        "statement": "Patient has attempted small activities and communication practice but has not established a reliable routine.",
+        "quote": "Rowan has attempted small activities and communication practice but has not yet established a reliable routine."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

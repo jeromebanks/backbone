@@ -1,0 +1,113 @@
+{
+  "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
+  "filename": "individual_therapy_jan14.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 10015,
+    "input_tokens": 8061,
+    "output_tokens": 1206,
+    "cost_usd": 0.0354196,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D011",
+      "title": "Individual psychotherapy note, encounter HG-E107, 2026-01-14",
+      "signed": true,
+      "signed_at": "2026-01-14T13:16",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E107",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-14",
+        "service_type": "individual_therapy",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended_full",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "11:00",
+            "end": "11:45"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 45,
+        "clinicians": [
+          "Mara Voss, LCSW"
+        ],
+        "quotes": [
+          "Encounter HG-E107 | Date 2026-01-14",
+          "Patient-present session 11:00\u201311:45 local; completed, 45 minutes"
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-14",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient reported completing several small activities, including opening a work message and taking two short walks.",
+        "quote": "Rowan reported completing several small activities since the prior individual appointment, including opening a work message and taking two short walks."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Patient has not replied to the work message and continues to imagine being asked questions they cannot answer.",
+        "quote": "They have not yet replied to the message and continue to imagine being asked questions they cannot answer."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "engagement",
+        "source": "patient_report",
+        "statement": "Patient described the family appointment as helpful because the planned check-in reduced repeated reminders.",
+        "quote": "Rowan described the family appointment as helpful because the planned check-in with Casey reduced repeated reminders."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Sleep remains interrupted and starting the morning requires effort.",
+        "quote": "Sleep remains interrupted, and getting started in the morning continues to require effort."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "anxiety",
+        "source": "clinician_observation",
+        "statement": "Patient noticed physical tension during rehearsal but was able to stay with the task.",
+        "quote": "Rowan noticed physical tension during the rehearsal but was able to remain with the task."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "A missed appointment from the prior week was explored; patient identified preparing appointment information the evening before as helpful.",
+        "quote": "Rowan identified setting out appointment information the evening before as a helpful preparation step."
+      },
+      {
+        "date": "2026-01-14",
+        "domain": "mood",
+        "source": "clinician_observation",
+        "statement": "Affect was more varied than at intake, though worry was evident when discussing employment.",
+        "quote": "Affect was more varied than at intake, although worry was evident when discussing employment."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

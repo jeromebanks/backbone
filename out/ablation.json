@@ -1,0 +1,274 @@
+{
+  "this system": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "UNDETERMINED",
+      "minutes": [
+        145,
+        155
+      ],
+      "days": 3
+    }
+  },
+  "scheduled group duration (ignore breaks, late arrival, early departure)": {
+    "2026-01-05": {
+      "status": "MET",
+      "minutes": [
+        185,
+        185
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        135,
+        135
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        255,
+        255
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "MET",
+      "minutes": [
+        160,
+        170
+      ],
+      "days": 3
+    }
+  },
+  "latest-received document wins (E110 departure 11:30 from the Jan 26 resend)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        195,
+        195
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "UNDETERMINED",
+      "minutes": [
+        145,
+        155
+      ],
+      "days": 3
+    }
+  },
+  "draft note / posted charge counts as attendance (E116)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "MET",
+      "minutes": [
+        220,
+        230
+      ],
+      "days": 4
+    }
+  },
+  "pick the primary note for disputed E115 (50 min)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "MET",
+      "minutes": [
+        155,
+        155
+      ],
+      "days": 3
+    }
+  },
+  "pick the later-signed note for disputed E115 (40 min)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "NOT_MET",
+      "minutes": [
+        145,
+        145
+      ],
+      "days": 3
+    }
+  },
+  "stated session length for E119 (45 min, incl. partner-only part)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "NOT_MET",
+      "minutes": [
+        120,
+        120
+      ],
+      "days": 2
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "MET",
+      "minutes": [
+        160,
+        170
+      ],
+      "days": 3
+    }
+  },
+  "partner-only collateral counts as family therapy (E109, 40 min)": {
+    "2026-01-05": {
+      "status": "NOT_MET",
+      "minutes": [
+        140,
+        140
+      ],
+      "days": 3
+    },
+    "2026-01-12": {
+      "status": "MET",
+      "minutes": [
+        160,
+        160
+      ],
+      "days": 3
+    },
+    "2026-01-19": {
+      "status": "MET",
+      "minutes": [
+        180,
+        180
+      ],
+      "days": 3
+    },
+    "2026-01-26": {
+      "status": "UNDETERMINED",
+      "minutes": [
+        145,
+        155
+      ],
+      "days": 3
+    }
+  }
+}

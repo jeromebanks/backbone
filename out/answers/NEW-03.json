@@ -1,0 +1,1544 @@
+{
+  "id": "NEW-03",
+  "question": "How did the types and amount of therapy Rowan received change before versus after January 19, 2026?",
+  "plan": {
+    "question": "How did the types and amount of therapy Rowan received change before versus after January 19, 2026?",
+    "steps": [
+      {
+        "op": "compare",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-05",
+          "end": "2026-01-30",
+          "service_types": null,
+          "include_excluded": false,
+          "include_evidence": true
+        },
+        "split": "2026-01-19"
+      }
+    ],
+    "unsupported_reason": null
+  },
+  "plan_explain": "QueryPlan: How did the types and amount of therapy Rowan received change before versus after January 19, 2026?\n  1. compare(patients=['HG-M042'], 2026-01-05..2026-01-30, split=2026-01-19)",
+  "results": {
+    "question": "How did the types and amount of therapy Rowan received change before versus after January 19, 2026?",
+    "plan": {
+      "question": "How did the types and amount of therapy Rowan received change before versus after January 19, 2026?",
+      "steps": [
+        {
+          "op": "compare",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": false,
+            "include_evidence": true
+          },
+          "split": "2026-01-19"
+        }
+      ],
+      "unsupported_reason": null
+    },
+    "results": [
+      {
+        "op": "compare",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": false,
+            "include_evidence": true
+          },
+          "split": "2026-01-19"
+        },
+        "totals": {},
+        "groups": [
+          {
+            "patient": "HG-M042",
+            "side": "before",
+            "period": "2026-01-05..2026-01-18",
+            "weeks": 2.0,
+            "sessions": {
+              "low": 5,
+              "high": 5,
+              "status": "established"
+            },
+            "therapy_days": {
+              "low": 5,
+              "high": 5,
+              "status": "established"
+            },
+            "minutes": {
+              "low": 260,
+              "high": 260,
+              "status": "established"
+            },
+            "hours": {
+              "low": 4.33,
+              "high": 4.33,
+              "status": "established"
+            },
+            "uncertain_encounters": [],
+            "minutes_per_week": {
+              "low": 130.0,
+              "high": 130.0
+            },
+            "by_service_type": {
+              "family_therapy": {
+                "sessions": {
+                  "low": 1,
+                  "high": 1,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 45,
+                  "high": 45,
+                  "status": "established"
+                }
+              },
+              "group_therapy": {
+                "sessions": {
+                  "low": 2,
+                  "high": 2,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 120,
+                  "high": 120,
+                  "status": "established"
+                }
+              },
+              "individual_therapy": {
+                "sessions": {
+                  "low": 2,
+                  "high": 2,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 95,
+                  "high": 95,
+                  "status": "established"
+                }
+              }
+            },
+            "encounters": [
+              "HG-E101",
+              "HG-E102",
+              "HG-E104",
+              "HG-E105",
+              "HG-E107"
+            ],
+            "minutes_calculation": "50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104) + 75 (HG-E105) + 45 (HG-E107)"
+          },
+          {
+            "patient": "HG-M042",
+            "side": "after",
+            "period": "2026-01-19..2026-01-30",
+            "weeks": 1.71,
+            "sessions": {
+              "low": 7,
+              "high": 7,
+              "status": "established"
+            },
+            "therapy_days": {
+              "low": 6,
+              "high": 6,
+              "status": "established"
+            },
+            "minutes": {
+              "low": 325,
+              "high": 335,
+              "status": "bounded"
+            },
+            "hours": {
+              "low": 5.42,
+              "high": 5.58,
+              "status": "bounded"
+            },
+            "uncertain_encounters": [
+              "HG-M042|HG-E115"
+            ],
+            "minutes_per_week": {
+              "low": 189.6,
+              "high": 195.4
+            },
+            "by_service_type": {
+              "family_therapy": {
+                "sessions": {
+                  "low": 1,
+                  "high": 1,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 30,
+                  "high": 30,
+                  "status": "established"
+                }
+              },
+              "group_therapy": {
+                "sessions": {
+                  "low": 3,
+                  "high": 3,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 180,
+                  "high": 180,
+                  "status": "established"
+                }
+              },
+              "individual_therapy": {
+                "sessions": {
+                  "low": 3,
+                  "high": 3,
+                  "status": "established"
+                },
+                "minutes": {
+                  "low": 115,
+                  "high": 125,
+                  "status": "bounded"
+                }
+              }
+            },
+            "encounters": [
+              "HG-E110",
+              "HG-E111",
+              "HG-E112",
+              "HG-E113",
+              "HG-E115",
+              "HG-E118",
+              "HG-E119"
+            ],
+            "minutes_calculation": "60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113) + [40\u201350] (HG-E115) + 75 (HG-E118) + 30 (HG-E119)"
+          }
+        ],
+        "facts": [
+          {
+            "encounter": "HG-E101",
+            "patient": "HG-M042",
+            "date": "2026-01-05",
+            "week_start": "2026-01-05",
+            "service_type": "individual_therapy",
+            "modality": "in_person",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 50.0,
+              "high": 50.0,
+              "status": "established"
+            },
+            "calculation": "09:00\u201309:50 (stated contact intervals; BH-D002) = 50 min",
+            "records": [
+              "BH-D002",
+              "BH-D006"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E102",
+            "patient": "HG-M042",
+            "date": "2026-01-06",
+            "week_start": "2026-01-05",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min",
+            "records": [
+              "BH-D004",
+              "BH-D005",
+              "BH-D006"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E104",
+            "patient": "HG-M042",
+            "date": "2026-01-09",
+            "week_start": "2026-01-05",
+            "service_type": "family_therapy",
+            "modality": "unknown",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "14:00\u201314:45 (stated contact intervals; BH-D007, BH-D008) = 45 min",
+            "records": [
+              "BH-D006",
+              "BH-D007",
+              "BH-D008",
+              "BH-D015"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E105",
+            "patient": "HG-M042",
+            "date": "2026-01-12",
+            "week_start": "2026-01-12",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 75.0,
+              "high": 75.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min",
+            "records": [
+              "BH-D005",
+              "BH-D006",
+              "BH-D009"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E107",
+            "patient": "HG-M042",
+            "date": "2026-01-14",
+            "week_start": "2026-01-12",
+            "service_type": "individual_therapy",
+            "modality": "unknown",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "11:00\u201311:45 (stated contact intervals; BH-D011) = 45 min",
+            "records": [
+              "BH-D006",
+              "BH-D011"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E110",
+            "patient": "HG-M042",
+            "date": "2026-01-19",
+            "week_start": "2026-01-19",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 60.0,
+              "high": 60.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
+            "records": [
+              "BH-D101",
+              "BH-D102",
+              "BH-D103",
+              "BH-D104"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E111",
+            "patient": "HG-M042",
+            "date": "2026-01-19",
+            "week_start": "2026-01-19",
+            "service_type": "individual_therapy",
+            "modality": "in_person",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 30.0,
+              "high": 30.0,
+              "status": "established"
+            },
+            "calculation": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min",
+            "records": [
+              "BH-D103",
+              "BH-D105"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E112",
+            "patient": "HG-M042",
+            "date": "2026-01-21",
+            "week_start": "2026-01-19",
+            "service_type": "individual_therapy",
+            "modality": "video",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "13:00\u201313:20 + 13:30\u201313:55 (stated contact intervals; BH-D106) = 45 min",
+            "records": [
+              "BH-D106"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E113",
+            "patient": "HG-M042",
+            "date": "2026-01-22",
+            "week_start": "2026-01-19",
+            "service_type": "group_therapy",
+            "modality": "unknown",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min",
+            "records": [
+              "BH-D107",
+              "BH-D108"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E115",
+            "patient": "HG-M042",
+            "date": "2026-01-26",
+            "week_start": "2026-01-26",
+            "service_type": "individual_therapy",
+            "modality": "in_person",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 40.0,
+              "high": 50.0,
+              "status": "disputed"
+            },
+            "calculation": "09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min",
+            "records": [
+              "BH-D110",
+              "BH-D111"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E118",
+            "patient": "HG-M042",
+            "date": "2026-01-29",
+            "week_start": "2026-01-26",
+            "service_type": "group_therapy",
+            "modality": "unknown",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 75.0,
+              "high": 75.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min",
+            "records": [
+              "BH-D107",
+              "BH-D108"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E119",
+            "patient": "HG-M042",
+            "date": "2026-01-30",
+            "week_start": "2026-01-26",
+            "service_type": "family_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 30.0,
+              "high": 30.0,
+              "status": "established"
+            },
+            "calculation": "13:15\u201313:45 (stated contact intervals; BH-D113) = 30 min",
+            "records": [
+              "BH-D113"
+            ],
+            "flags": [
+              "BH-D113 states 45 min; patient-present computation gives 30 min"
+            ]
+          }
+        ],
+        "calculation": [],
+        "exclusions": [
+          {
+            "encounter": "HG-E103",
+            "date": "2026-01-08",
+            "service_type": "individual_therapy",
+            "reason": "not attended (no_show)"
+          },
+          {
+            "encounter": "U-2026-01-08-outreach_call-1",
+            "date": "2026-01-08",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E106",
+            "date": "2026-01-13",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)"
+          },
+          {
+            "encounter": "HG-E108",
+            "date": "2026-01-15",
+            "service_type": "group_therapy",
+            "reason": "not attended (clinic_cancelled)"
+          },
+          {
+            "encounter": "U-2026-01-15-administrative-1",
+            "date": "2026-01-15",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)"
+          },
+          {
+            "encounter": "U-2026-01-15-outreach_call-1",
+            "date": "2026-01-15",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E109",
+            "date": "2026-01-16",
+            "service_type": "family_collateral",
+            "reason": "not a psychotherapy service (family_collateral)"
+          },
+          {
+            "encounter": "U-2026-01-16-administrative-1",
+            "date": "2026-01-16",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)"
+          },
+          {
+            "encounter": "U-2026-01-16-other-1",
+            "date": "2026-01-16",
+            "service_type": "other",
+            "reason": "not a psychotherapy service (other)"
+          },
+          {
+            "encounter": "HG-E114",
+            "date": "2026-01-23",
+            "service_type": "care_coordination",
+            "reason": "not a psychotherapy service (care_coordination)"
+          },
+          {
+            "encounter": "HG-E116",
+            "date": "2026-01-27",
+            "service_type": "group_therapy",
+            "reason": "not attended (no_show)"
+          },
+          {
+            "encounter": "U-2026-01-27-outreach_call-1",
+            "date": "2026-01-27",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E117",
+            "date": "2026-01-28",
+            "service_type": "individual_therapy",
+            "reason": "not attended (patient_cancelled)"
+          },
+          {
+            "encounter": "HG-E120",
+            "date": "2026-01-30",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)"
+          }
+        ],
+        "conflicts": [
+          {
+            "subject": "HG-E115",
+            "field": "patient_present_interval",
+            "resolution": "disputed",
+            "candidates": [
+              {
+                "value": "09:00\u201309:50",
+                "minutes": 50,
+                "claim_ids": [
+                  "4b64c46a13b8:service_event:0"
+                ],
+                "documents": [
+                  "BH-D110"
+                ]
+              },
+              {
+                "value": "09:10\u201309:50",
+                "minutes": 40,
+                "claim_ids": [
+                  "d03451942797:service_event:0"
+                ],
+                "documents": [
+                  "BH-D111"
+                ]
+              }
+            ]
+          }
+        ],
+        "decisions": [
+          {
+            "subject": "HG-E101",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D002 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E102",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D004 (clinical_note: attended), BH-D005 (attendance_record: attended_partial)"
+          },
+          {
+            "subject": "HG-E104",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D007 (clinical_note: attended_full), BH-D008 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E105",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D005 (attendance_record: attended_full), BH-D009 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E107",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D011 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D105 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E112",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D106 (clinical_note: attended), BH-D106 (platform_log: unknown)"
+          },
+          {
+            "subject": "HG-E113",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E115",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D110 (clinical_note: attended), BH-D111 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E115",
+            "rule": "R4",
+            "outcome": "minutes_disputed",
+            "reason": "tier-1 records give different patient-contact intervals and none corrects the other: 09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min; carried as bounds [40, 50]"
+          },
+          {
+            "subject": "HG-E118",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E119",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D113 (clinical_note: attended_partial)"
+          }
+        ],
+        "evidence": [
+          {
+            "claim_id": "7f5f7d4bbfc9:service_event:0",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Encounter HG-E101 | Service date 2026-01-05"
+              },
+              {
+                "lines": "8",
+                "quote": "Patient-present individual therapy: 09:00\u201309:50 local; completed, 50 minutes."
+              },
+              {
+                "lines": "13",
+                "quote": "Rowan arrived independently and participated throughout the appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:service_event:0",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "Service date 2026-01-06 | Group scheduled 10:00\u201311:30 local"
+              },
+              {
+                "lines": "12",
+                "quote": "The whole group took a break from 10:45 to 11:00."
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan was quiet initially and responded when invited to identify a situation involving avoidance."
+              },
+              {
+                "lines": "12",
+                "quote": "The whole group took a break from 10:45 to 11:00. No therapy was conducted during that interval."
+              }
+            ]
+          },
+          {
+            "claim_id": "6f205f89f8d3:service_event:0",
+            "doc_id": "BH-D005",
+            "file": "early_group_attendance_roster.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "2026-01-06 | HG-E102   | 10:00\u201311:30    | 10:15           | 11:15            | Attended part"
+              },
+              {
+                "lines": "13",
+                "quote": "Rowan advised the facilitator that they would need to leave early for a previously arranged ride."
+              },
+              {
+                "lines": "13",
+                "quote": "Rowan did not re-enter the group room after departing."
+              }
+            ]
+          },
+          {
+            "claim_id": "6f205f89f8d3:service_event:1",
+            "doc_id": "BH-D005",
+            "file": "early_group_attendance_roster.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "2026-01-12 | HG-E105   | 10:00\u201311:30    | 10:00           | 11:30            | Attended full"
+              },
+              {
+                "lines": "15",
+                "quote": "Rowan checked in before the group began and remained until the group was released."
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:0",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "HG-E101   | Jan05 | Individual therapy     | 09:00\u201309:50    | Completed"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:1",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "HG-E102   | Jan06 | Coping skills group    | 10:00\u201311:30    | Attended part"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:3",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "HG-E104   | Jan09 | Family therapy         | 14:00\u201314:45    | Completed"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:4",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "HG-E105   | Jan12 | Coping skills group    | 10:00\u201311:30    | Completed"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:6",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "HG-E107   | Jan14 | Individual therapy     | 11:00\u201311:45    | Completed"
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:service_event:0",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Encounter HG-E104 | 2026-01-09, 14:00\u201314:45 local"
+              },
+              {
+                "lines": "7",
+                "quote": "Present: Rowan and partner, Casey Mercer"
+              },
+              {
+                "lines": "9",
+                "quote": "Patient-present family therapy duration: 45 minutes"
+              },
+              {
+                "lines": "16",
+                "quote": "Rowan remained present and engaged throughout the visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:service_event:0",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Encounter HG-E104 | Date 2026-01-09 | 14:00\u201314:45 local"
+              },
+              {
+                "lines": "8",
+                "quote": "Participants: Rowan Mercer and Casey Mercer; both present for the full 45 minutes"
+              },
+              {
+                "lines": "7",
+                "quote": "Author: Leena Park, LPC, cofacilitator with Mara Voss, LCSW"
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:service_event:0",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Service date 2026-01-12 | Scheduled group 10:00\u201311:30 local"
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan contributed an example about leaving work messages unopened."
+              },
+              {
+                "lines": "12",
+                "quote": "Group break: 10:40\u201310:55; no therapeutic activity occurred during the break."
+              },
+              {
+                "lines": "12",
+                "quote": "Group break: 10:40\u201310:55; no therapeutic activity occurred during the break."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:service_event:0",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Encounter HG-E107 | Date 2026-01-14"
+              },
+              {
+                "lines": "7",
+                "quote": "Patient-present session 11:00\u201311:45 local; completed, 45 minutes"
+              }
+            ]
+          },
+          {
+            "claim_id": "4521a120a4d7:service_event:3",
+            "doc_id": "BH-D015",
+            "file": "missed_visit_outreach_jan08.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "The next scheduled appointment remained the family visit on January 9."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:service_event:0",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Skills group clinical record | Service date: January 19, 2026"
+              },
+              {
+                "lines": "6",
+                "quote": "Scheduled group: 10:00\u201311:30. Nontherapeutic break: 10:45\u201311:00."
+              },
+              {
+                "lines": "10",
+                "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+              },
+              {
+                "lines": "10",
+                "quote": "Patient-specific arrival and departure are maintained on the attendance roster."
+              },
+              {
+                "lines": "6",
+                "quote": "Nontherapeutic break: 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:service_event:0",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "4",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "9",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "12",
+                "quote": "Arrival and departure fields were entered at roster close."
+              }
+            ]
+          },
+          {
+            "claim_id": "674440968b5d:service_event:0",
+            "doc_id": "BH-D103",
+            "file": "BH-D103_attendance_correction_2026-01-20.txt",
+            "record_type": "attendance_correction",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "Applies to group encounter HG-E110, service date January 19, 2026"
+              },
+              {
+                "lines": "7",
+                "quote": "Correction: Patient departure for HG-E110 is 11:15, replacing the original roster value of 11:30. Patient arrival remains 10:00."
+              },
+              {
+                "lines": "9",
+                "quote": "The group continued for other members until its scheduled close."
+              }
+            ]
+          },
+          {
+            "claim_id": "674440968b5d:service_event:1",
+            "doc_id": "BH-D103",
+            "file": "BH-D103_attendance_correction_2026-01-20.txt",
+            "record_type": "other",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The room-transfer record shows Rowan leaving skills room B at 11:15 and being received by the individual clinician at 11:15."
+              },
+              {
+                "lines": "11",
+                "quote": "It does not change the group service date, scheduled opening or closing, the break recorded in the group clinical note, or the separate individual appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "f3f25065559f:service_event:0",
+            "doc_id": "BH-D104",
+            "file": "BH-D104_resent_roster_received_2026-01-26.txt",
+            "record_type": "retransmitted_copy",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "13",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "14",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "20",
+                "quote": "The received copy contains no new clinician signature and records no additional visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:service_event:0",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Individual psychotherapy | Encounter HG-E111"
+              },
+              {
+                "lines": "5",
+                "quote": "January 19, 2026 | In person"
+              },
+              {
+                "lines": "6",
+                "quote": "Patient contact: 11:15\u201311:45 | Completed: 30 minutes"
+              },
+              {
+                "lines": "11",
+                "quote": "Rowan participated throughout the individual contact and reported that the immediate intensity of anxiety eased enough to discuss a next step."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:service_event:0",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "January 21, 2026 | Video | Clinician: Mira Patel, LCSW"
+              },
+              {
+                "lines": "7",
+                "quote": "Patient contact occurred 13:00\u201313:20 and 13:30\u201313:55."
+              },
+              {
+                "lines": "7",
+                "quote": "Total patient psychotherapy contact: 45 minutes."
+              },
+              {
+                "lines": "7",
+                "quote": "The reconnection continued the same clinical encounter under original appointment HG-A112."
+              },
+              {
+                "lines": "7",
+                "quote": "Connection was lost from 13:20\u201313:30; there was no therapeutic contact during that interval."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:service_event:1",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "platform_log",
+            "passages": [
+              {
+                "lines": "17",
+                "quote": "HG-A112 | VC-112A | January 21 13:00 | January 21 13:20"
+              },
+              {
+                "lines": "18",
+                "quote": "HG-A112 | VC-112B | January 21 13:30 | January 21 13:55"
+              },
+              {
+                "lines": "19",
+                "quote": "Second call reason: Rejoin original appointment after network disconnect."
+              },
+              {
+                "lines": "20",
+                "quote": "Exported January 21, 2026, 14:06; all times local."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:service_event:0",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "7",
+                "quote": "January 22, 2026 | Encounter HG-E113"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled group 10:00\u201311:30. Nontherapeutic break 10:45\u201311:00."
+              },
+              {
+                "lines": "9",
+                "quote": "Rowan joined the discussion after it had begun; the arrival field is maintained in the attendance register."
+              },
+              {
+                "lines": "9",
+                "quote": "The patient contributed an example to the discussion after the break."
+              },
+              {
+                "lines": "8",
+                "quote": "Nontherapeutic break 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:service_event:1",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "January 29, 2026 | Encounter HG-E118"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled group 10:00\u201311:30. Nontherapeutic break 10:45\u201311:00."
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan participated in the paired rehearsal and accepted feedback about keeping the request brief."
+              },
+              {
+                "lines": "8",
+                "quote": "Nontherapeutic break 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:service_event:0",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "January 22 | HG-E113 | Skills group | 10:00\u201311:30 | 10:30 | 11:30 | Attended, late arrival"
+              },
+              {
+                "lines": "14",
+                "quote": "January 22 attendance attestation: Rowan arrived at 10:30 and remained until the group closed."
+              },
+              {
+                "lines": "14",
+                "quote": "Signed: Leah Chen, LCSW, January 22, 12:09."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:service_event:4",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "January 29 | HG-E118 | Skills group | 10:00\u201311:30 | 10:00 | 11:30 | Attended"
+              },
+              {
+                "lines": "20",
+                "quote": "January 29 attendance attestation: Rowan was present from opening through closing."
+              },
+              {
+                "lines": "20",
+                "quote": "Signed: Leah Chen, LCSW, January 29, 12:15."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:service_event:0",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Individual psychotherapy | Encounter HG-E115 | Appointment HG-A115"
+              },
+              {
+                "lines": "5",
+                "quote": "January 26, 2026 | In person"
+              },
+              {
+                "lines": "7",
+                "quote": "Actual patient psychotherapy contact: 09:00\u201309:50, 50 minutes."
+              },
+              {
+                "lines": "6",
+                "quote": "Clinicians: Mira Patel, LCSW; Nora Ellis, LCSW"
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:service_event:0",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "4",
+                "quote": "Encounter HG-E115 | Appointment HG-A115 | Service date January 26, 2026"
+              },
+              {
+                "lines": "7",
+                "quote": "Actual patient psychotherapy contact: 09:10\u201309:50, 40 minutes."
+              },
+              {
+                "lines": "10",
+                "quote": "Rowan entered the treatment room at 09:10, when we began the session."
+              },
+              {
+                "lines": "14",
+                "quote": "The session concluded with Rowan at 09:50."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:service_event:0",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "January 30, 2026 | In person | Clinician: Mira Patel, LCSW"
+              },
+              {
+                "lines": "6",
+                "quote": "Therapist session interval: 13:00\u201313:45, 45 minutes."
+              },
+              {
+                "lines": "7",
+                "quote": "Partner only: 13:00\u201313:15. Rowan present with partner: 13:15\u201313:45, 30 minutes."
+              },
+              {
+                "lines": "11",
+                "quote": "Rowan joined at 13:15 and participated through the end of the session."
+              },
+              {
+                "lines": "7",
+                "quote": "Partner only: 13:00\u201313:15."
+              }
+            ]
+          }
+        ],
+        "notes": [],
+        "sql": [
+          {
+            "sql": "SELECT mrn, name, dob FROM patients WHERE mrn IN (?) ORDER BY mrn",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-18",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-19",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:0",
+              "7f5f7d4bbfc9:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "0bf056f3769e:service_event:1",
+              "5edddc6b2093:service_event:0",
+              "6f205f89f8d3:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "params": [
+              "0bf056f3769e:service_event:3",
+              "4521a120a4d7:service_event:3",
+              "924dee06b05c:service_event:0",
+              "ad416fbda806:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "0bf056f3769e:service_event:4",
+              "6f205f89f8d3:service_event:1",
+              "d30d18d0335d:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:6",
+              "8c2fbaf5bb45:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "514ca20809f6:service_event:0",
+              "674440968b5d:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "674440968b5d:service_event:1",
+              "91fd8e8b1b31:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "09c946a2248a:service_event:0",
+              "09c946a2248a:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:0",
+              "c5953bcb242e:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "4b64c46a13b8:service_event:0",
+              "d03451942797:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:4",
+              "c5953bcb242e:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
+            "params": [
+              "HG-M042|HG-E101",
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E104",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E107",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111",
+              "HG-M042|HG-E112",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E115",
+              "HG-M042|HG-E118",
+              "HG-M042|HG-E119"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?) AND rule IN (?,?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|HG-E101",
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E104",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E107",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111",
+              "HG-M042|HG-E112",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E115",
+              "HG-M042|HG-E118",
+              "HG-M042|HG-E119",
+              "R2",
+              "R3",
+              "R4"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "09c946a2248a:service_event:0",
+              "09c946a2248a:service_event:1",
+              "0bf056f3769e:service_event:0",
+              "0bf056f3769e:service_event:1",
+              "0bf056f3769e:service_event:3",
+              "0bf056f3769e:service_event:4",
+              "0bf056f3769e:service_event:6",
+              "36764827bcb3:service_event:0",
+              "4521a120a4d7:service_event:3",
+              "4b64c46a13b8:service_event:0",
+              "514ca20809f6:service_event:0",
+              "5edddc6b2093:service_event:0",
+              "674440968b5d:service_event:0",
+              "674440968b5d:service_event:1",
+              "6f205f89f8d3:service_event:0",
+              "6f205f89f8d3:service_event:1",
+              "7f5f7d4bbfc9:service_event:0",
+              "805b2c69c7fa:service_event:0",
+              "805b2c69c7fa:service_event:4",
+              "8c2fbaf5bb45:service_event:0",
+              "91fd8e8b1b31:service_event:0",
+              "924dee06b05c:service_event:0",
+              "ad416fbda806:service_event:0",
+              "c5953bcb242e:service_event:0",
+              "c5953bcb242e:service_event:1",
+              "d03451942797:service_event:0",
+              "d30d18d0335d:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answer_markdown": "# Rowan's therapy before vs. after January 19, 2026\n\nRowan received the same three therapy types in both periods: individual, group and family therapy. After January 19 there were more sessions and more patient-present minutes, both in total and per week. The \"after\" period is shorter (1.71 weeks, versus 2.0 weeks before), so the per-week figures are the fairer comparison.\n\n| | Before (Jan 5\u201318, 2.0 wk) | After (Jan 19\u201330, 1.71 wk) |\n|---|---|---|\n| Sessions | 5 | 7 |\n| Therapy days | 5 | 6 |\n| Patient-present minutes | 260 (4.33 h) | 325\u2013335 (5.42\u20135.58 h) |\n| Minutes per week | 130.0 | 189.6\u2013195.4 |\n| Individual | 2 sessions / 95 min | 3 sessions / 115\u2013125 min |\n| Group | 2 sessions / 120 min | 3 sessions / 180 min |\n| Family | 1 session / 45 min | 1 session / 30 min |\n\n**Before (encounters HG-E101, E102, E104, E105, E107)**\n- **Individual:** 50 min on Jan 5 (BH-D002 L8) and 45 min on Jan 14 (BH-D011 L7).\n- **Group:** 45 min on Jan 6. Rowan arrived at 10:15 and left at 11:15, and the 10:45\u201311:00 break is not counted (BH-D005 L10; BH-D004 L12). The second group was 75 min on Jan 12 (BH-D005 L11; break per BH-D009 L12).\n- **Family:** 45 min with partner Casey Mercer on Jan 9 (BH-D007 L7, L9; BH-D008 L8).\n\n**After (encounters HG-E110, E111, E112, E113, E115, E118, E119)**\n- **Group:**\n  - 60 min on Jan 19. The departure time was corrected from 11:30 to 11:15 (BH-D103 L7).\n  - 45 min on Jan 22, after a late arrival at 10:30 (BH-D108 L9).\n  - 75 min on Jan 29 (BH-D108 L12; BH-D107 L8).\n- **Individual:**\n  - 30 min in person on Jan 19 (BH-D105 L6).\n  - 45 min by video on Jan 21, with a 13:20\u201313:30 disconnection not counted (BH-D106 L7). This is the only video session in the window.\n  - 40\u201350 min on Jan 26 (see below).\n- **Family:** 30 min on Jan 30 (BH-D113 L7).\n\n## What the record does not settle\n- **Jan 26 individual session (HG-E115):** two clinical notes disagree. One gives 09:00\u201309:50, 50 min (BH-D110 L7). The other gives 09:10\u201309:50, 40 min, and says Rowan entered at 09:10 (BH-D111 L7, L10). Neither corrects the other, so the minutes are carried as the range 40\u201350. This is the only source of the ranges in the \"after\" figures.\n- **Jan 30 family session (HG-E119):** the note gives a 45-minute therapist session interval (BH-D113 L6). However, only the partner was present from 13:00 to 13:15, and Rowan was present for 30 min (BH-D113 L7, L11). Only the 30 minutes are counted.\n- **Modality:** not stated for some sessions (HG-E104, E107, E113, E118).\n- **Interpretation:** the records show more sessions and more minutes per week after January 19. They do not explain why, and these figures say nothing about clinical outcomes.\n\n## Excluded or merged records\n- **Retransmitted copy:** BH-D104 is a copy of the Jan 19 roster. It still showed the old 11:30 departure and was not treated as independent evidence (BH-D104 L14, L20).\n- **Scheduled but not attended:**\n  - Before: a no-show for individual therapy on Jan 8 (HG-E103) and a clinic-cancelled group on Jan 15 (HG-E108).\n  - After: a no-show for group therapy on Jan 27 (HG-E116) and a patient-cancelled individual session on Jan 28 (HG-E117).\n- **Not psychotherapy:**\n  - Medication management (HG-E106, HG-E120)\n  - A family collateral contact (HG-E109)\n  - Care coordination (HG-E114)\n  - Outreach calls on Jan 8, Jan 15 and Jan 27\n  - Administrative and other contacts on Jan 15\u201316",
+  "unresolved": [
+    "HG-E115 (Jan 26 individual) patient-present minutes disputed: 50 min per BH-D110 vs 40 min per BH-D111; carried as 40\u201350."
+  ],
+  "caveats": [
+    "Periods differ in length (2.0 vs 1.71 weeks); per-week figures are the fairer comparison.",
+    "Modality not documented for HG-E104, E107, E113, E118.",
+    "HG-E119 note states a 45-min session interval, but only Rowan's 30 patient-present minutes are counted.",
+    "Analysis window limited to 2026-01-05 through 2026-01-30."
+  ],
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 2485,
+    "execute": 2.78,
+    "narrate_llm": 30945,
+    "total": 33433
+  },
+  "llm": {
+    "calls": 2,
+    "input_tokens": 20255,
+    "output_tokens": 4217,
+    "cost_usd": 0.09367899999999998
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T12:00:23"
+}

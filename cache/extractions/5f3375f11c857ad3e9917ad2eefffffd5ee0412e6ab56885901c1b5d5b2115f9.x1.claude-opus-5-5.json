@@ -1,0 +1,138 @@
+{
+  "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
+  "filename": "group_cancellation_notice_jan15.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 15390,
+    "input_tokens": 7905,
+    "output_tokens": 1837,
+    "cost_usd": 0.0467916,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D016",
+      "title": "Clinic cancellation notice for coping skills group (HG-E108) on 2026-01-15",
+      "signed": false,
+      "signed_at": null,
+      "received_at": "2026-01-15T08:12",
+      "finality": "unknown",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": "HG-E108",
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-15",
+          "quote": "Related encounter: HG-E108"
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E108",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-15",
+        "service_type": "group_therapy",
+        "modality": "in_person",
+        "evidence_type": "administrative_notice",
+        "disposition": "clinic_cancelled",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "The coping skills group scheduled for January 15 from 10:00 to 11:30 is cancelled by the clinic because of staff illness.",
+          "No group was held and no participants were seen for HG-E108.",
+          "No replacement group was conducted in the January 15 slot."
+        ]
+      },
+      {
+        "encounter_id": null,
+        "related_encounter_id": "HG-E108",
+        "appointment_id": null,
+        "service_date": "2026-01-15",
+        "service_type": "administrative",
+        "modality": "portal",
+        "evidence_type": "administrative_notice",
+        "disposition": "unknown",
+        "patient_present": "unknown",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [
+          "N. Ellis"
+        ],
+        "quotes": [
+          "08:15: Portal notice delivered to Rowan's account.",
+          "The notice states that the office initiated the cancellation and that the participant should not come to the group room this morning."
+        ]
+      },
+      {
+        "encounter_id": null,
+        "related_encounter_id": "HG-E108",
+        "appointment_id": null,
+        "service_date": "2026-01-15",
+        "service_type": "outreach_call",
+        "modality": "phone",
+        "evidence_type": "administrative_notice",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "08:37: Rowan called the desk and acknowledged receiving the notice.",
+          "The telephone contact was limited to confirming the cancellation and upcoming appointment information."
+        ]
+      },
+      {
+        "encounter_id": null,
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-16",
+        "service_type": "other",
+        "modality": "unknown",
+        "evidence_type": "administrative_notice",
+        "disposition": "scheduled_only",
+        "patient_present": "unknown",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "Staff confirmed that the family-related appointment on January 16 remained on the schedule and that later appointments would appear on the next weekly list."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [],
+    "plan_requirements": []
+  }
+}

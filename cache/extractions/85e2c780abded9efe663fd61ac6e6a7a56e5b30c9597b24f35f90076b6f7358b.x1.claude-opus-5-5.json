@@ -1,0 +1,101 @@
+{
+  "sha256": "85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
+  "filename": "imported_measure_summary_received_jan26.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 17208,
+    "input_tokens": 17189,
+    "output_tokens": 2238,
+    "cost_usd": 0.0672528,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D014",
+      "title": "Administrative import receipt of program measurement summary (PHQ-9) batch HG-MEAS-0126",
+      "signed": false,
+      "signed_at": null,
+      "received_at": "2026-01-26T07:44",
+      "finality": "unknown",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "copies_measurement",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": "HG-Q116",
+          "original_date": "2026-01-16",
+          "quote": "Import detail: copied result from the January 16 portal form."
+        },
+        {
+          "type": "references",
+          "encounter_id": null,
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-16",
+          "quote": "Original clinician review timestamp: January 16, 2026, 09:10 local."
+        }
+      ]
+    },
+    "service_events": [],
+    "assessments": [
+      {
+        "instrument": "PHQ-9",
+        "total_score": 14.0,
+        "item_scores": [],
+        "completed_date": "2026-01-16",
+        "completed_time": null,
+        "form_id": "HG-Q116",
+        "is_copy_of_earlier": true,
+        "quote": "PHQ-9   | 14     | 2026-01-16     | HG-Q116"
+      }
+    ],
+    "observations": [
+      {
+        "date": "2026-01-16",
+        "domain": "mood",
+        "source": "measurement",
+        "statement": "PHQ-9 total score of 14 completed via portal form.",
+        "quote": "PHQ-9   | 14     | 2026-01-16     | HG-Q116"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "overall_progress",
+        "source": "clinician_assessment",
+        "statement": "Clinician noted some improvement in depressive symptoms.",
+        "quote": "some improvement in depressive symptoms"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "avoidance",
+        "source": "clinician_assessment",
+        "statement": "Clinician noted ongoing avoidance of work communication.",
+        "quote": "ongoing avoidance of work communication and inconsistent sleep"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "sleep",
+        "source": "clinician_assessment",
+        "statement": "Clinician noted inconsistent sleep.",
+        "quote": "ongoing avoidance of work communication and inconsistent sleep"
+      },
+      {
+        "date": "2026-01-16",
+        "domain": "functioning",
+        "source": "clinician_assessment",
+        "statement": "Clinician plans to continue current focus and review practical functioning at next direct appointment.",
+        "quote": "Continue current therapeutic focus and review practical functioning at the next direct appointment."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
+  "filename": "group_facilitator_jan06.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 11552,
+    "input_tokens": 7954,
+    "output_tokens": 1352,
+    "cost_usd": 0.0374836,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D004",
+      "title": "Coping skills group facilitator note",
+      "signed": true,
+      "signed_at": "2026-01-06T12:02",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": [
+        {
+          "type": "references",
+          "encounter_id": "HG-E102",
+          "field": null,
+          "old_value": null,
+          "new_value": null,
+          "form_id": null,
+          "original_date": "2026-01-06",
+          "quote": "The patient attendance roster is maintained by the group desk."
+        }
+      ]
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E102",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-06",
+        "service_type": "group_therapy",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": {
+          "start": "10:00",
+          "end": "11:30"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [
+          {
+            "start": "10:45",
+            "end": "11:00",
+            "kind": "break",
+            "quote": "The whole group took a break from 10:45 to 11:00. No therapy was conducted during that interval."
+          }
+        ],
+        "stated_minutes": null,
+        "clinicians": [
+          "Leena Park, LPC"
+        ],
+        "quotes": [
+          "Service date 2026-01-06 | Group scheduled 10:00\u201311:30 local",
+          "The whole group took a break from 10:45 to 11:00.",
+          "Rowan was quiet initially and responded when invited to identify a situation involving avoidance."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-06",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Rowan was quiet at first and responded when invited to identify an avoidance situation.",
+        "quote": "Rowan was quiet initially and responded when invited to identify a situation involving avoidance."
+      },
+      {
+        "date": "2026-01-06",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Rowan reported delaying a reply to a work message out of fear of being asked for a firm return date.",
+        "quote": "They described delaying a reply to a work message because they feared being asked for a firm return date."
+      },
+      {
+        "date": "2026-01-06",
+        "domain": "anxiety",
+        "source": "clinician_observation",
+        "statement": "Rowan practiced a breathing exercise during group.",
+        "quote": "Rowan practiced a breathing exercise and selected reading the message before deciding how to respond as a possible next step."
+      },
+      {
+        "date": "2026-01-06",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Rowan chose reading the message before deciding how to respond as a possible next step.",
+        "quote": "Rowan practiced a breathing exercise and selected reading the message before deciding how to respond as a possible next step."
+      },
+      {
+        "date": "2026-01-06",
+        "domain": "engagement",
+        "source": "clinician_assessment",
+        "statement": "Rowan's participation was on topic and they seemed receptive to peer suggestions.",
+        "quote": "Their participation was relevant to the topic, and they appeared receptive to peer suggestions."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

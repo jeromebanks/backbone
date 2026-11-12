@@ -1,0 +1,33 @@
+{
+  "sha256": "d2240979a2de7d7782a34a6ca26e289ee829d01eea9932e4d61b3588c724ceb1",
+  "filename": "group_authorization_letter.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 9977,
+    "input_tokens": 7907,
+    "output_tokens": 773,
+    "cost_usd": 0.025527600000000004,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D001",
+      "title": "Group service authorization letter (HG-A260104-88) with administrative entry",
+      "signed": true,
+      "signed_at": "2026-01-05T08:05",
+      "received_at": "2026-01-04T15:26",
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [],
+    "assessments": [],
+    "observations": [],
+    "plan_requirements": []
+  }
+}

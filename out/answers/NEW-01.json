@@ -1,0 +1,952 @@
+{
+  "id": "NEW-01",
+  "question": "How many group therapy sessions were scheduled for Rowan in January 2026 that did not count as attended, and why did each one not count?",
+  "plan": {
+    "question": "How many group therapy sessions were scheduled for Rowan in January 2026 that did not count as attended, and why did each one not count?",
+    "steps": [
+      {
+        "op": "care",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-01",
+          "end": "2026-01-31",
+          "service_types": [
+            "group_therapy"
+          ],
+          "include_excluded": true,
+          "include_evidence": true
+        },
+        "group_by": "none"
+      }
+    ],
+    "unsupported_reason": null
+  },
+  "plan_explain": "QueryPlan: How many group therapy sessions were scheduled for Rowan in January 2026 that did not count as attended, and why did each one not count?\n  1. care(patients=['HG-M042'], 2026-01-01..2026-01-31, types=['group_therapy'], include_excluded, group_by=none)",
+  "results": {
+    "question": "How many group therapy sessions were scheduled for Rowan in January 2026 that did not count as attended, and why did each one not count?",
+    "plan": {
+      "question": "How many group therapy sessions were scheduled for Rowan in January 2026 that did not count as attended, and why did each one not count?",
+      "steps": [
+        {
+          "op": "care",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-01",
+            "end": "2026-01-31",
+            "service_types": [
+              "group_therapy"
+            ],
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "group_by": "none"
+        }
+      ],
+      "unsupported_reason": null
+    },
+    "results": [
+      {
+        "op": "care",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-01",
+            "end": "2026-01-31",
+            "service_types": [
+              "group_therapy"
+            ],
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "group_by": "none"
+        },
+        "totals": {
+          "sessions": {
+            "low": 5,
+            "high": 5,
+            "status": "established"
+          },
+          "therapy_days": {
+            "low": 5,
+            "high": 5,
+            "status": "established"
+          },
+          "minutes": {
+            "low": 300,
+            "high": 300,
+            "status": "established"
+          },
+          "hours": {
+            "low": 5,
+            "high": 5,
+            "status": "established"
+          },
+          "uncertain_encounters": [],
+          "by_service_type": [
+            {
+              "service_type": "group_therapy",
+              "sessions": {
+                "low": 5,
+                "high": 5,
+                "status": "established"
+              },
+              "therapy_days": {
+                "low": 5,
+                "high": 5,
+                "status": "established"
+              },
+              "minutes": {
+                "low": 300,
+                "high": 300,
+                "status": "established"
+              }
+            }
+          ]
+        },
+        "groups": [],
+        "facts": [
+          {
+            "encounter": "HG-E102",
+            "patient": "HG-M042",
+            "date": "2026-01-06",
+            "week_start": "2026-01-05",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min",
+            "records": [
+              "BH-D004",
+              "BH-D005",
+              "BH-D006"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E105",
+            "patient": "HG-M042",
+            "date": "2026-01-12",
+            "week_start": "2026-01-12",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 75.0,
+              "high": 75.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min",
+            "records": [
+              "BH-D005",
+              "BH-D006",
+              "BH-D009"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E108",
+            "patient": "HG-M042",
+            "date": "2026-01-15",
+            "week_start": "2026-01-12",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "clinic_cancelled",
+            "counts_as_therapy_session": "no",
+            "exclusion_reason": "not attended (clinic_cancelled)",
+            "patient_present_minutes": {
+              "low": 0.0,
+              "high": 0.0,
+              "status": "not_applicable"
+            },
+            "calculation": null,
+            "records": [
+              "BH-D006",
+              "BH-D016"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E110",
+            "patient": "HG-M042",
+            "date": "2026-01-19",
+            "week_start": "2026-01-19",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 60.0,
+              "high": 60.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
+            "records": [
+              "BH-D101",
+              "BH-D102",
+              "BH-D103",
+              "BH-D104"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E113",
+            "patient": "HG-M042",
+            "date": "2026-01-22",
+            "week_start": "2026-01-19",
+            "service_type": "group_therapy",
+            "modality": "unknown",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 45.0,
+              "high": 45.0,
+              "status": "established"
+            },
+            "calculation": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min",
+            "records": [
+              "BH-D107",
+              "BH-D108"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E116",
+            "patient": "HG-M042",
+            "date": "2026-01-27",
+            "week_start": "2026-01-26",
+            "service_type": "group_therapy",
+            "modality": "unknown",
+            "disposition": "no_show",
+            "counts_as_therapy_session": "no",
+            "exclusion_reason": "not attended (no_show)",
+            "patient_present_minutes": {
+              "low": 0.0,
+              "high": 0.0,
+              "status": "not_applicable"
+            },
+            "calculation": null,
+            "records": [
+              "BH-D108",
+              "BH-D112"
+            ],
+            "flags": []
+          },
+          {
+            "encounter": "HG-E118",
+            "patient": "HG-M042",
+            "date": "2026-01-29",
+            "week_start": "2026-01-26",
+            "service_type": "group_therapy",
+            "modality": "unknown",
+            "disposition": "attended",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 75.0,
+              "high": 75.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min",
+            "records": [
+              "BH-D107",
+              "BH-D108"
+            ],
+            "flags": []
+          }
+        ],
+        "calculation": [
+          "sessions = count of encounters that count as therapy sessions = 5: HG-E102, HG-E105, HG-E110, HG-E113, HG-E118",
+          "therapy days = distinct (patient, date) pairs among them = 5: 2026-01-06, 2026-01-12, 2026-01-19, 2026-01-22, 2026-01-29",
+          "patient-present minutes = 45 (HG-E102) + 75 (HG-E105) + 60 (HG-E110) + 45 (HG-E113) + 75 (HG-E118) = 300 min (5 h)"
+        ],
+        "exclusions": [
+          {
+            "encounter": "HG-E108",
+            "date": "2026-01-15",
+            "service_type": "group_therapy",
+            "reason": "not attended (clinic_cancelled)",
+            "records": [
+              "BH-D006",
+              "BH-D016"
+            ]
+          },
+          {
+            "encounter": "HG-E116",
+            "date": "2026-01-27",
+            "service_type": "group_therapy",
+            "reason": "not attended (no_show)",
+            "records": [
+              "BH-D108",
+              "BH-D112"
+            ]
+          }
+        ],
+        "conflicts": [],
+        "decisions": [
+          {
+            "subject": "HG-E102",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D004 (clinical_note: attended), BH-D005 (attendance_record: attended_partial)"
+          },
+          {
+            "subject": "HG-E105",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D005 (attendance_record: attended_full), BH-D009 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E108",
+            "rule": "R4",
+            "outcome": "attended=no",
+            "reason": "decided by tier-2 records: BH-D006 (schedule_listing: clinic_cancelled), BH-D016 (administrative_notice: clinic_cancelled)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R7",
+            "outcome": "correction_consistent",
+            "reason": "the superseded value in BH-D102 (10:00\u201311:30) would overlap HG-M042|HG-E111 11:15\u201311:45; the corrected value does not"
+          },
+          {
+            "subject": "HG-E113",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E116",
+            "rule": "R2",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D112 (draft_template): draft/template text is not attendance evidence; it states disposition 'attended_full'"
+          },
+          {
+            "subject": "HG-E116",
+            "rule": "R2",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D112 (billing): a billing/charge row is not attendance evidence"
+          },
+          {
+            "subject": "HG-E116",
+            "rule": "R4",
+            "outcome": "attended=no",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: no_show)"
+          },
+          {
+            "subject": "HG-E118",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          }
+        ],
+        "evidence": [
+          {
+            "claim_id": "5edddc6b2093:service_event:0",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "Service date 2026-01-06 | Group scheduled 10:00\u201311:30 local"
+              },
+              {
+                "lines": "12",
+                "quote": "The whole group took a break from 10:45 to 11:00."
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan was quiet initially and responded when invited to identify a situation involving avoidance."
+              },
+              {
+                "lines": "12",
+                "quote": "The whole group took a break from 10:45 to 11:00. No therapy was conducted during that interval."
+              }
+            ]
+          },
+          {
+            "claim_id": "6f205f89f8d3:service_event:0",
+            "doc_id": "BH-D005",
+            "file": "early_group_attendance_roster.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "2026-01-06 | HG-E102   | 10:00\u201311:30    | 10:15           | 11:15            | Attended part"
+              },
+              {
+                "lines": "13",
+                "quote": "Rowan advised the facilitator that they would need to leave early for a previously arranged ride."
+              },
+              {
+                "lines": "13",
+                "quote": "Rowan did not re-enter the group room after departing."
+              }
+            ]
+          },
+          {
+            "claim_id": "6f205f89f8d3:service_event:1",
+            "doc_id": "BH-D005",
+            "file": "early_group_attendance_roster.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "2026-01-12 | HG-E105   | 10:00\u201311:30    | 10:00           | 11:30            | Attended full"
+              },
+              {
+                "lines": "15",
+                "quote": "Rowan checked in before the group began and remained until the group was released."
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:1",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "HG-E102   | Jan06 | Coping skills group    | 10:00\u201311:30    | Attended part"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:4",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "HG-E105   | Jan12 | Coping skills group    | 10:00\u201311:30    | Completed"
+              }
+            ]
+          },
+          {
+            "claim_id": "0bf056f3769e:service_event:7",
+            "doc_id": "BH-D006",
+            "file": "early_appointment_status_export.txt",
+            "record_type": "schedule_listing",
+            "passages": [
+              {
+                "lines": "17",
+                "quote": "HG-E108   | Jan15 | Coping skills group    | 10:00\u201311:30    | Clinic cancelled"
+              },
+              {
+                "lines": "20",
+                "quote": "HG-E108 was removed from the active room schedule after staff illness was reported."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:service_event:0",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "Service date 2026-01-12 | Scheduled group 10:00\u201311:30 local"
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan contributed an example about leaving work messages unopened."
+              },
+              {
+                "lines": "12",
+                "quote": "Group break: 10:40\u201310:55; no therapeutic activity occurred during the break."
+              },
+              {
+                "lines": "12",
+                "quote": "Group break: 10:40\u201310:55; no therapeutic activity occurred during the break."
+              }
+            ]
+          },
+          {
+            "claim_id": "5f3375f11c85:service_event:0",
+            "doc_id": "BH-D016",
+            "file": "group_cancellation_notice_jan15.txt",
+            "record_type": "administrative_notice",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The coping skills group scheduled for January 15 from 10:00 to 11:30 is cancelled by the clinic because of staff illness."
+              },
+              {
+                "lines": "15",
+                "quote": "No group was held and no participants were seen for HG-E108."
+              },
+              {
+                "lines": "15",
+                "quote": "No replacement group was conducted in the January 15 slot."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:service_event:0",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Skills group clinical record | Service date: January 19, 2026"
+              },
+              {
+                "lines": "6",
+                "quote": "Scheduled group: 10:00\u201311:30. Nontherapeutic break: 10:45\u201311:00."
+              },
+              {
+                "lines": "10",
+                "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+              },
+              {
+                "lines": "10",
+                "quote": "Patient-specific arrival and departure are maintained on the attendance roster."
+              },
+              {
+                "lines": "6",
+                "quote": "Nontherapeutic break: 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:service_event:0",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "4",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "9",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "12",
+                "quote": "Arrival and departure fields were entered at roster close."
+              }
+            ]
+          },
+          {
+            "claim_id": "674440968b5d:service_event:0",
+            "doc_id": "BH-D103",
+            "file": "BH-D103_attendance_correction_2026-01-20.txt",
+            "record_type": "attendance_correction",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "Applies to group encounter HG-E110, service date January 19, 2026"
+              },
+              {
+                "lines": "7",
+                "quote": "Correction: Patient departure for HG-E110 is 11:15, replacing the original roster value of 11:30. Patient arrival remains 10:00."
+              },
+              {
+                "lines": "9",
+                "quote": "The group continued for other members until its scheduled close."
+              }
+            ]
+          },
+          {
+            "claim_id": "f3f25065559f:service_event:0",
+            "doc_id": "BH-D104",
+            "file": "BH-D104_resent_roster_received_2026-01-26.txt",
+            "record_type": "retransmitted_copy",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "13",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "14",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "20",
+                "quote": "The received copy contains no new clinician signature and records no additional visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:service_event:0",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "7",
+                "quote": "January 22, 2026 | Encounter HG-E113"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled group 10:00\u201311:30. Nontherapeutic break 10:45\u201311:00."
+              },
+              {
+                "lines": "9",
+                "quote": "Rowan joined the discussion after it had begun; the arrival field is maintained in the attendance register."
+              },
+              {
+                "lines": "9",
+                "quote": "The patient contributed an example to the discussion after the break."
+              },
+              {
+                "lines": "8",
+                "quote": "Nontherapeutic break 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:service_event:1",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "January 29, 2026 | Encounter HG-E118"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled group 10:00\u201311:30. Nontherapeutic break 10:45\u201311:00."
+              },
+              {
+                "lines": "14",
+                "quote": "Rowan participated in the paired rehearsal and accepted feedback about keeping the request brief."
+              },
+              {
+                "lines": "8",
+                "quote": "Nontherapeutic break 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:service_event:0",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "January 22 | HG-E113 | Skills group | 10:00\u201311:30 | 10:30 | 11:30 | Attended, late arrival"
+              },
+              {
+                "lines": "14",
+                "quote": "January 22 attendance attestation: Rowan arrived at 10:30 and remained until the group closed."
+              },
+              {
+                "lines": "14",
+                "quote": "Signed: Leah Chen, LCSW, January 22, 12:09."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:service_event:1",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "January 27 | HG-E116 | Skills group | 10:00\u201311:30 | \u2014 | \u2014 | No show; patient did not attend"
+              },
+              {
+                "lines": "16",
+                "quote": "Final roster confirms Rowan was absent for the entire group."
+              },
+              {
+                "lines": "16",
+                "quote": "No patient treatment contact occurred."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:service_event:4",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "January 29 | HG-E118 | Skills group | 10:00\u201311:30 | 10:00 | 11:30 | Attended"
+              },
+              {
+                "lines": "20",
+                "quote": "January 29 attendance attestation: Rowan was present from opening through closing."
+              },
+              {
+                "lines": "20",
+                "quote": "Signed: Leah Chen, LCSW, January 29, 12:15."
+              }
+            ]
+          },
+          {
+            "claim_id": "b4390ed6b672:service_event:0",
+            "doc_id": "BH-D112",
+            "file": "BH-D112_draft_note_and_charge_extract_2026-01-27.txt",
+            "record_type": "draft_template",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Status: DRAFT \u2014 UNSIGNED \u2014 system populated from scheduled group template"
+              },
+              {
+                "lines": "10",
+                "quote": "Scheduled service: Skills group, 10:00\u201311:30"
+              },
+              {
+                "lines": "11",
+                "quote": "Template attendance text: Patient attended the full session and participated in the skills discussion."
+              },
+              {
+                "lines": "16",
+                "quote": "It was generated from the appointment template before the scheduled group."
+              }
+            ]
+          },
+          {
+            "claim_id": "b4390ed6b672:service_event:1",
+            "doc_id": "BH-D112",
+            "file": "BH-D112_draft_note_and_charge_extract_2026-01-27.txt",
+            "record_type": "billing",
+            "passages": [
+              {
+                "lines": "19",
+                "quote": "Charge ID: CH-116 | Encounter: HG-E116"
+              },
+              {
+                "lines": "20",
+                "quote": "Service date: January 27, 2026 | Posting date: January 27, 2026, 18:06"
+              },
+              {
+                "lines": "21",
+                "quote": "Description: Group psychotherapy"
+              },
+              {
+                "lines": "22",
+                "quote": "Quantity charged: 1 group session"
+              }
+            ]
+          }
+        ],
+        "notes": [],
+        "sql": [
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND service_type IN (?) ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-01",
+              "2026-01-31",
+              "HG-M042",
+              "group_therapy"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "0bf056f3769e:service_event:1",
+              "5edddc6b2093:service_event:0",
+              "6f205f89f8d3:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "0bf056f3769e:service_event:4",
+              "6f205f89f8d3:service_event:1",
+              "d30d18d0335d:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:7",
+              "5f3375f11c85:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "514ca20809f6:service_event:0",
+              "674440968b5d:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:0",
+              "c5953bcb242e:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:1",
+              "b4390ed6b672:service_event:0",
+              "b4390ed6b672:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:4",
+              "c5953bcb242e:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:7",
+              "5f3375f11c85:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:1",
+              "b4390ed6b672:service_event:0",
+              "b4390ed6b672:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
+            "params": [
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E108",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E116",
+              "HG-M042|HG-E118"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?,?,?,?,?,?) AND rule IN (?,?,?,?,?,?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E108",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E116",
+              "HG-M042|HG-E118",
+              "R0",
+              "R1",
+              "R2",
+              "R3",
+              "R4",
+              "R7",
+              "R9"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "0bf056f3769e:service_event:1",
+              "0bf056f3769e:service_event:4",
+              "0bf056f3769e:service_event:7",
+              "514ca20809f6:service_event:0",
+              "5edddc6b2093:service_event:0",
+              "5f3375f11c85:service_event:0",
+              "674440968b5d:service_event:0",
+              "6f205f89f8d3:service_event:0",
+              "6f205f89f8d3:service_event:1",
+              "805b2c69c7fa:service_event:0",
+              "805b2c69c7fa:service_event:1",
+              "805b2c69c7fa:service_event:4",
+              "b4390ed6b672:service_event:0",
+              "b4390ed6b672:service_event:1",
+              "c5953bcb242e:service_event:0",
+              "c5953bcb242e:service_event:1",
+              "d30d18d0335d:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answer_markdown": "**Answer:** Two scheduled group therapy sessions in January 2026 did not count as attended for Rowan (HG-M042):\n\n| Encounter | Date | Why it did not count | Sources |\n|---|---|---|---|\n| HG-E108 | 2026-01-15 | **The clinic cancelled it.** The clinic cancelled the coping skills group because of staff illness. \"No group was held and no participants were seen for HG-E108,\" and nothing replaced it in that slot. | (BH-D016 L9, L15); schedule shows \"Clinic cancelled\" (BH-D006 L17, L20) |\n| HG-E116 | 2026-01-27 | **Rowan didn't show up.** The final register reads \"No show; patient did not attend.\" The final roster \"confirms Rowan was absent for the entire group\" and \"No patient treatment contact occurred.\" | (BH-D108 L10, L16) |\n\n**Records that seem to conflict for HG-E116**\n- An unsigned draft note (BH-D112) says \"Patient attended the full session.\" It is labelled \"DRAFT \u2014 UNSIGNED \u2014 system populated from scheduled group template\" and was \"generated from the appointment template before the scheduled group\" (BH-D112 L9, L11, L16). Template text doesn't count as proof of attendance, so it wasn't used.\n- A billing row for the same encounter charges \"1 group session\" of \"Group psychotherapy,\" posted January 27 (BH-D112 L19\u2013L22). A charge doesn't count as proof of attendance either, so it wasn't used. Whether this charge should be reversed is outside these results.\n- The signed final attendance register (BH-D108) decided the no-show.\n\n**Context: sessions that did count.** Five group sessions counted as attended, totalling 300 minutes (5 hours) with Rowan present: HG-E102, HG-E105, HG-E110, HG-E113 and HG-E118. Two of these were partial attendances, and both still counted:\n- **HG-E102 (Jan 6):** Rowan arrived at 10:15 and left at 11:15 for a ride, giving 45 minutes after the break (BH-D005 L10, L13).\n- **HG-E110 (Jan 19):** a correction changed Rowan's departure from 11:30 to 11:15, giving 60 minutes (BH-D103 L7).\n\nAlso for HG-E110, a resent copy of the roster (BH-D104) was not treated as a separate session or as independent evidence. It \"records no additional visit\" (BH-D104 L20).\n\n**Not settled by the record:** Nothing was in conflict, and all counts are firm (low = high). The results don't say whether either missed session was rescheduled. They also don't record a reason for the no-show.",
+  "unresolved": [
+    "Whether HG-E108 or HG-E116 was rescheduled is not documented in the results.",
+    "No reason for the Jan 27 no-show is recorded."
+  ],
+  "caveats": [
+    "A billing charge (CH-116) exists for the Jan 27 no-show encounter HG-E116. It was excluded as attendance evidence, and these results don't say whether it should be reversed."
+  ],
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 2844,
+    "execute": 6.97,
+    "narrate_llm": 18221,
+    "total": 21072
+  },
+  "llm": {
+    "calls": 2,
+    "input_tokens": 14437,
+    "output_tokens": 2378,
+    "cost_usd": 0.129734
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T11:59:28"
+}

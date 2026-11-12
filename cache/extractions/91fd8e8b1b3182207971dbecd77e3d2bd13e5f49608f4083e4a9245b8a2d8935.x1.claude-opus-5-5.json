@@ -1,0 +1,115 @@
+{
+  "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
+  "filename": "BH-D105_individual_2026-01-19.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 11033,
+    "input_tokens": 8011,
+    "output_tokens": 1302,
+    "cost_usd": 0.0369396,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D105",
+      "title": "Individual psychotherapy note, encounter HG-E111 (added visit during group)",
+      "signed": true,
+      "signed_at": "2026-01-19T12:32",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E111",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-19",
+        "service_type": "individual_therapy",
+        "modality": "in_person",
+        "evidence_type": "clinical_note",
+        "disposition": "attended_full",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "11:15",
+            "end": "11:45"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 30,
+        "clinicians": [
+          "Mira Patel, LCSW"
+        ],
+        "quotes": [
+          "Individual psychotherapy | Encounter HG-E111",
+          "January 19, 2026 | In person",
+          "Patient contact: 11:15\u201311:45 | Completed: 30 minutes",
+          "Rowan participated throughout the individual contact and reported that the immediate intensity of anxiety eased enough to discuss a next step."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-19",
+        "domain": "anxiety",
+        "source": "clinician_observation",
+        "statement": "Rowan became anxious during group and needed individual grounding and a review of coping strategies.",
+        "quote": "This visit was added because Rowan became anxious during group and needed individual grounding and review of coping strategies."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Rowan felt overwhelmed when other group members talked about work demands and worried about keeping up after returning to work.",
+        "quote": "The patient described feeling overwhelmed when other members discussed workplace demands and worried that returning to work would expose difficulties keeping up."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation.",
+        "quote": "Rowan was able to identify muscle tension, rapid breathing, and an urge to leave as early signs of activation."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Rowan took part for the whole contact and said the anxiety eased enough to discuss a next step.",
+        "quote": "Rowan participated throughout the individual contact and reported that the immediate intensity of anxiety eased enough to discuss a next step."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "safety",
+        "source": "patient_report",
+        "statement": "Rowan denied current suicidal thoughts and stayed future oriented.",
+        "quote": "Rowan denied current suicidal thoughts and remained future oriented in discussing the next appointment."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "safety",
+        "source": "clinician_assessment",
+        "statement": "The clinician found no acute safety concern during this contact.",
+        "quote": "No acute safety concern was identified during this contact."
+      },
+      {
+        "date": "2026-01-19",
+        "domain": "functioning",
+        "source": "clinician_assessment",
+        "statement": "Ongoing avoidance and disrupted sleep continue to get in the way of returning to a usual work routine.",
+        "quote": "Persistent avoidance and disrupted sleep continue to interfere with resuming a usual work routine."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

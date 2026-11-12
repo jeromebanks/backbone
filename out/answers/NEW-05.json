@@ -1,0 +1,216 @@
+{
+  "id": "NEW-05",
+  "question": "How did Rowan's care change after their treatment plan was revised?",
+  "plan": {
+    "question": "How did Rowan's care change after their treatment plan was revised?",
+    "steps": [
+      {
+        "op": "compare",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-05",
+          "end": "2026-01-30",
+          "service_types": null,
+          "include_excluded": false,
+          "include_evidence": true
+        },
+        "split": "plan_change"
+      }
+    ],
+    "unsupported_reason": null
+  },
+  "plan_explain": "QueryPlan: How did Rowan's care change after their treatment plan was revised?\n  1. compare(patients=['HG-M042'], 2026-01-05..2026-01-30, split=plan_change)",
+  "results": {
+    "question": "How did Rowan's care change after their treatment plan was revised?",
+    "plan": {
+      "question": "How did Rowan's care change after their treatment plan was revised?",
+      "steps": [
+        {
+          "op": "compare",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": false,
+            "include_evidence": true
+          },
+          "split": "plan_change"
+        }
+      ],
+      "unsupported_reason": null
+    },
+    "results": [
+      {
+        "op": "compare",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": false,
+            "include_evidence": true
+          },
+          "split": "plan_change"
+        },
+        "totals": {},
+        "groups": [],
+        "facts": [],
+        "calculation": [],
+        "exclusions": [
+          {
+            "encounter": "HG-E103",
+            "date": "2026-01-08",
+            "service_type": "individual_therapy",
+            "reason": "not attended (no_show)"
+          },
+          {
+            "encounter": "U-2026-01-08-outreach_call-1",
+            "date": "2026-01-08",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E106",
+            "date": "2026-01-13",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)"
+          },
+          {
+            "encounter": "HG-E108",
+            "date": "2026-01-15",
+            "service_type": "group_therapy",
+            "reason": "not attended (clinic_cancelled)"
+          },
+          {
+            "encounter": "U-2026-01-15-administrative-1",
+            "date": "2026-01-15",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)"
+          },
+          {
+            "encounter": "U-2026-01-15-outreach_call-1",
+            "date": "2026-01-15",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E109",
+            "date": "2026-01-16",
+            "service_type": "family_collateral",
+            "reason": "not a psychotherapy service (family_collateral)"
+          },
+          {
+            "encounter": "U-2026-01-16-administrative-1",
+            "date": "2026-01-16",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)"
+          },
+          {
+            "encounter": "U-2026-01-16-other-1",
+            "date": "2026-01-16",
+            "service_type": "other",
+            "reason": "not a psychotherapy service (other)"
+          },
+          {
+            "encounter": "HG-E114",
+            "date": "2026-01-23",
+            "service_type": "care_coordination",
+            "reason": "not a psychotherapy service (care_coordination)"
+          },
+          {
+            "encounter": "HG-E116",
+            "date": "2026-01-27",
+            "service_type": "group_therapy",
+            "reason": "not attended (no_show)"
+          },
+          {
+            "encounter": "U-2026-01-27-outreach_call-1",
+            "date": "2026-01-27",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)"
+          },
+          {
+            "encounter": "HG-E117",
+            "date": "2026-01-28",
+            "service_type": "individual_therapy",
+            "reason": "not attended (patient_cancelled)"
+          },
+          {
+            "encounter": "HG-E120",
+            "date": "2026-01-30",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)"
+          }
+        ],
+        "conflicts": [],
+        "decisions": [],
+        "evidence": [],
+        "notes": [
+          "HG-M042: no treatment-plan change takes effect inside 2026-01-05..2026-01-30; plans on file: [('BH-D003', '2026-01-05', '2026-01-30')]"
+        ],
+        "sql": [
+          {
+            "sql": "SELECT mrn, name, dob FROM patients WHERE mrn IN (?) ORDER BY mrn",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT * FROM plan_requirements WHERE mrn=? ORDER BY effective_start, metric",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answer_markdown": "**The records don't show a revision to Rowan's (HG-M042) treatment plan in this period, so there is no before-and-after to compare.** Only one plan is on file, BH-D003, and it covers the whole window from 2026-01-05 to 2026-01-30. No change to that plan takes effect within those dates. Because there was no plan change to split the window on, the comparison produced no groups, totals or evidence lines. I can't describe a \"before\" or \"after\" pattern of care.\n\n**What the computed output does contain**\n\nThe output only lists encounters in the window that were left out of the psychotherapy count. These exclusions are not a full record of Rowan's care. Any psychotherapy sessions Rowan attended would have been counted in the comparison groups, which are empty here because no comparison was made.\n\n| Date | Encounter | Service type | Reason excluded |\n|---|---|---|---|\n| 2026-01-08 | HG-E103 | individual_therapy | not attended (no_show) |\n| 2026-01-08 | U-2026-01-08-outreach_call-1 | outreach_call | not a psychotherapy service |\n| 2026-01-13 | HG-E106 | medication_management | not a psychotherapy service |\n| 2026-01-15 | HG-E108 | group_therapy | not attended (clinic_cancelled) |\n| 2026-01-15 | U-2026-01-15-administrative-1 | administrative | not a psychotherapy service |\n| 2026-01-15 | U-2026-01-15-outreach_call-1 | outreach_call | not a psychotherapy service |\n| 2026-01-16 | HG-E109 | family_collateral | not a psychotherapy service |\n| 2026-01-16 | U-2026-01-16-administrative-1 | administrative | not a psychotherapy service |\n| 2026-01-16 | U-2026-01-16-other-1 | other | not a psychotherapy service |\n| 2026-01-23 | HG-E114 | care_coordination | not a psychotherapy service |\n| 2026-01-27 | HG-E116 | group_therapy | not attended (no_show) |\n| 2026-01-27 | U-2026-01-27-outreach_call-1 | outreach_call | not a psychotherapy service |\n| 2026-01-28 | HG-E117 | individual_therapy | not attended (patient_cancelled) |\n| 2026-01-30 | HG-E120 | medication_management | not a psychotherapy service |\n\n**What the record does not settle**\n- Whether a plan revision happened outside 2026-01-05 to 2026-01-30. Only that window was checked. If you have a revision date in mind, re-running the comparison over a period that includes it would answer the question.\n- Whether a revision was made but never filed as a separate plan document. Only BH-D003 is on file.\n- How many psychotherapy sessions Rowan attended, and how often. The comparison returned no counts.\n- No line-level evidence was returned, so the statements above are not tied to specific lines in BH-D003 or any other document.",
+  "unresolved": [
+    "No treatment-plan revision takes effect within 2026-01-05..2026-01-30; only BH-D003 (2026-01-05 to 2026-01-30) is on file, so the before/after comparison could not be made.",
+    "Whether a revision occurred outside the queried window is unknown.",
+    "Attended psychotherapy session counts for the window were not returned."
+  ],
+  "caveats": [
+    "No evidence lines were returned, so nothing can be tied to specific document lines.",
+    "The exclusions table only shows encounters left out of the psychotherapy count. It is not a complete record of Rowan's care."
+  ],
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 2622,
+    "execute": 1.08,
+    "narrate_llm": 14460,
+    "total": 17083
+  },
+  "llm": {
+    "calls": 2,
+    "input_tokens": 6714,
+    "output_tokens": 1742,
+    "cost_usd": 0.041470799999999995
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T12:01:10"
+}

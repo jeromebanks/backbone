@@ -1,0 +1,136 @@
+{
+  "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
+  "filename": "BH-D106_telehealth_2026-01-21.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 10237,
+    "input_tokens": 8104,
+    "output_tokens": 1363,
+    "cost_usd": 0.092084,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D106",
+      "title": "Individual psychotherapy video session note with attached platform connection export",
+      "signed": true,
+      "signed_at": "2026-01-21T15:04",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E112",
+        "related_encounter_id": null,
+        "appointment_id": "HG-A112",
+        "service_date": "2026-01-21",
+        "service_type": "individual_therapy",
+        "modality": "video",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "13:00",
+            "end": "13:20"
+          },
+          {
+            "start": "13:30",
+            "end": "13:55"
+          }
+        ],
+        "nontherapeutic_intervals": [
+          {
+            "start": "13:20",
+            "end": "13:30",
+            "kind": "disconnection",
+            "quote": "Connection was lost from 13:20\u201313:30; there was no therapeutic contact during that interval."
+          }
+        ],
+        "stated_minutes": 45,
+        "clinicians": [
+          "Mira Patel, LCSW"
+        ],
+        "quotes": [
+          "January 21, 2026 | Video | Clinician: Mira Patel, LCSW",
+          "Patient contact occurred 13:00\u201313:20 and 13:30\u201313:55.",
+          "Total patient psychotherapy contact: 45 minutes.",
+          "The reconnection continued the same clinical encounter under original appointment HG-A112."
+        ]
+      },
+      {
+        "encounter_id": "HG-E112",
+        "related_encounter_id": null,
+        "appointment_id": "HG-A112",
+        "service_date": "2026-01-21",
+        "service_type": "individual_therapy",
+        "modality": "video",
+        "evidence_type": "platform_log",
+        "disposition": "unknown",
+        "patient_present": "unknown",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [],
+        "quotes": [
+          "HG-A112 | VC-112A | January 21 13:00 | January 21 13:20",
+          "HG-A112 | VC-112B | January 21 13:30 | January 21 13:55",
+          "Second call reason: Rejoin original appointment after network disconnect.",
+          "Exported January 21, 2026, 14:06; all times local."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-21",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient drafted a message about a possible gradual return to work but stopped before sending it.",
+        "quote": "Rowan reported drafting a short message about a possible gradual return to work but stopping before sending it."
+      },
+      {
+        "date": "2026-01-21",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient identified repeatedly checking the draft as another way of delaying the task.",
+        "quote": "The patient identified checking the draft repeatedly as another way the task was being delayed."
+      },
+      {
+        "date": "2026-01-21",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Patient described one night of improved sleep followed by a night of prolonged wakefulness.",
+        "quote": "Rowan described one night of improved sleep followed by a night of prolonged wakefulness."
+      },
+      {
+        "date": "2026-01-21",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient was engaged and able to restate the agreed task.",
+        "quote": "Rowan was engaged and able to restate the agreed task."
+      },
+      {
+        "date": "2026-01-21",
+        "domain": "safety",
+        "source": "patient_report",
+        "statement": "No urgent safety concern was reported.",
+        "quote": "No urgent safety concern was reported."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

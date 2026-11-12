@@ -1,0 +1,5040 @@
+{
+  "id": "DEV-05",
+  "question": "Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?",
+  "plan": {
+    "question": "Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?",
+    "steps": [
+      {
+        "op": "timeline",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-05",
+          "end": "2026-01-30",
+          "service_types": null,
+          "include_excluded": true,
+          "include_evidence": true
+        },
+        "kinds": [
+          "assessments",
+          "observations"
+        ],
+        "observation_domains": null
+      },
+      {
+        "op": "timeline",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-19",
+          "end": "2026-01-19",
+          "service_types": null,
+          "include_excluded": true,
+          "include_evidence": true
+        },
+        "kinds": [
+          "encounters",
+          "documents",
+          "decisions"
+        ],
+        "observation_domains": null
+      }
+    ],
+    "unsupported_reason": null
+  },
+  "plan_explain": "QueryPlan: Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?\n  1. timeline(patients=['HG-M042'], 2026-01-05..2026-01-30, include_excluded, kinds=['assessments', 'observations'])\n  2. timeline(patients=['HG-M042'], 2026-01-19..2026-01-19, include_excluded, kinds=['encounters', 'documents', 'decisions'])",
+  "results": {
+    "question": "Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?",
+    "plan": {
+      "question": "Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?",
+      "steps": [
+        {
+          "op": "timeline",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "kinds": [
+            "assessments",
+            "observations"
+          ],
+          "observation_domains": null
+        },
+        {
+          "op": "timeline",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-19",
+            "end": "2026-01-19",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "kinds": [
+            "encounters",
+            "documents",
+            "decisions"
+          ],
+          "observation_domains": null
+        }
+      ],
+      "unsupported_reason": null
+    },
+    "results": [
+      {
+        "op": "timeline",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "kinds": [
+            "assessments",
+            "observations"
+          ],
+          "observation_domains": null
+        },
+        "totals": {},
+        "groups": [],
+        "facts": [
+          {
+            "kind": "assessment",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "instrument": "PHQ-9",
+            "total_score": 18.0,
+            "item_scores": [],
+            "form_id": null,
+            "status": "distinct",
+            "recorded_in": [
+              "BH-D002"
+            ],
+            "copies_not_counted": []
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Worry increases when thinking about returning to work after leave.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_assessment",
+            "statement": "Patient has anxiety about resuming work responsibilities.",
+            "documents": [
+              "BH-D003"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "Patient shows avoidance of tasks and communication.",
+            "documents": [
+              "BH-D003"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient has been postponing emails, avoiding return-date conversations, and spending more time alone at home.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient wishes to improve follow-through without waiting for anxiety to disappear.",
+            "documents": [
+              "BH-D003"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient participated throughout and selected a behavioral activation task.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "patient_report",
+            "statement": "Patient reports several weeks of low mood, reduced interest, fragmented sleep, and difficulty starting tasks.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "clinician_assessment",
+            "statement": "Presenting needs include depressed mood and sleep disruption.",
+            "documents": [
+              "BH-D003"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "clinician_observation",
+            "statement": "Speech clear and organized; affect subdued but responsive.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "clinician_assessment",
+            "statement": "Partner support is available, though repeated reminders sometimes increase tension.",
+            "documents": [
+              "BH-D003"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "clinician_assessment",
+            "statement": "Clinical impression of depressive symptoms with anxiety and behavioral avoidance.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "clinician_assessment",
+            "statement": "No immediate safety concern identified; patient could discuss support contacts and help-seeking.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-05",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient wakes at night and repeatedly checks the time.",
+            "documents": [
+              "BH-D002"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-06",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Rowan practiced a breathing exercise during group.",
+            "documents": [
+              "BH-D004"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-06",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Rowan chose reading the message before deciding how to respond as a possible next step.",
+            "documents": [
+              "BH-D004"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-06",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Rowan reported delaying a reply to a work message out of fear of being asked for a firm return date.",
+            "documents": [
+              "BH-D004"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-06",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_assessment",
+            "statement": "Rowan's participation was on topic and they seemed receptive to peer suggestions.",
+            "documents": [
+              "BH-D004"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-06",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Rowan was quiet at first and responded when invited to identify an avoidance situation.",
+            "documents": [
+              "BH-D004"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-07",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient reported a poor night of sleep before the missed appointment.",
+            "documents": [
+              "BH-D015"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-08",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient confirmed intention to attend the next day's family visit with Casey.",
+            "documents": [
+              "BH-D015"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-08",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient did not check in or call to cancel and was marked a no-show for the scheduled individual visit.",
+            "documents": [
+              "BH-D015"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-08",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_assessment",
+            "statement": "Clinician notified so that barriers to attendance could be discussed at the next visit.",
+            "documents": [
+              "BH-D015"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Rowan initially described partner reminders as evidence of falling behind.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Rowan remained present and engaged throughout the visit.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Rowan was able to reflect Casey's wish for reassurance that preparation was happening.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Rowan practiced asking for one specific kind of help and agreed to state when they want practical assistance versus quiet company.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Both participants contributed ideas for a brief, predictable check-in.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "collateral_report",
+            "statement": "Partner Casey expressed worry that giving Rowan space might leave them isolated.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "clinician_observation",
+            "statement": "Session focused on support patterns at home as Rowan attempts to rebuild a routine.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "patient_report",
+            "statement": "Rowan found a shared evening walk more acceptable than a lengthy review of unfinished tasks.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "clinician_observation",
+            "statement": "Rowan became more animated describing a shared evening walk, identified as support that did not feel like pressure.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "patient_report",
+            "statement": "Rowan reported feeling watched when repeatedly asked whether they had contacted work.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "collateral_report",
+            "statement": "Casey explained reminders were meant to help but acknowledged repeated prompts increased tension.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_observation",
+            "statement": "The communication rehearsal became less defensive with repetition.",
+            "documents": [
+              "BH-D008"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-09",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_assessment",
+            "statement": "Both partners acknowledged that their intentions differed from how the other experienced the exchange.",
+            "documents": [
+              "BH-D007"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-12",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient reported a weekend walk with Casey helped the evening feel less dominated by worry.",
+            "documents": [
+              "BH-D009"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-12",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient described leaving work messages unopened as an example of avoidance.",
+            "documents": [
+              "BH-D009"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-12",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient identified looking at one message as a smaller step than replying to all outstanding messages.",
+            "documents": [
+              "BH-D009"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-12",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient listened to peers and offered a supportive comment to another member.",
+            "documents": [
+              "BH-D009"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-12",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "During planning, patient wrote down an action to try after breakfast and asked how to respond if the morning went poorly.",
+            "documents": [
+              "BH-D009"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was attentive, asked questions about monitoring, and could restate next steps.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_assessment",
+            "statement": "Patient is engaged with the therapy program and intends to continue scheduled appointments.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "clinician_assessment",
+            "statement": "Clinician assessed ongoing depressive and anxiety symptoms with sleep disruption.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "patient_report",
+            "statement": "Patient described mood as somewhat less heavy on days with a planned activity but remained concerned about work communication.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "patient_report",
+            "statement": "Patient denied any new medication-related concern needing urgent intervention.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-13",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient reported continuing sleep interruption and daytime tiredness.",
+            "documents": [
+              "BH-D010"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient has not replied to the work message and continues to imagine being asked questions they cannot answer.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Patient noticed physical tension during rehearsal but was able to stay with the task.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient reported completing several small activities, including opening a work message and taking two short walks.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient described the family appointment as helpful because the planned check-in reduced repeated reminders.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "A missed appointment from the prior week was explored; patient identified preparing appointment information the evening before as helpful.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "clinician_observation",
+            "statement": "Affect was more varied than at intake, though worry was evident when discussing employment.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-14",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Sleep remains interrupted and starting the morning requires effort.",
+            "documents": [
+              "BH-D011"
+            ]
+          },
+          {
+            "kind": "assessment",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "instrument": "PHQ-9",
+            "total_score": 14.0,
+            "item_scores": [],
+            "form_id": "HG-Q116",
+            "status": "distinct",
+            "recorded_in": [
+              "BH-D013"
+            ],
+            "copies_not_counted": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "Clinician noted persistent avoidance, difficulty initiating work communication, and sleep disruption remain clinically relevant.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "collateral_report",
+            "statement": "Partner describes the patient going quiet when conversation turns to work.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient reported that leaving the apartment had become a little easier.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient reported that thinking about work still made them want to procrastinate.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "Clinician noted ongoing avoidance of work communication.",
+            "documents": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_assessment",
+            "statement": "Patient has attempted small activities and communication practice but has not established a reliable routine.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "The patient told the office they could not take part and was absent for the whole contact.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "clinician_assessment",
+            "statement": "Clinician plans to continue current focus and review practical functioning at next direct appointment.",
+            "documents": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "collateral_report",
+            "statement": "Partner reports the patient has been going out for short walks and seems more willing to talk about the coming week.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "collateral_report",
+            "statement": "Partner reports the scheduled evening check-in has cut down on unplanned reminders.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "collateral_report",
+            "statement": "Partner says mornings are still difficult for the patient.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "measurement",
+            "statement": "PHQ-9 total score was 14, lower than the intake score of 18.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "measurement",
+            "statement": "PHQ-9 total score of 14 completed via portal form.",
+            "documents": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "collateral_report",
+            "statement": "Partner notices fewer arguments when asking the patient what kind of help they want.",
+            "documents": [
+              "BH-D012"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_assessment",
+            "statement": "Clinician judged that the score and recent sessions suggest some improvement in depressive symptoms.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_assessment",
+            "statement": "Clinician noted some improvement in depressive symptoms.",
+            "documents": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient described sleep as inconsistent.",
+            "documents": [
+              "BH-D013"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-16",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "clinician_assessment",
+            "statement": "Clinician noted inconsistent sleep.",
+            "documents": [
+              "BH-D014"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Rowan became anxious during group and needed individual grounding and a review of coping strategies.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Patient became visibly tense when discussion turned to returning to the workplace.",
+            "documents": [
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Rowan felt overwhelmed when other group members talked about work demands and worried about keeping up after returning to work.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient identified anxiety about reconnecting with work.",
+            "documents": [
+              "BH-D102"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient identified postponing a message to a supervisor as a familiar avoidance pattern.",
+            "documents": [
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient attended the group's opening check-in and accepted the exercise handout.",
+            "documents": [
+              "BH-D104"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was present for the group's opening check-in.",
+            "documents": [
+              "BH-D102"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient accepted an exercise handout and requested additional help, so staff arranged access to the individual clinician.",
+            "documents": [
+              "BH-D102"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient initially followed the group exercise.",
+            "documents": [
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Rowan took part for the whole contact and said the anxiety eased enough to discuss a next step.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "clinician_assessment",
+            "statement": "Clinician cautions that participation in a group exercise should not be assumed to reflect completion of the patient's own work task; plan to continue brief coping skills before approach tasks.",
+            "documents": [
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "clinician_assessment",
+            "statement": "Ongoing avoidance and disrupted sleep continue to get in the way of returning to a usual work routine.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "clinician_observation",
+            "statement": "Facilitator offered grounding and arranged a same-day individual meeting with the treating clinician.",
+            "documents": [
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "patient_report",
+            "statement": "Rowan denied current suicidal thoughts and stayed future oriented.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "clinician_assessment",
+            "statement": "The clinician found no acute safety concern during this contact.",
+            "documents": [
+              "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-21",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient identified repeatedly checking the draft as another way of delaying the task.",
+            "documents": [
+              "BH-D106"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-21",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient drafted a message about a possible gradual return to work but stopped before sending it.",
+            "documents": [
+              "BH-D106"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-21",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was engaged and able to restate the agreed task.",
+            "documents": [
+              "BH-D106"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-21",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "patient_report",
+            "statement": "No urgent safety concern was reported.",
+            "documents": [
+              "BH-D106"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-21",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient described one night of improved sleep followed by a night of prolonged wakefulness.",
+            "documents": [
+              "BH-D106"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-22",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient described concern that seeing outstanding items on a work calendar would become overwhelming.",
+            "documents": [
+              "BH-D107"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-22",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient arrived late to the skills group and stayed until it closed.",
+            "documents": [
+              "BH-D108"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-22",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient contributed an example to the discussion after the break.",
+            "documents": [
+              "BH-D107"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-22",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient joined the group discussion after it had already begun.",
+            "documents": [
+              "BH-D107"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-23",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "Clinician will continue addressing avoidance and coping in scheduled therapy.",
+            "documents": [
+              "BH-D109"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-23",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "collateral_report",
+            "statement": "Outside social worker reported the patient asked for help understanding whom to contact about a gradual return-to-work schedule.",
+            "documents": [
+              "BH-D109"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-23",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "clinician_assessment",
+            "statement": "No change to medication or psychotherapy frequency was made.",
+            "documents": [
+              "BH-D109"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient anticipated becoming overwhelmed if several work issues were raised at once.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "The supervisor's reply reduced some uncertainty but raised worry about being asked for commitments the patient might not meet.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Patient recognized a tendency to keep editing a message after the essential point was clear.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient continued to put off scheduling the conversation with the supervisor.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was engaged with the treatment team and wished to resume a steadier routine.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was attentive and collaborative but hesitant about completing the task outside the office.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient was able to return to the main request with prompting during role-play.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient could use the grounding cue during rehearsal but was uncertain about using it independently when anxious.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "patient_report",
+            "statement": "Patient described difficulty moving from a supervisor's reply to arranging the next conversation.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "patient_report",
+            "statement": "Patient sent a short message to the supervisor and got a request to discuss next steps.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_assessment",
+            "statement": "Presentation remained consistent with ongoing anxiety, low mood, and functional difficulty around work demands.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "patient_report",
+            "statement": "No current suicidal ideation was reported.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "clinician_observation",
+            "statement": "Repetitive planning at night was discussed as affecting settling for sleep.",
+            "documents": [
+              "BH-D111"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-26",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Sleep remained uneven, with trouble settling when work thoughts became repetitive.",
+            "documents": [
+              "BH-D110"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-27",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient missed the entire skills group.",
+            "documents": [
+              "BH-D108"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-28",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient cancelled the individual appointment because of a personal scheduling conflict.",
+            "documents": [
+              "BH-D108"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-29",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient reported opening the work calendar but delaying a follow-up conversation.",
+            "documents": [
+              "BH-D107"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-29",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient took part in the paired rehearsal and accepted feedback about keeping the request brief.",
+            "documents": [
+              "BH-D107"
+            ]
+          },
+          {
+            "kind": "assessment",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "instrument": "PHQ-9",
+            "total_score": 10.0,
+            "item_scores": [
+              "Item 9: 0"
+            ],
+            "form_id": null,
+            "status": "distinct",
+            "recorded_in": [
+              "BH-D115"
+            ],
+            "copies_not_counted": []
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Anxiety remained noticeable when anticipating contact with work.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Patient remained anxious about the work conversation but could explain the intended first step.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "Patient has taken initial steps such as sending a message but continues to delay follow-up and becomes anxious when tasks expand.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "clinician_assessment",
+            "statement": "A recurring pattern was identified in which reminders about contacting work led to lengthy discussion followed by the patient withdrawing from the task.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient practiced requesting a specific kind of help and naming when a reminder felt overwhelming.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient agreed to continue scheduled outpatient follow-up.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient reported taking medication as prescribed with no new adverse effect.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Both participants agreed to try one brief planned check-in instead of repeated questions.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "functioning",
+            "source": "clinician_assessment",
+            "statement": "Continued treatment is appropriate given remaining difficulties with follow-through and work-related functioning.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "patient_report",
+            "statement": "Patient reported fewer days of pervasive low mood than at intake.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "mood",
+            "source": "patient_report",
+            "statement": "Mood felt less persistently low than earlier in the month.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "clinician_observation",
+            "statement": "Patient was alert, organized in conversation, and able to describe the follow-up plan.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "other",
+            "source": "collateral_report",
+            "statement": "Partner described uncertainty about when reminders helped versus increased the patient's sense of pressure.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "clinician_assessment",
+            "statement": "Clinician judged partial improvement with persistent avoidance and functional impact around returning to work.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "overall_progress",
+            "source": "patient_report",
+            "statement": "Patient reported that having a limited plan felt more manageable.",
+            "documents": [
+              "BH-D113"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "clinician_assessment",
+            "statement": "No new acute safety issue emerged during the visit.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "measurement",
+            "statement": "PHQ-9 item 9 was scored 0.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "safety",
+            "source": "patient_report",
+            "statement": "Patient denied current suicidal thoughts.",
+            "documents": [
+              "BH-D114"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "clinician_assessment",
+            "statement": "Sleep disruption remains an intermittent barrier to a steadier daytime routine.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Patient continued to endorse sleep difficulty.",
+            "documents": [
+              "BH-D115"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-30",
+            "patient": "HG-M042",
+            "domain": "sleep",
+            "source": "patient_report",
+            "statement": "Sleep remained variable.",
+            "documents": [
+              "BH-D114"
+            ]
+          }
+        ],
+        "calculation": [],
+        "exclusions": [],
+        "conflicts": [],
+        "decisions": [
+          {
+            "subject": "PHQ-9|2026-01-16|HG-Q116",
+            "rule": "R8",
+            "outcome": "copy_not_distinct",
+            "reason": "BH-D014 restate(s) the PHQ-9 completed 2026-01-16 (form HG-Q116) recorded in BH-D013; not counted as a separate assessment"
+          }
+        ],
+        "evidence": [
+          {
+            "claim_id": "7f5f7d4bbfc9:assessment:0",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "assessment",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "PHQ-9 completed by Rowan on 2026-01-05: total score 18."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:0",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan describes several weeks of low mood, reduced interest in usual activities, fragmented sleep, and difficulty beginning ordinary tasks."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:1",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan has been postponing email replies, avoiding conversations about the return date, and spending more time alone at home."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:2",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Worry increases when thinking about returning to work after a recent leave."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:3",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Affect was subdued but responsive, especially when discussing their partner's support."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:4",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan described waking in the night and then checking the time repeatedly."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:5",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "No immediate safety concern was identified in today's assessment; Rowan was able to discuss support contacts and ways to seek additional help if needed."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:6",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Clinical impressions are depressive symptoms with anxiety and behavioral avoidance."
+              }
+            ]
+          },
+          {
+            "claim_id": "7f5f7d4bbfc9:observation:7",
+            "doc_id": "BH-D002",
+            "file": "intake_and_individual_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "17",
+                "quote": "Rowan selected opening their work inbox for five minutes without requiring an immediate reply."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:observation:0",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:observation:1",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:observation:2",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Presenting needs: depressed mood, sleep disruption, anxiety about resuming work responsibilities, and avoidance of tasks and communication."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:observation:3",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan wishes to improve follow-through without waiting for anxiety to disappear."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:observation:4",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Partner support is available but repeated reminders sometimes increase tension."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:observation:0",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan was quiet initially and responded when invited to identify a situation involving avoidance."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:observation:1",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "They described delaying a reply to a work message because they feared being asked for a firm return date."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:observation:2",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan practiced a breathing exercise and selected reading the message before deciding how to respond as a possible next step."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:observation:3",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan practiced a breathing exercise and selected reading the message before deciding how to respond as a possible next step."
+              }
+            ]
+          },
+          {
+            "claim_id": "5edddc6b2093:observation:4",
+            "doc_id": "BH-D004",
+            "file": "group_facilitator_jan06.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Their participation was relevant to the topic, and they appeared receptive to peer suggestions."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:0",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Rowan described feeling watched when asked repeatedly whether they had contacted work."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:1",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Casey described worry that giving Rowan space might leave them isolated."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:2",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "Rowan remained present and engaged throughout the visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:3",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "They became more animated when describing a shared evening walk and identified this as support that did not feel like pressure."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:4",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Both were able to acknowledge that their intentions differed from how the other person experienced the exchange."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:5",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "Rowan agreed to say when they wanted practical assistance versus quiet company."
+              }
+            ]
+          },
+          {
+            "claim_id": "924dee06b05c:observation:6",
+            "doc_id": "BH-D007",
+            "file": "family_primary_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "The appointment focused on patterns of support at home as Rowan attempts to rebuild a routine."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:0",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan initially described partner reminders as evidence that they were falling behind."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:1",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Casey explained that the reminders were an attempt to help, while also recognizing that repeated prompts increased tension."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:2",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan was able to state that Casey wanted reassurance that some preparation was happening."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:3",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "The rehearsal became less defensive with repetition."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:4",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Both participants contributed ideas for a brief, predictable check-in."
+              }
+            ]
+          },
+          {
+            "claim_id": "ad416fbda806:observation:5",
+            "doc_id": "BH-D008",
+            "file": "family_cofacilitator_jan09.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Rowan said this felt more acceptable than a lengthy review of unfinished tasks."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:observation:0",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan contributed an example about leaving work messages unopened."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:observation:1",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "They identified looking at one message as a lower step than replying to every outstanding message."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:observation:2",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "They also described taking a walk with Casey over the weekend and noted that it helped the evening feel less dominated by worry."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:observation:3",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "During the planning exercise, Rowan wrote down an action to try after breakfast and asked how to respond if the morning went poorly."
+              }
+            ]
+          },
+          {
+            "claim_id": "d30d18d0335d:observation:4",
+            "doc_id": "BH-D009",
+            "file": "group_facilitator_jan12.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "Rowan listened to peers and offered a supportive comment to another member."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:0",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan reported continuing sleep interruption and daytime tiredness."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:1",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "They described mood as somewhat less heavy on days with a planned activity but remained concerned about work communication."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:2",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan denied a new medication-related concern requiring urgent intervention."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:3",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan was attentive, asked questions about the monitoring plan, and could restate the next steps."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:4",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Assessment: ongoing depressive and anxiety symptoms with sleep disruption."
+              }
+            ]
+          },
+          {
+            "claim_id": "95debafd3a72:observation:5",
+            "doc_id": "BH-D010",
+            "file": "medication_review_jan13.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Rowan is engaged with the therapy program and intends to continue the scheduled appointments."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:0",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan reported completing several small activities since the prior individual appointment, including opening a work message and taking two short walks."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:1",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "They have not yet replied to the message and continue to imagine being asked questions they cannot answer."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:2",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan described the family appointment as helpful because the planned check-in with Casey reduced repeated reminders."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:3",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Sleep remains interrupted, and getting started in the morning continues to require effort."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:4",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan noticed physical tension during the rehearsal but was able to remain with the task."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:5",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Rowan identified setting out appointment information the evening before as a helpful preparation step."
+              }
+            ]
+          },
+          {
+            "claim_id": "8c2fbaf5bb45:observation:6",
+            "doc_id": "BH-D011",
+            "file": "individual_therapy_jan14.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Affect was more varied than at intake, although worry was evident when discussing employment."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:0",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Casey reported that Rowan had been getting out for short walks and seemed more willing to discuss the coming week."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:1",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Mornings remain difficult, and Casey described Rowan becoming quiet when the conversation turns to work."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:2",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Mornings remain difficult, and Casey described Rowan becoming quiet when the conversation turns to work."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:3",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "The scheduled evening check-in has reduced unplanned reminders."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:4",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Casey said it takes effort to resist offering multiple solutions but has noticed less argument when asking what kind of help Rowan wants."
+              }
+            ]
+          },
+          {
+            "claim_id": "432c973d1a4d:observation:5",
+            "doc_id": "BH-D012",
+            "file": "partner_collateral_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Casey attended the arranged contact after Rowan advised the office that they could not participate."
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:assessment:0",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "assessment",
+            "passages": [
+              {
+                "lines": "7",
+                "quote": "Completed by patient: 2026-01-16, 08:17 local"
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:0",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "The submitted score is lower than the intake score of 18 recorded on January 5."
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:1",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan wrote that getting out of the apartment had become a little easier"
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:2",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "thinking about work continued to make them want to put things off"
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:3",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan also described sleep as inconsistent."
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:4",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Clinician review: the score and recent individual-session material suggest some improvement in depressive symptoms."
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:5",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Persistent avoidance, difficulty initiating work communication, and sleep disruption remain clinically relevant."
+              }
+            ]
+          },
+          {
+            "claim_id": "300a30dbe42b:observation:6",
+            "doc_id": "BH-D013",
+            "file": "symptom_measure_review_jan16.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan has attempted small activities and communication practice but has not yet established a reliable routine."
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:assessment:0",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "assessment",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "PHQ-9   | 14     | 2026-01-16     | HG-Q116"
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:observation:0",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "PHQ-9   | 14     | 2026-01-16     | HG-Q116"
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:observation:1",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "some improvement in depressive symptoms"
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:observation:2",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "ongoing avoidance of work communication and inconsistent sleep"
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:observation:3",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "ongoing avoidance of work communication and inconsistent sleep"
+              }
+            ]
+          },
+          {
+            "claim_id": "85e2c780abde:observation:4",
+            "doc_id": "BH-D014",
+            "file": "imported_measure_summary_received_jan26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "Continue current therapeutic focus and review practical functioning at the next direct appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "4521a120a4d7:observation:0",
+            "doc_id": "BH-D015",
+            "file": "missed_visit_outreach_jan08.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "There was no arrival call or cancellation message on the scheduling line."
+              }
+            ]
+          },
+          {
+            "claim_id": "4521a120a4d7:observation:1",
+            "doc_id": "BH-D015",
+            "file": "missed_visit_outreach_jan08.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "They said the morning had gotten away from them after a poor night of sleep"
+              }
+            ]
+          },
+          {
+            "claim_id": "4521a120a4d7:observation:2",
+            "doc_id": "BH-D015",
+            "file": "missed_visit_outreach_jan08.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "15",
+                "quote": "confirmed that they still intended to attend the next day's visit with Casey"
+              }
+            ]
+          },
+          {
+            "claim_id": "4521a120a4d7:observation:3",
+            "doc_id": "BH-D015",
+            "file": "missed_visit_outreach_jan08.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "17",
+                "quote": "The individual clinician was notified of the missed appointment so that barriers to attendance could be discussed at the next visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:0",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:1",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:2",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "When discussion turned to returning to the workplace, Rowan became visibly tense and said the amount of discussion felt difficult to manage."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:3",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "When discussion turned to returning to the workplace, Rowan became visibly tense and said the amount of discussion felt difficult to manage."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:4",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "The facilitator offered grounding and arranged a same-day individual meeting with the treating clinician."
+              }
+            ]
+          },
+          {
+            "claim_id": "05a234a8adc9:observation:5",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Coordinate with the individual clinician regarding the group experience so that future attendance can be supported without assuming that participation in a group exercise reflects completion of the patient's own work task."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:observation:0",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan was present for the opening check-in."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:observation:1",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "The patient identified anxiety about reconnecting with work and accepted an exercise handout."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:observation:2",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Staff arranged access to the individual clinician after Rowan requested additional help."
+              }
+            ]
+          },
+          {
+            "claim_id": "f3f25065559f:observation:0",
+            "doc_id": "BH-D104",
+            "file": "BH-D104_resent_roster_received_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "18",
+                "quote": "Rowan attended the opening check-in, accepted the exercise handout, and requested additional help from the individual clinician."
+              }
+            ]
+          },
+          {
+            "claim_id": "f3f25065559f:observation:1",
+            "doc_id": "BH-D104",
+            "file": "BH-D104_resent_roster_received_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "18",
+                "quote": "Rowan attended the opening check-in, accepted the exercise handout, and requested additional help from the individual clinician."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:0",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "This visit was added because Rowan became anxious during group and needed individual grounding and review of coping strategies."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:1",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The patient described feeling overwhelmed when other members discussed workplace demands and worried that returning to work would expose difficulties keeping up."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:2",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan was able to identify muscle tension, rapid breathing, and an urge to leave as early signs of activation."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:3",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan participated throughout the individual contact and reported that the immediate intensity of anxiety eased enough to discuss a next step."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:4",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan denied current suicidal thoughts and remained future oriented in discussing the next appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:5",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "No acute safety concern was identified during this contact."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:observation:6",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Persistent avoidance and disrupted sleep continue to interfere with resuming a usual work routine."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:observation:0",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan reported drafting a short message about a possible gradual return to work but stopping before sending it."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:observation:1",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The patient identified checking the draft repeatedly as another way the task was being delayed."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:observation:2",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan described one night of improved sleep followed by a night of prolonged wakefulness."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:observation:3",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan was engaged and able to restate the agreed task."
+              }
+            ]
+          },
+          {
+            "claim_id": "09c946a2248a:observation:4",
+            "doc_id": "BH-D106",
+            "file": "BH-D106_telehealth_2026-01-21.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "No urgent safety concern was reported."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:observation:0",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan joined the discussion after it had begun"
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:observation:1",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan used opening a work calendar as an example and described concern that seeing outstanding items would become overwhelming."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:observation:2",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The patient contributed an example to the discussion after the break."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:observation:3",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan reported opening the work calendar but delaying a follow-up conversation."
+              }
+            ]
+          },
+          {
+            "claim_id": "c5953bcb242e:observation:4",
+            "doc_id": "BH-D107",
+            "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan participated in the paired rehearsal and accepted feedback about keeping the request brief."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:observation:0",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan arrived at 10:30 and remained until the group closed."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:observation:1",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "16",
+                "quote": "Final roster confirms Rowan was absent for the entire group."
+              }
+            ]
+          },
+          {
+            "claim_id": "805b2c69c7fa:observation:2",
+            "doc_id": "BH-D108",
+            "file": "BH-D108_final_attendance_and_cancellation_register.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "18",
+                "quote": "Rowan reported a personal scheduling conflict."
+              }
+            ]
+          },
+          {
+            "claim_id": "069ea4112779:observation:0",
+            "doc_id": "BH-D109",
+            "file": "BH-D109_care_coordination_2026-01-23.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The outside social worker reported that Rowan had asked for help understanding whom to contact about a gradual return schedule."
+              }
+            ]
+          },
+          {
+            "claim_id": "069ea4112779:observation:1",
+            "doc_id": "BH-D109",
+            "file": "BH-D109_care_coordination_2026-01-23.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "I will continue to address avoidance and coping within scheduled therapy."
+              }
+            ]
+          },
+          {
+            "claim_id": "069ea4112779:observation:2",
+            "doc_id": "BH-D109",
+            "file": "BH-D109_care_coordination_2026-01-23.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "No change to medication or psychotherapy frequency was made during the coordination call."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:0",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan continued to postpone choosing a time for the conversation."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:1",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The reply reduced one uncertainty but also brought up worry about being asked for commitments the patient might not be able to meet."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:2",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Sleep remained uneven, with difficulty settling on nights when work-related thoughts became repetitive."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:3",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "Rowan described sending a short message to the supervisor and receiving a request to discuss possible next steps."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:4",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan was able to return to the main request with prompting."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:5",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "The patient remained attentive and collaborative, although hesitant about completing the task outside the office."
+              }
+            ]
+          },
+          {
+            "claim_id": "4b64c46a13b8:observation:6",
+            "doc_id": "BH-D110",
+            "file": "BH-D110_individual_primary_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "No current suicidal ideation was reported."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:0",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan discussed difficulty moving from a supervisor's reply to arranging the next conversation."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:1",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "The patient anticipated becoming overwhelmed if several work issues were raised at once."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:2",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Rowan recognized a tendency to keep editing a message after the essential point was already clear."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:3",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "The patient could use the cue during the rehearsal but remained uncertain about using it independently when anxious."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:4",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "The discussion also addressed how repetitive planning at night affected settling for sleep."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:5",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Clinical presentation remained consistent with ongoing anxiety, low mood, and functional difficulty around work demands."
+              }
+            ]
+          },
+          {
+            "claim_id": "d03451942797:observation:6",
+            "doc_id": "BH-D111",
+            "file": "BH-D111_individual_second_record_2026-01-26.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "14",
+                "quote": "Rowan was engaged with the treatment team and described a wish to resume a steadier routine."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:0",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "During the initial interval, Casey described uncertainty about when reminders helped and when they seemed to increase Rowan's sense of pressure."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:1",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Together, they identified a recurring pattern in which a reminder about contacting work led to a lengthy discussion, followed by Rowan withdrawing from the task."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:2",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Rowan practiced requesting a specific kind of help and naming when a reminder felt overwhelming."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:3",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Both participants agreed to try one brief check-in at a planned time rather than repeated questions across the evening."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:4",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "Rowan remained anxious about the work conversation but could explain the intended first step."
+              }
+            ]
+          },
+          {
+            "claim_id": "36764827bcb3:observation:5",
+            "doc_id": "BH-D113",
+            "file": "BH-D113_family_therapy_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "13",
+                "quote": "The patient reported that having a limited plan felt more manageable."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:0",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "Rowan reported taking the medication as prescribed and did not describe a new adverse effect."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:1",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "Mood felt less persistently low than earlier in the month, although anxiety remained noticeable when anticipating contact with work."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:2",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "Mood felt less persistently low than earlier in the month, although anxiety remained noticeable when anticipating contact with work."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:3",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "Sleep was still variable."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:4",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan was alert, organized in conversation, and able to describe the follow-up plan."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:5",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "The patient denied current suicidal thoughts."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:6",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "No new acute safety issue emerged in this visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "9942bd886fcd:observation:7",
+            "doc_id": "BH-D114",
+            "file": "BH-D114_medication_management_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Rowan agreed to continue attending scheduled outpatient follow-up and to bring questions about the medication regimen to the next medication appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:assessment:0",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "assessment",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "PHQ-9 total: 10. Item 9: 0."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:0",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "The patient continued to endorse sleep difficulty and trouble sustaining usual activities, with fewer days of pervasive low mood than reported at intake."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:1",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "8",
+                "quote": "The patient continued to endorse sleep difficulty and trouble sustaining usual activities, with fewer days of pervasive low mood than reported at intake."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:2",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Rowan shows partial improvement, with persistent avoidance and meaningful functional impact around returning to work."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:3",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "The patient has taken some initial steps, including drafting and sending a message, but continues to delay follow-up and becomes anxious when a task expands beyond a narrowly defined action."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:4",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "10",
+                "quote": "Sleep disruption remains an intermittent barrier to establishing a steadier daytime routine."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:5",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Continued treatment is appropriate given the remaining difficulties with follow-through and work-related functioning."
+              }
+            ]
+          },
+          {
+            "claim_id": "4a3859fd81fc:observation:6",
+            "doc_id": "BH-D115",
+            "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
+            "record_type": "observation",
+            "passages": [
+              {
+                "lines": "6",
+                "quote": "PHQ-9 total: 10. Item 9: 0."
+              }
+            ]
+          }
+        ],
+        "notes": [],
+        "sql": [
+          {
+            "sql": "SELECT * FROM assessments WHERE completed_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, completed_date",
+            "params": [
+              "2026-01-05",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:assessment:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:assessment:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:assessment:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:assessment:0"
+            ]
+          },
+          {
+            "sql": "SELECT * FROM observations WHERE obs_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, obs_date, domain, observation_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "3b3f50db40b3:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "3b3f50db40b3:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "3b3f50db40b3:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:7"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "3b3f50db40b3:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "3b3f50db40b3:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "7f5f7d4bbfc9:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5edddc6b2093:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5edddc6b2093:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5edddc6b2093:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5edddc6b2093:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5edddc6b2093:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4521a120a4d7:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4521a120a4d7:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4521a120a4d7:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "ad416fbda806:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "924dee06b05c:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d30d18d0335d:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d30d18d0335d:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d30d18d0335d:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d30d18d0335d:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d30d18d0335d:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "95debafd3a72:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "8c2fbaf5bb45:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "432c973d1a4d:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "85e2c780abde:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "05a234a8adc9:observation:2",
+              "05a234a8adc9:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "514ca20809f6:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "05a234a8adc9:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "f3f25065559f:observation:0",
+              "f3f25065559f:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "514ca20809f6:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "514ca20809f6:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "05a234a8adc9:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "05a234a8adc9:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "05a234a8adc9:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "91fd8e8b1b31:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "09c946a2248a:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "09c946a2248a:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "09c946a2248a:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "09c946a2248a:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "09c946a2248a:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "c5953bcb242e:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "805b2c69c7fa:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "c5953bcb242e:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "c5953bcb242e:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "069ea4112779:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "069ea4112779:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "069ea4112779:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "805b2c69c7fa:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "805b2c69c7fa:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "c5953bcb242e:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "c5953bcb242e:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:7"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "36764827bcb3:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:6"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:5"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:4"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4a3859fd81fc:observation:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|PHQ-9|2026-01-05|-",
+              "HG-M042|PHQ-9|2026-01-16|HG-Q116",
+              "HG-M042|PHQ-9|2026-01-30|-"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?) ORDER BY subject_key, conflict_id",
+            "params": [
+              "HG-M042|PHQ-9|2026-01-05|-",
+              "HG-M042|PHQ-9|2026-01-16|HG-Q116",
+              "HG-M042|PHQ-9|2026-01-30|-"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "params": [
+              "05a234a8adc9:observation:0",
+              "05a234a8adc9:observation:1",
+              "05a234a8adc9:observation:2",
+              "05a234a8adc9:observation:3",
+              "05a234a8adc9:observation:4",
+              "05a234a8adc9:observation:5",
+              "069ea4112779:observation:0",
+              "069ea4112779:observation:1",
+              "069ea4112779:observation:2",
+              "09c946a2248a:observation:0",
+              "09c946a2248a:observation:1",
+              "09c946a2248a:observation:2",
+              "09c946a2248a:observation:3",
+              "09c946a2248a:observation:4",
+              "300a30dbe42b:assessment:0",
+              "300a30dbe42b:observation:0",
+              "300a30dbe42b:observation:1",
+              "300a30dbe42b:observation:2",
+              "300a30dbe42b:observation:3",
+              "300a30dbe42b:observation:4",
+              "300a30dbe42b:observation:5",
+              "300a30dbe42b:observation:6",
+              "36764827bcb3:observation:0",
+              "36764827bcb3:observation:1",
+              "36764827bcb3:observation:2",
+              "36764827bcb3:observation:3",
+              "36764827bcb3:observation:4",
+              "36764827bcb3:observation:5",
+              "3b3f50db40b3:observation:0",
+              "3b3f50db40b3:observation:1",
+              "3b3f50db40b3:observation:2",
+              "3b3f50db40b3:observation:3",
+              "3b3f50db40b3:observation:4",
+              "432c973d1a4d:observation:0",
+              "432c973d1a4d:observation:1",
+              "432c973d1a4d:observation:2",
+              "432c973d1a4d:observation:3",
+              "432c973d1a4d:observation:4",
+              "432c973d1a4d:observation:5",
+              "4521a120a4d7:observation:0",
+              "4521a120a4d7:observation:1",
+              "4521a120a4d7:observation:2",
+              "4521a120a4d7:observation:3",
+              "4a3859fd81fc:assessment:0",
+              "4a3859fd81fc:observation:0",
+              "4a3859fd81fc:observation:1",
+              "4a3859fd81fc:observation:2",
+              "4a3859fd81fc:observation:3",
+              "4a3859fd81fc:observation:4",
+              "4a3859fd81fc:observation:5",
+              "4a3859fd81fc:observation:6",
+              "4b64c46a13b8:observation:0",
+              "4b64c46a13b8:observation:1",
+              "4b64c46a13b8:observation:2",
+              "4b64c46a13b8:observation:3",
+              "4b64c46a13b8:observation:4",
+              "4b64c46a13b8:observation:5",
+              "4b64c46a13b8:observation:6",
+              "514ca20809f6:observation:0",
+              "514ca20809f6:observation:1",
+              "514ca20809f6:observation:2",
+              "5edddc6b2093:observation:0",
+              "5edddc6b2093:observation:1",
+              "5edddc6b2093:observation:2",
+              "5edddc6b2093:observation:3",
+              "5edddc6b2093:observation:4",
+              "7f5f7d4bbfc9:assessment:0",
+              "7f5f7d4bbfc9:observation:0",
+              "7f5f7d4bbfc9:observation:1",
+              "7f5f7d4bbfc9:observation:2",
+              "7f5f7d4bbfc9:observation:3",
+              "7f5f7d4bbfc9:observation:4",
+              "7f5f7d4bbfc9:observation:5",
+              "7f5f7d4bbfc9:observation:6",
+              "7f5f7d4bbfc9:observation:7",
+              "805b2c69c7fa:observation:0",
+              "805b2c69c7fa:observation:1",
+              "805b2c69c7fa:observation:2",
+              "85e2c780abde:assessment:0",
+              "85e2c780abde:observation:0",
+              "85e2c780abde:observation:1",
+              "85e2c780abde:observation:2",
+              "85e2c780abde:observation:3",
+              "85e2c780abde:observation:4",
+              "8c2fbaf5bb45:observation:0",
+              "8c2fbaf5bb45:observation:1",
+              "8c2fbaf5bb45:observation:2",
+              "8c2fbaf5bb45:observation:3",
+              "8c2fbaf5bb45:observation:4",
+              "8c2fbaf5bb45:observation:5",
+              "8c2fbaf5bb45:observation:6",
+              "91fd8e8b1b31:observation:0",
+              "91fd8e8b1b31:observation:1",
+              "91fd8e8b1b31:observation:2",
+              "91fd8e8b1b31:observation:3",
+              "91fd8e8b1b31:observation:4",
+              "91fd8e8b1b31:observation:5",
+              "91fd8e8b1b31:observation:6",
+              "924dee06b05c:observation:0",
+              "924dee06b05c:observation:1",
+              "924dee06b05c:observation:2",
+              "924dee06b05c:observation:3",
+              "924dee06b05c:observation:4",
+              "924dee06b05c:observation:5",
+              "924dee06b05c:observation:6",
+              "95debafd3a72:observation:0",
+              "95debafd3a72:observation:1",
+              "95debafd3a72:observation:2",
+              "95debafd3a72:observation:3",
+              "95debafd3a72:observation:4",
+              "95debafd3a72:observation:5",
+              "9942bd886fcd:observation:0",
+              "9942bd886fcd:observation:1",
+              "9942bd886fcd:observation:2",
+              "9942bd886fcd:observation:3",
+              "9942bd886fcd:observation:4",
+              "9942bd886fcd:observation:5",
+              "9942bd886fcd:observation:6",
+              "9942bd886fcd:observation:7",
+              "ad416fbda806:observation:0",
+              "ad416fbda806:observation:1",
+              "ad416fbda806:observation:2",
+              "ad416fbda806:observation:3",
+              "ad416fbda806:observation:4",
+              "ad416fbda806:observation:5",
+              "c5953bcb242e:observation:0",
+              "c5953bcb242e:observation:1",
+              "c5953bcb242e:observation:2",
+              "c5953bcb242e:observation:3",
+              "c5953bcb242e:observation:4",
+              "d03451942797:observation:0",
+              "d03451942797:observation:1",
+              "d03451942797:observation:2",
+              "d03451942797:observation:3",
+              "d03451942797:observation:4",
+              "d03451942797:observation:5",
+              "d03451942797:observation:6",
+              "d30d18d0335d:observation:0",
+              "d30d18d0335d:observation:1",
+              "d30d18d0335d:observation:2",
+              "d30d18d0335d:observation:3",
+              "d30d18d0335d:observation:4",
+              "f3f25065559f:observation:0",
+              "f3f25065559f:observation:1"
+            ]
+          }
+        ]
+      },
+      {
+        "op": "timeline",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-19",
+            "end": "2026-01-19",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "kinds": [
+            "encounters",
+            "documents",
+            "decisions"
+          ],
+          "observation_domains": null
+        },
+        "totals": {
+          "sessions": {
+            "low": 2,
+            "high": 2,
+            "status": "established"
+          },
+          "therapy_days": {
+            "low": 1,
+            "high": 1,
+            "status": "established"
+          },
+          "minutes": {
+            "low": 90,
+            "high": 90,
+            "status": "established"
+          },
+          "hours": {
+            "low": 1.5,
+            "high": 1.5,
+            "status": "established"
+          },
+          "uncertain_encounters": []
+        },
+        "groups": [],
+        "facts": [
+          {
+            "kind": "document",
+            "doc_id": "BH-D104",
+            "title": "Records inbox cover sheet with resent January 19, 2026 group attendance roster copy (HG-E110)",
+            "signed_at": null,
+            "received_at": "2026-01-26T16:22",
+            "finality": "unknown",
+            "assertions": [
+              {
+                "encounter": "HG-E110",
+                "record_type": "retransmitted_copy",
+                "disposition": "attended",
+                "arrival": "10:00",
+                "departure": "11:30",
+                "contact_intervals": [],
+                "nontherapeutic": [],
+                "stated_minutes": null
+              }
+            ],
+            "relations": [
+              {
+                "encounter_id": "HG-E110",
+                "original_date": "2026-01-19",
+                "type": "retransmits_original"
+              }
+            ]
+          },
+          {
+            "kind": "encounter",
+            "date": "2026-01-19",
+            "encounter": "HG-E110",
+            "patient": "HG-M042",
+            "week_start": "2026-01-19",
+            "service_type": "group_therapy",
+            "modality": "in_person",
+            "disposition": "attended_partial",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 60.0,
+              "high": 60.0,
+              "status": "established"
+            },
+            "calculation": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
+            "records": [
+              "BH-D101",
+              "BH-D102",
+              "BH-D103",
+              "BH-D104"
+            ],
+            "flags": []
+          },
+          {
+            "kind": "encounter",
+            "date": "2026-01-19",
+            "encounter": "HG-E111",
+            "patient": "HG-M042",
+            "week_start": "2026-01-19",
+            "service_type": "individual_therapy",
+            "modality": "in_person",
+            "disposition": "attended_full",
+            "counts_as_therapy_session": "yes",
+            "exclusion_reason": null,
+            "patient_present_minutes": {
+              "low": 30.0,
+              "high": 30.0,
+              "status": "established"
+            },
+            "calculation": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min",
+            "records": [
+              "BH-D103",
+              "BH-D105"
+            ],
+            "flags": []
+          },
+          {
+            "kind": "document",
+            "doc_id": "BH-D101",
+            "title": "Skills group clinical record (group encounter HG-E110), January 19, 2026",
+            "signed_at": "2026-01-19T12:08",
+            "received_at": null,
+            "finality": "final",
+            "assertions": [
+              {
+                "encounter": "HG-E110",
+                "record_type": "clinical_note",
+                "disposition": "attended",
+                "arrival": null,
+                "departure": null,
+                "contact_intervals": [],
+                "nontherapeutic": [
+                  "break 10:45\u201311:00"
+                ],
+                "stated_minutes": null
+              }
+            ]
+          },
+          {
+            "kind": "document",
+            "doc_id": "BH-D102",
+            "title": "Patient-specific attendance roster extract for group encounter HG-E110 (original signed attendance entry)",
+            "signed_at": "2026-01-19T12:14",
+            "received_at": null,
+            "finality": "final",
+            "assertions": [
+              {
+                "encounter": "HG-E110",
+                "record_type": "attendance_record",
+                "disposition": "attended",
+                "arrival": "10:00",
+                "departure": "11:30",
+                "contact_intervals": [],
+                "nontherapeutic": [],
+                "stated_minutes": null
+              }
+            ]
+          },
+          {
+            "kind": "document",
+            "doc_id": "BH-D105",
+            "title": "Individual psychotherapy note, encounter HG-E111 (added visit during group)",
+            "signed_at": "2026-01-19T12:32",
+            "received_at": null,
+            "finality": "final",
+            "assertions": [
+              {
+                "encounter": "HG-E111",
+                "record_type": "clinical_note",
+                "disposition": "attended_full",
+                "arrival": null,
+                "departure": null,
+                "contact_intervals": [
+                  "11:15\u201311:45"
+                ],
+                "nontherapeutic": [],
+                "stated_minutes": 30
+              }
+            ]
+          },
+          {
+            "kind": "document",
+            "doc_id": "BH-D103",
+            "title": "Attendance correction for group encounter HG-E110 (departure time)",
+            "signed_at": "2026-01-20T08:42",
+            "received_at": null,
+            "finality": "final",
+            "assertions": [
+              {
+                "encounter": "HG-E110",
+                "record_type": "attendance_correction",
+                "disposition": "attended_partial",
+                "arrival": "10:00",
+                "departure": "11:15",
+                "contact_intervals": [],
+                "nontherapeutic": [],
+                "stated_minutes": null
+              },
+              {
+                "encounter": "HG-E111",
+                "record_type": "other",
+                "disposition": "unknown",
+                "arrival": "11:15",
+                "departure": null,
+                "contact_intervals": [],
+                "nontherapeutic": [],
+                "stated_minutes": null
+              }
+            ],
+            "relations": [
+              {
+                "encounter_id": "HG-E110",
+                "field": "departure",
+                "new_value": "11:15",
+                "old_value": "11:30",
+                "original_date": "2026-01-19",
+                "type": "corrects_field"
+              }
+            ]
+          }
+        ],
+        "calculation": [
+          "patient-present minutes = 60 (HG-E110) + 30 (HG-E111) = 90"
+        ],
+        "exclusions": [],
+        "conflicts": [],
+        "decisions": [
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R5",
+            "outcome": "eligible=yes",
+            "reason": "group_therapy, attended, patient present"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R6",
+            "outcome": "minutes=60",
+            "reason": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R7",
+            "outcome": "correction_consistent",
+            "reason": "the superseded value in BH-D102 (10:00\u201311:30) would overlap HG-M042|HG-E111 11:15\u201311:45; the corrected value does not"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R1",
+            "outcome": "matched_without_id",
+            "reason": "BH-D103 names no encounter ID; matched on date 2026-01-19 + service type individual_therapy"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D105 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R5",
+            "outcome": "eligible=yes",
+            "reason": "individual_therapy, attended, patient present"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R6",
+            "outcome": "minutes=30",
+            "reason": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min"
+          }
+        ],
+        "evidence": [
+          {
+            "claim_id": "05a234a8adc9:service_event:0",
+            "doc_id": "BH-D101",
+            "file": "BH-D101_group_content_2026-01-19.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Skills group clinical record | Service date: January 19, 2026"
+              },
+              {
+                "lines": "6",
+                "quote": "Scheduled group: 10:00\u201311:30. Nontherapeutic break: 10:45\u201311:00."
+              },
+              {
+                "lines": "10",
+                "quote": "Rowan initially followed the exercise and identified postponing a message to a supervisor as a familiar pattern."
+              },
+              {
+                "lines": "10",
+                "quote": "Patient-specific arrival and departure are maintained on the attendance roster."
+              },
+              {
+                "lines": "6",
+                "quote": "Nontherapeutic break: 10:45\u201311:00."
+              }
+            ]
+          },
+          {
+            "claim_id": "514ca20809f6:service_event:0",
+            "doc_id": "BH-D102",
+            "file": "BH-D102_original_attendance_2026-01-19.txt",
+            "record_type": "attendance_record",
+            "passages": [
+              {
+                "lines": "4",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "8",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "9",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "12",
+                "quote": "Arrival and departure fields were entered at roster close."
+              }
+            ]
+          },
+          {
+            "claim_id": "674440968b5d:service_event:0",
+            "doc_id": "BH-D103",
+            "file": "BH-D103_attendance_correction_2026-01-20.txt",
+            "record_type": "attendance_correction",
+            "passages": [
+              {
+                "lines": "5",
+                "quote": "Applies to group encounter HG-E110, service date January 19, 2026"
+              },
+              {
+                "lines": "7",
+                "quote": "Correction: Patient departure for HG-E110 is 11:15, replacing the original roster value of 11:30. Patient arrival remains 10:00."
+              },
+              {
+                "lines": "9",
+                "quote": "The group continued for other members until its scheduled close."
+              }
+            ]
+          },
+          {
+            "claim_id": "674440968b5d:service_event:1",
+            "doc_id": "BH-D103",
+            "file": "BH-D103_attendance_correction_2026-01-20.txt",
+            "record_type": "other",
+            "passages": [
+              {
+                "lines": "9",
+                "quote": "The room-transfer record shows Rowan leaving skills room B at 11:15 and being received by the individual clinician at 11:15."
+              },
+              {
+                "lines": "11",
+                "quote": "It does not change the group service date, scheduled opening or closing, the break recorded in the group clinical note, or the separate individual appointment."
+              }
+            ]
+          },
+          {
+            "claim_id": "f3f25065559f:service_event:0",
+            "doc_id": "BH-D104",
+            "file": "BH-D104_resent_roster_received_2026-01-26.txt",
+            "record_type": "retransmitted_copy",
+            "passages": [
+              {
+                "lines": "11",
+                "quote": "Service date: January 19, 2026 | Group encounter: HG-E110"
+              },
+              {
+                "lines": "13",
+                "quote": "Scheduled opening: 10:00 | Scheduled closing: 11:30"
+              },
+              {
+                "lines": "14",
+                "quote": "Patient arrival: 10:00 | Patient departure: 11:30 | Status: Attended"
+              },
+              {
+                "lines": "20",
+                "quote": "The received copy contains no new clinician signature and records no additional visit."
+              }
+            ]
+          },
+          {
+            "claim_id": "91fd8e8b1b31:service_event:0",
+            "doc_id": "BH-D105",
+            "file": "BH-D105_individual_2026-01-19.txt",
+            "record_type": "clinical_note",
+            "passages": [
+              {
+                "lines": "3",
+                "quote": "Individual psychotherapy | Encounter HG-E111"
+              },
+              {
+                "lines": "5",
+                "quote": "January 19, 2026 | In person"
+              },
+              {
+                "lines": "6",
+                "quote": "Patient contact: 11:15\u201311:45 | Completed: 30 minutes"
+              },
+              {
+                "lines": "11",
+                "quote": "Rowan participated throughout the individual contact and reported that the immediate intensity of anxiety eased enough to discuss a next step."
+              }
+            ]
+          }
+        ],
+        "notes": [],
+        "sql": [
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-19",
+              "2026-01-19",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "514ca20809f6:service_event:0",
+              "674440968b5d:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "674440968b5d:service_event:1",
+              "91fd8e8b1b31:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.evidence_type, c.subject_key, c.payload, c.sha256 FROM claims c WHERE c.claim_id IN (?,?,?,?,?,?) ORDER BY c.doc_label",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "514ca20809f6:service_event:0",
+              "674440968b5d:service_event:0",
+              "674440968b5d:service_event:1",
+              "91fd8e8b1b31:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5"
+            ]
+          },
+          {
+            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "params": [
+              "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935"
+            ]
+          },
+          {
+            "sql": "SELECT doc_label, payload FROM claims WHERE kind='relation' AND subject_key IN (?,?)",
+            "params": [
+              "HG-E110",
+              "HG-E111"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?) ORDER BY subject_key, conflict_id",
+            "params": [
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "params": [
+              "05a234a8adc9:service_event:0",
+              "514ca20809f6:service_event:0",
+              "674440968b5d:service_event:0",
+              "674440968b5d:service_event:1",
+              "91fd8e8b1b31:service_event:0",
+              "f3f25065559f:service_event:0"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answer_markdown": "# Rowan (HG-M042): symptom course, January 5\u201330, 2026\n\n## Direct answer\n- **Symptom scores:** Three distinct PHQ-9 administrations are on record. The totals were **18** on Jan 5, **14** on Jan 16 and **10** on Jan 30. Each later score is lower than the one before.\n- **What the clinician concluded:** On Jan 16 the clinician noted \"some improvement in depressive symptoms.\" On Jan 30 the clinician judged \"partial improvement.\" Both times the clinician also recorded that avoidance and functional impact around returning to work were still present.\n- **Why there was an extra visit on January 19:** Rowan became anxious during the skills group and needed individual grounding and a review of coping strategies (BH-D105 L9). The group facilitator arranged a same-day individual visit (BH-D101 L10). That visit (encounter HG-E111) ran 11:15\u201311:45, 30 min (BH-D105 L6).\n\n## Distinct symptom assessments\n\n| Date | Instrument | Total | Recorded in | Notes |\n|---|---|---|---|---|\n| 2026-01-05 | PHQ-9 | 18 | BH-D002 L15 | Intake; no form ID; no item scores recorded |\n| 2026-01-16 | PHQ-9 | 14 | BH-D013 L7, L11 | Form HG-Q116; completed via portal |\n| 2026-01-30 | PHQ-9 | 10 | BH-D115 L6 | Item 9: 0 |\n\n**Excluded as a copy:** BH-D014, an imported measure summary received Jan 26, repeats the same Jan 16 PHQ-9 (14, form HG-Q116) (BH-D014 L13). It is not counted as a separate assessment. No anxiety measure or other instrument appears in the results.\n\n## Documented course (facts from the record)\n- **Intake (Jan 5):**\n  - Rowan reported several weeks of low mood, reduced interest, fragmented sleep, trouble starting tasks, and avoidance of email and of conversations about a return date (BH-D002 L11).\n  - The clinician's impression was depressive symptoms with anxiety and behavioral avoidance (BH-D002 L15; BH-D003 L10).\n- **Jan 13\u201314:**\n  - Mood was \"somewhat less heavy on days with a planned activity,\" but sleep interruption continued (BH-D010 L11). The clinician assessed ongoing depressive and anxiety symptoms (BH-D010 L15).\n  - Rowan opened a work message and took two short walks but had not replied to the message (BH-D011 L11).\n  - Affect was \"more varied than at intake\" (BH-D011 L15).\n- **Jan 16:**\n  - The PHQ-9 of 14 was reviewed. The clinician recorded that persistent avoidance, difficulty starting work communication and sleep disruption \"remain clinically relevant\" (BH-D013 L13).\n  - The partner contact that day was collateral only; Rowan told the office they could not take part (BH-D012 L11). Casey reported short walks and fewer unplanned reminders, but said mornings are still difficult (BH-D012 L13).\n- **Jan 19:**\n  - In group, Rowan became visibly tense when talk turned to returning to the workplace (BH-D101 L10) and asked for more help (BH-D102 L14).\n  - In the added individual visit, Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation. Rowan said the anxiety \"eased enough to discuss a next step\" (BH-D105 L9, L11).\n  - Rowan denied suicidal thoughts and the clinician found no acute safety concern (BH-D105 L13).\n- **Jan 21\u201326:**\n  - Rowan drafted a message to work but did not send it, and reported one better night of sleep followed by prolonged wakefulness (BH-D106 L9, L11).\n  - By Jan 26, Rowan had sent a short message to the supervisor but kept putting off scheduling the follow-up conversation (BH-D110 L9).\n  - The clinician recorded \"ongoing anxiety, low mood, and functional difficulty around work demands\" (BH-D111 L14).\n- **Jan 30:**\n  - Rowan reported fewer days of pervasive low mood than at intake, and that sleep was still a problem (BH-D115 L8; BH-D114 L8).\n  - Anxiety was still noticeable when anticipating contact with work (BH-D114 L8).\n  - The clinician judged partial improvement, recommended continued treatment (BH-D115 L10, L12), and found no new acute safety issue (BH-D114 L10).\n- **Missed or partial attendance:**\n  - Jan 8: no-show for an individual visit (BH-D015 L9).\n  - Jan 22: arrived late to group and stayed until it closed (BH-D108 L14).\n  - Jan 27: missed the whole group (BH-D108 L16).\n  - Jan 28: cancelled an individual visit (BH-D108 L18).\n\n## January 19 records\n- **Group (HG-E110):**\n  - The original roster said Rowan left at 11:30 (BH-D102 L9). A signed correction changed this to 11:15 (BH-D103 L7). It is supported by a room-transfer record showing Rowan was received by the individual clinician at 11:15 (BH-D103 L9).\n  - With the 10:45\u201311:00 break removed (BH-D101 L6), group time counts as 60 min.\n- **Individual visit (HG-E111):** 30 min (BH-D105 L6).\n- **Day total:** 90 patient-present minutes over 2 sessions.\n- **Excluded record:** BH-D104 is a resent copy of the roster with the old 11:30 departure time (BH-D104 L14). It is not independent evidence and records no additional visit (BH-D104 L20).\n\n## What the record supports\n- The PHQ-9 totals went down across the three distinct administrations (18 \u2192 14 \u2192 10).\n- The clinician documented \"some\" improvement on Jan 16 (BH-D013 L13) and \"partial\" improvement on Jan 30 (BH-D115 L10). Rowan's own reports describe mood as less persistently low (BH-D114 L8; BH-D115 L8).\n- Rowan took small behavioral steps: opening a work message (BH-D011 L11), then sending one to the supervisor (BH-D110 L9).\n\n## What the record does not support\n- **A clinical response or remission label.** The record never states one, and the clinician's own wording is limited to \"some\" and \"partial\" improvement.\n- **That treatment or medication caused the change.** No document makes that link.\n- **Improvement in anxiety, sleep or work functioning.** Anxiety is still documented on Jan 30 (BH-D114 L8; BH-D113 L13). Sleep is still \"variable\" (BH-D114 L8), and avoidance and delayed follow-through persist (BH-D115 L10). There was no anxiety instrument to measure change.\n- **Item-level change in symptoms.** The only item score is item 9 = 0 on Jan 30.\n- **That Rowan completed their own work task on Jan 19.** The clinician cautioned that taking part in the group exercise should not be read as completing their own work task (BH-D101 L12).",
+  "unresolved": [
+    "No item-level PHQ-9 data except item 9 on Jan 30, so it is unclear which symptoms changed.",
+    "No standardized anxiety measure is in the record, so change in anxiety can't be measured.",
+    "The Jan 5 PHQ-9 has no form ID."
+  ],
+  "caveats": [
+    "BH-D014 repeats the Jan 16 PHQ-9 and was not counted as a separate assessment.",
+    "BH-D104 is a resent copy of the Jan 19 roster and was excluded as evidence. The group departure time of 11:15 comes from the correction in BH-D103.",
+    "The Jan 16 partner contact (BH-D012) was collateral only; Rowan was absent.",
+    "Improvement statements are the clinician's judgments or Rowan's reports. Causation is not documented."
+  ],
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 3486,
+    "execute": 9.95,
+    "narrate_llm": 48709,
+    "total": 52205
+  },
+  "llm": {
+    "calls": 2,
+    "input_tokens": 96642,
+    "output_tokens": 6345,
+    "cost_usd": 0.1770142
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T11:59:07"
+}

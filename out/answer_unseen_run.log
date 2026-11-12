@@ -1,0 +1,6 @@
+NEW-01: total {'plan_llm': 2844, 'execute': 6.97, 'narrate_llm': 18221, 'total': 21072} cached=False postcheck_ok=True
+NEW-02: total {'plan_llm': 2676, 'execute': 7.51, 'narrate_llm': 19147, 'total': 21830} cached=False postcheck_ok=True
+NEW-03: total {'plan_llm': 2485, 'execute': 2.78, 'narrate_llm': 30945, 'total': 33433} cached=False postcheck_ok=True
+NEW-04: total {'plan_llm': 3324, 'execute': 6.04, 'narrate_llm': 25801, 'total': 29131} cached=False postcheck_ok=True
+NEW-05: total {'plan_llm': 2622, 'execute': 1.08, 'narrate_llm': 14460, 'total': 17083} cached=False postcheck_ok=True
+NEW-06: total {'plan_llm': 5796, 'execute': 0.04, 'narrate_llm': 0, 'total': 5796} cached=False postcheck_ok=True

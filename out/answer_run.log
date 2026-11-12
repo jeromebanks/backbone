@@ -1,0 +1,5 @@
+DEV-01: total {'plan_llm': 3198, 'execute': 10.23, 'narrate_llm': 48892, 'total': 52100} cached=False postcheck_ok=True
+DEV-02: total {'plan_llm': 4177, 'execute': 8.86, 'narrate_llm': 41712, 'total': 45898} cached=False postcheck_ok=True
+DEV-03: total {'plan_llm': 2775, 'execute': 7.58, 'narrate_llm': 26319, 'total': 29101} cached=False postcheck_ok=True
+DEV-04: total {'plan_llm': 4670, 'execute': 6.81, 'narrate_llm': 15049, 'total': 19725} cached=False postcheck_ok=True
+DEV-05: total {'plan_llm': 3486, 'execute': 9.95, 'narrate_llm': 48709, 'total': 52205} cached=False postcheck_ok=True

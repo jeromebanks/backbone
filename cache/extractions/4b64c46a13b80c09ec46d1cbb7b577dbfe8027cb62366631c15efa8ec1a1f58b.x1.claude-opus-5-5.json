@@ -1,0 +1,116 @@
+{
+  "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
+  "filename": "BH-D110_individual_primary_record_2026-01-26.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 10391,
+    "input_tokens": 8034,
+    "output_tokens": 1229,
+    "cost_usd": 0.035663600000000004,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D110",
+      "title": "Individual psychotherapy primary note, encounter HG-E115",
+      "signed": true,
+      "signed_at": "2026-01-26T11:16",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E115",
+        "related_encounter_id": null,
+        "appointment_id": "HG-A115",
+        "service_date": "2026-01-26",
+        "service_type": "individual_therapy",
+        "modality": "in_person",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "yes",
+        "scheduled": null,
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [
+          {
+            "start": "09:00",
+            "end": "09:50"
+          }
+        ],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": 50,
+        "clinicians": [
+          "Mira Patel, LCSW",
+          "Nora Ellis, LCSW"
+        ],
+        "quotes": [
+          "Individual psychotherapy | Encounter HG-E115 | Appointment HG-A115",
+          "January 26, 2026 | In person",
+          "Actual patient psychotherapy contact: 09:00\u201309:50, 50 minutes.",
+          "Clinicians: Mira Patel, LCSW; Nora Ellis, LCSW"
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-26",
+        "domain": "avoidance",
+        "source": "patient_report",
+        "statement": "Patient continued to put off scheduling the conversation with the supervisor.",
+        "quote": "Rowan continued to postpone choosing a time for the conversation."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "anxiety",
+        "source": "patient_report",
+        "statement": "The supervisor's reply reduced some uncertainty but raised worry about being asked for commitments the patient might not meet.",
+        "quote": "The reply reduced one uncertainty but also brought up worry about being asked for commitments the patient might not be able to meet."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "sleep",
+        "source": "patient_report",
+        "statement": "Sleep remained uneven, with trouble settling when work thoughts became repetitive.",
+        "quote": "Sleep remained uneven, with difficulty settling on nights when work-related thoughts became repetitive."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "functioning",
+        "source": "patient_report",
+        "statement": "Patient sent a short message to the supervisor and got a request to discuss next steps.",
+        "quote": "Rowan described sending a short message to the supervisor and receiving a request to discuss possible next steps."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient was able to return to the main request with prompting during role-play.",
+        "quote": "Rowan was able to return to the main request with prompting."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "engagement",
+        "source": "clinician_observation",
+        "statement": "Patient was attentive and collaborative but hesitant about completing the task outside the office.",
+        "quote": "The patient remained attentive and collaborative, although hesitant about completing the task outside the office."
+      },
+      {
+        "date": "2026-01-26",
+        "domain": "safety",
+        "source": "patient_report",
+        "statement": "No current suicidal ideation was reported.",
+        "quote": "No current suicidal ideation was reported."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

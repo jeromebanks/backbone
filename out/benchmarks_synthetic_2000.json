@@ -1,0 +1,214 @@
+{
+  "machine": "Darwin arm64 / Python 3.12.8",
+  "measured_at": "2026-11-12 11:54:59",
+  "extraction_initial_run": {
+    "documents": 31,
+    "model": [
+      "claude-opus-5-5"
+    ],
+    "effort": [
+      "high"
+    ],
+    "latency_ms_mean": 13200,
+    "latency_ms_p95": 19506,
+    "input_tokens_total": 257882,
+    "output_tokens_total": 48809,
+    "input_tokens_per_doc": 8318,
+    "output_tokens_per_doc": 1574,
+    "list_price_cost_usd_total": 1.382,
+    "list_price_cost_usd_per_doc": 0.0446,
+    "note": "cost is the API list-price equivalent reported by the CLI; the run used a Claude subscription"
+  },
+  "rebuild_from_cache": {
+    "documents": 31,
+    "llm_calls": 0,
+    "ingest_ms": 19.0,
+    "reconcile_ms": 4.3,
+    "reconcile": {
+      "HG-M042": {
+        "encounters": 26,
+        "decisions": 77,
+        "conflicts": 1,
+        "assessments": 3
+      }
+    }
+  },
+  "reingest_unchanged": {
+    "ms": 1.1,
+    "llm_calls": 0,
+    "new_documents": 0,
+    "patients_reconciled": 0
+  },
+  "incremental_add_one_document": {
+    "document": "symptom_measure_review_jan16.txt",
+    "ingest_ms_excluding_llm": 1.4,
+    "reconcile_one_patient_ms": 4.4,
+    "llm_calls_if_new": 1,
+    "llm_latency_ms_if_new": 13200
+  },
+  "operator_latency_real_patient": {
+    "care_by_week": {
+      "runs": 20,
+      "median_ms": 0.408,
+      "p95_ms": 0.456,
+      "min_ms": 0.399
+    },
+    "care_with_exclusions_and_evidence": {
+      "runs": 20,
+      "median_ms": 0.915,
+      "p95_ms": 1.032,
+      "min_ms": 0.907
+    },
+    "weekly_compliance": {
+      "runs": 20,
+      "median_ms": 0.642,
+      "p95_ms": 0.674,
+      "min_ms": 0.638
+    },
+    "reconstruct_day": {
+      "runs": 20,
+      "median_ms": 0.242,
+      "p95_ms": 0.27,
+      "min_ms": 0.24
+    },
+    "symptom_course": {
+      "runs": 20,
+      "median_ms": 1.742,
+      "p95_ms": 1.793,
+      "min_ms": 1.67
+    }
+  },
+  "synthetic_collection_scale": {
+    "label": "SYNTHETIC: reconciled layer of the real patient cloned per patient; documents/claims not cloned",
+    "patients": 2000,
+    "encounters": 52000,
+    "build_ms": 176.9,
+    "db_mb": 20.4,
+    "single_patient_care_by_week": {
+      "runs": 20,
+      "median_ms": 0.337,
+      "p95_ms": 0.386,
+      "min_ms": 0.334
+    },
+    "single_patient_weekly_compliance": {
+      "runs": 20,
+      "median_ms": 0.572,
+      "p95_ms": 0.677,
+      "min_ms": 0.567
+    },
+    "collection_care_by_patient": {
+      "runs": 3,
+      "median_ms": 446.17,
+      "p95_ms": 446.17,
+      "min_ms": 425.749
+    },
+    "collection_care_by_week": {
+      "runs": 3,
+      "median_ms": 433.313,
+      "p95_ms": 433.313,
+      "min_ms": 430.813
+    },
+    "collection_weekly_compliance_consecutive_below_2": {
+      "runs": 1,
+      "median_ms": 930.173,
+      "p95_ms": 930.173,
+      "min_ms": 930.173
+    }
+  },
+  "persisted_abstraction": {
+    "db_path": "out/backbone.db",
+    "db_bytes": 2281472,
+    "extraction_cache_bytes": 136278,
+    "documents": 31,
+    "claims": 254,
+    "encounters": 26,
+    "decisions": 77,
+    "conflicts": 1,
+    "assessments": 3,
+    "observations": 138,
+    "unverified_claims": 0
+  },
+  "question_answering": {
+    "DEV-01": {
+      "timings_ms": {
+        "plan_llm": 3422,
+        "execute": 12.09,
+        "narrate_llm": 42495,
+        "total": 45930
+      },
+      "llm": {
+        "calls": 2,
+        "input_tokens": 129697,
+        "output_tokens": 5777,
+        "cost_usd": 0.16845880000000002
+      },
+      "postcheck_ok": true
+    },
+    "DEV-02": {
+      "timings_ms": {
+        "plan_llm": 3759,
+        "execute": 9.73,
+        "narrate_llm": 48118,
+        "total": 51887
+      },
+      "llm": {
+        "calls": 2,
+        "input_tokens": 126090,
+        "output_tokens": 6662,
+        "cost_usd": 0.644366
+      },
+      "postcheck_ok": true
+    },
+    "DEV-03": {
+      "timings_ms": {
+        "plan_llm": 3104,
+        "execute": 6.39,
+        "narrate_llm": 25243,
+        "total": 28354
+      },
+      "llm": {
+        "calls": 2,
+        "input_tokens": 13202,
+        "output_tokens": 3447,
+        "cost_usd": 0.0768684
+      },
+      "postcheck_ok": true
+    },
+    "DEV-04": {
+      "timings_ms": {
+        "plan_llm": 3786,
+        "execute": 5.77,
+        "narrate_llm": 16846,
+        "total": 20638
+      },
+      "llm": {
+        "calls": 2,
+        "input_tokens": 18030,
+        "output_tokens": 2171,
+        "cost_usd": 0.15408840000000001
+      },
+      "postcheck_ok": true
+    },
+    "DEV-05": {
+      "timings_ms": {
+        "plan_llm": 3293,
+        "execute": 7.22,
+        "narrate_llm": 48435,
+        "total": 51735
+      },
+      "llm": {
+        "calls": 2,
+        "input_tokens": 48526,
+        "output_tokens": 6642,
+        "cost_usd": 0.14783320000000003
+      },
+      "postcheck_ok": true
+    }
+  },
+  "question_answering_cached_repeat": {
+    "runs": 5,
+    "median_ms": 1.576,
+    "p95_ms": 1.645,
+    "min_ms": 1.216
+  }
+}

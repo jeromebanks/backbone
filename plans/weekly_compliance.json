@@ -1,0 +1,5 @@
+{"question": "Weekly treatment-plan compliance for HG-M042, Jan 5-30 2026, with consecutive weeks below goal",
+ "steps": [
+  {"op": "care", "scope": {"patients": ["HG-M042"], "start": "2026-01-05", "end": "2026-01-30", "include_excluded": true, "include_evidence": false}, "group_by": "week"},
+  {"op": "compliance", "scope": {"patients": ["HG-M042"], "start": "2026-01-05", "end": "2026-01-30", "include_evidence": false}, "consecutive_below": 2}
+ ]}

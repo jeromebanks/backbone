@@ -1,0 +1,86 @@
+{
+  "sha256": "069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
+  "filename": "BH-D109_care_coordination_2026-01-23.txt",
+  "meta": {
+    "model": "claude-opus-5-5",
+    "extractor_version": "x1",
+    "effort": "high",
+    "latency_ms": 8220,
+    "input_tokens": 7955,
+    "output_tokens": 853,
+    "cost_usd": 0.027511599999999997,
+    "attempts": 1,
+    "from_cache": false
+  },
+  "extraction": {
+    "document": {
+      "document_id": "BH-D109",
+      "title": "Care coordination note, encounter HG-E114 (professionals only)",
+      "signed": true,
+      "signed_at": "2026-01-23T10:02",
+      "received_at": null,
+      "finality": "final",
+      "patient_name": "Rowan Mercer",
+      "patient_mrn": "HG-M042",
+      "patient_dob": "1991-04-12",
+      "relations": []
+    },
+    "service_events": [
+      {
+        "encounter_id": "HG-E114",
+        "related_encounter_id": null,
+        "appointment_id": null,
+        "service_date": "2026-01-23",
+        "service_type": "care_coordination",
+        "modality": "unknown",
+        "evidence_type": "clinical_note",
+        "disposition": "attended",
+        "patient_present": "no",
+        "scheduled": {
+          "start": "09:00",
+          "end": "09:20"
+        },
+        "patient_arrival": null,
+        "patient_departure": null,
+        "patient_contact_intervals": [],
+        "nontherapeutic_intervals": [],
+        "stated_minutes": null,
+        "clinicians": [
+          "Mira Patel, LCSW",
+          "Daniel Shaw, outside social worker"
+        ],
+        "quotes": [
+          "January 23, 2026 | 09:00\u201309:20",
+          "Patient participation: None. No patient contact occurred.",
+          "This contact was between professionals only.",
+          "Rowan did not join by telephone or video, and no psychotherapy was delivered to the patient during the call."
+        ]
+      }
+    ],
+    "assessments": [],
+    "observations": [
+      {
+        "date": "2026-01-23",
+        "domain": "functioning",
+        "source": "collateral_report",
+        "statement": "Outside social worker reported the patient asked for help understanding whom to contact about a gradual return-to-work schedule.",
+        "quote": "The outside social worker reported that Rowan had asked for help understanding whom to contact about a gradual return schedule."
+      },
+      {
+        "date": "2026-01-23",
+        "domain": "avoidance",
+        "source": "clinician_assessment",
+        "statement": "Clinician will continue addressing avoidance and coping in scheduled therapy.",
+        "quote": "I will continue to address avoidance and coping within scheduled therapy."
+      },
+      {
+        "date": "2026-01-23",
+        "domain": "other",
+        "source": "clinician_assessment",
+        "statement": "No change to medication or psychotherapy frequency was made.",
+        "quote": "No change to medication or psychotherapy frequency was made during the coordination call."
+      }
+    ],
+    "plan_requirements": []
+  }
+}

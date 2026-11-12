@@ -1,0 +1,997 @@
+{
+  "id": "DEV-03",
+  "question": "For each week, did the delivered therapy meet the goal documented in Rowan\u2019s treatment plan? State the goal, the relevant therapy-day and minute totals, and whether it was met, not met, or cannot be determined from the current record.",
+  "plan": {
+    "question": "For each week, did the delivered therapy meet the goal documented in Rowan\u2019s treatment plan? State the goal, the relevant therapy-day and minute totals, and whether it was met, not met, or cannot be determined from the current record.",
+    "steps": [
+      {
+        "op": "compliance",
+        "scope": {
+          "patients": [
+            "HG-M042"
+          ],
+          "start": "2026-01-05",
+          "end": "2026-01-30",
+          "service_types": null,
+          "include_excluded": true,
+          "include_evidence": true
+        },
+        "consecutive_below": null
+      }
+    ],
+    "unsupported_reason": null
+  },
+  "plan_explain": "QueryPlan: For each week, did the delivered therapy meet the goal documented in Rowan\u2019s treatment plan? State the goal, the relevant therapy-day and minute totals, and whether it was met, not met, or cannot be determined from the current record.\n  1. compliance(patients=['HG-M042'], 2026-01-05..2026-01-30, include_excluded)",
+  "results": {
+    "question": "For each week, did the delivered therapy meet the goal documented in Rowan\u2019s treatment plan? State the goal, the relevant therapy-day and minute totals, and whether it was met, not met, or cannot be determined from the current record.",
+    "plan": {
+      "question": "For each week, did the delivered therapy meet the goal documented in Rowan\u2019s treatment plan? State the goal, the relevant therapy-day and minute totals, and whether it was met, not met, or cannot be determined from the current record.",
+      "steps": [
+        {
+          "op": "compliance",
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "consecutive_below": null
+        }
+      ],
+      "unsupported_reason": null
+    },
+    "results": [
+      {
+        "op": "compliance",
+        "params": {
+          "scope": {
+            "patients": [
+              "HG-M042"
+            ],
+            "start": "2026-01-05",
+            "end": "2026-01-30",
+            "service_types": null,
+            "include_excluded": true,
+            "include_evidence": true
+          },
+          "consecutive_below": null
+        },
+        "totals": {
+          "weeks_by_status": {
+            "NOT_MET": 2,
+            "MET": 1,
+            "UNDETERMINED": 1
+          },
+          "patients": 1
+        },
+        "groups": [
+          {
+            "mrn": "HG-M042",
+            "week_start": "2026-01-05",
+            "week_end": "2026-01-11",
+            "evaluated_days": "2026-01-05..2026-01-11",
+            "status": "NOT_MET",
+            "evaluations": [
+              {
+                "plan_days": "2026-01-05..2026-01-11",
+                "plan_documents": [
+                  "BH-D003"
+                ],
+                "counted_service_types": [
+                  "family_therapy",
+                  "group_therapy",
+                  "individual_therapy"
+                ],
+                "totals": {
+                  "sessions": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "therapy_days": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "minutes": {
+                    "low": 140,
+                    "high": 140,
+                    "status": "established"
+                  },
+                  "hours": {
+                    "low": 2.33,
+                    "high": 2.33,
+                    "status": "established"
+                  },
+                  "uncertain_encounters": []
+                },
+                "requirements": [
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|patient_present_minutes|2026-01-05",
+                    "metric": "patient_present_minutes",
+                    "goal": ">= 150",
+                    "value": {
+                      "low": 140,
+                      "high": 140,
+                      "status": "established"
+                    },
+                    "status": "NOT_MET",
+                    "reason": "patient_present_minutes 140 vs goal >= 150"
+                  },
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|therapy_days|2026-01-05",
+                    "metric": "therapy_days",
+                    "goal": ">= 3",
+                    "value": {
+                      "low": 3,
+                      "high": 3,
+                      "status": "established"
+                    },
+                    "status": "MET",
+                    "reason": "therapy_days 3 vs goal >= 3"
+                  }
+                ],
+                "status": "NOT_MET",
+                "encounters": [
+                  "HG-E101",
+                  "HG-E102",
+                  "HG-E104"
+                ],
+                "minutes_calculation": "50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104)"
+              }
+            ],
+            "notes": []
+          },
+          {
+            "mrn": "HG-M042",
+            "week_start": "2026-01-12",
+            "week_end": "2026-01-18",
+            "evaluated_days": "2026-01-12..2026-01-18",
+            "status": "NOT_MET",
+            "evaluations": [
+              {
+                "plan_days": "2026-01-12..2026-01-18",
+                "plan_documents": [
+                  "BH-D003"
+                ],
+                "counted_service_types": [
+                  "family_therapy",
+                  "group_therapy",
+                  "individual_therapy"
+                ],
+                "totals": {
+                  "sessions": {
+                    "low": 2,
+                    "high": 2,
+                    "status": "established"
+                  },
+                  "therapy_days": {
+                    "low": 2,
+                    "high": 2,
+                    "status": "established"
+                  },
+                  "minutes": {
+                    "low": 120,
+                    "high": 120,
+                    "status": "established"
+                  },
+                  "hours": {
+                    "low": 2,
+                    "high": 2,
+                    "status": "established"
+                  },
+                  "uncertain_encounters": []
+                },
+                "requirements": [
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|patient_present_minutes|2026-01-05",
+                    "metric": "patient_present_minutes",
+                    "goal": ">= 150",
+                    "value": {
+                      "low": 120,
+                      "high": 120,
+                      "status": "established"
+                    },
+                    "status": "NOT_MET",
+                    "reason": "patient_present_minutes 120 vs goal >= 150"
+                  },
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|therapy_days|2026-01-05",
+                    "metric": "therapy_days",
+                    "goal": ">= 3",
+                    "value": {
+                      "low": 2,
+                      "high": 2,
+                      "status": "established"
+                    },
+                    "status": "NOT_MET",
+                    "reason": "therapy_days 2 vs goal >= 3"
+                  }
+                ],
+                "status": "NOT_MET",
+                "encounters": [
+                  "HG-E105",
+                  "HG-E107"
+                ],
+                "minutes_calculation": "75 (HG-E105) + 45 (HG-E107)"
+              }
+            ],
+            "notes": []
+          },
+          {
+            "mrn": "HG-M042",
+            "week_start": "2026-01-19",
+            "week_end": "2026-01-25",
+            "evaluated_days": "2026-01-19..2026-01-25",
+            "status": "MET",
+            "evaluations": [
+              {
+                "plan_days": "2026-01-19..2026-01-25",
+                "plan_documents": [
+                  "BH-D003"
+                ],
+                "counted_service_types": [
+                  "family_therapy",
+                  "group_therapy",
+                  "individual_therapy"
+                ],
+                "totals": {
+                  "sessions": {
+                    "low": 4,
+                    "high": 4,
+                    "status": "established"
+                  },
+                  "therapy_days": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "minutes": {
+                    "low": 180,
+                    "high": 180,
+                    "status": "established"
+                  },
+                  "hours": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "uncertain_encounters": []
+                },
+                "requirements": [
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|patient_present_minutes|2026-01-05",
+                    "metric": "patient_present_minutes",
+                    "goal": ">= 150",
+                    "value": {
+                      "low": 180,
+                      "high": 180,
+                      "status": "established"
+                    },
+                    "status": "MET",
+                    "reason": "patient_present_minutes 180 vs goal >= 150"
+                  },
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|therapy_days|2026-01-05",
+                    "metric": "therapy_days",
+                    "goal": ">= 3",
+                    "value": {
+                      "low": 3,
+                      "high": 3,
+                      "status": "established"
+                    },
+                    "status": "MET",
+                    "reason": "therapy_days 3 vs goal >= 3"
+                  }
+                ],
+                "status": "MET",
+                "encounters": [
+                  "HG-E110",
+                  "HG-E111",
+                  "HG-E112",
+                  "HG-E113"
+                ],
+                "minutes_calculation": "60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113)"
+              }
+            ],
+            "notes": []
+          },
+          {
+            "mrn": "HG-M042",
+            "week_start": "2026-01-26",
+            "week_end": "2026-02-01",
+            "evaluated_days": "2026-01-26..2026-01-30",
+            "status": "UNDETERMINED",
+            "evaluations": [
+              {
+                "plan_days": "2026-01-26..2026-01-30",
+                "plan_documents": [
+                  "BH-D003"
+                ],
+                "counted_service_types": [
+                  "family_therapy",
+                  "group_therapy",
+                  "individual_therapy"
+                ],
+                "totals": {
+                  "sessions": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "therapy_days": {
+                    "low": 3,
+                    "high": 3,
+                    "status": "established"
+                  },
+                  "minutes": {
+                    "low": 145,
+                    "high": 155,
+                    "status": "bounded"
+                  },
+                  "hours": {
+                    "low": 2.42,
+                    "high": 2.58,
+                    "status": "bounded"
+                  },
+                  "uncertain_encounters": [
+                    "HG-M042|HG-E115"
+                  ]
+                },
+                "requirements": [
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|patient_present_minutes|2026-01-05",
+                    "metric": "patient_present_minutes",
+                    "goal": ">= 150",
+                    "value": {
+                      "low": 145,
+                      "high": 155,
+                      "status": "bounded"
+                    },
+                    "status": "UNDETERMINED",
+                    "reason": "patient_present_minutes 145\u2013155 vs goal >= 150"
+                  },
+                  {
+                    "requirement": "HG-M042|plan|BH-D003|therapy_days|2026-01-05",
+                    "metric": "therapy_days",
+                    "goal": ">= 3",
+                    "value": {
+                      "low": 3,
+                      "high": 3,
+                      "status": "established"
+                    },
+                    "status": "MET",
+                    "reason": "therapy_days 3 vs goal >= 3"
+                  }
+                ],
+                "status": "UNDETERMINED",
+                "encounters": [
+                  "HG-E115",
+                  "HG-E118",
+                  "HG-E119"
+                ],
+                "minutes_calculation": "[40\u201350] (HG-E115) + 75 (HG-E118) + 30 (HG-E119)"
+              }
+            ],
+            "notes": [
+              "partial week: 2026-01-26..2026-01-30 is inside the requested period (5 of 7 days)"
+            ]
+          }
+        ],
+        "facts": [],
+        "calculation": [
+          "HG-M042 week 2026-01-05: 2026-01-05..2026-01-11: days 3, minutes 140 -> patient_present_minutes NOT_MET; therapy_days MET => NOT_MET",
+          "HG-M042 week 2026-01-12: 2026-01-12..2026-01-18: days 2, minutes 120 -> patient_present_minutes NOT_MET; therapy_days NOT_MET => NOT_MET",
+          "HG-M042 week 2026-01-19: 2026-01-19..2026-01-25: days 3, minutes 180 -> patient_present_minutes MET; therapy_days MET => MET",
+          "HG-M042 week 2026-01-26: 2026-01-26..2026-01-30: days 3, minutes 145\u2013155 -> patient_present_minutes UNDETERMINED; therapy_days MET => UNDETERMINED"
+        ],
+        "exclusions": [
+          {
+            "encounter": "HG-E103",
+            "date": "2026-01-08",
+            "week_start": "2026-01-05",
+            "service_type": "individual_therapy",
+            "reason": "not attended (no_show)",
+            "records": [
+              "BH-D006",
+              "BH-D015"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-08-outreach_call-1",
+            "date": "2026-01-08",
+            "week_start": "2026-01-05",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)",
+            "records": [
+              "BH-D015"
+            ]
+          },
+          {
+            "encounter": "HG-E106",
+            "date": "2026-01-13",
+            "week_start": "2026-01-12",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)",
+            "records": [
+              "BH-D006",
+              "BH-D010"
+            ]
+          },
+          {
+            "encounter": "HG-E108",
+            "date": "2026-01-15",
+            "week_start": "2026-01-12",
+            "service_type": "group_therapy",
+            "reason": "not attended (clinic_cancelled)",
+            "records": [
+              "BH-D006",
+              "BH-D016"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-15-administrative-1",
+            "date": "2026-01-15",
+            "week_start": "2026-01-12",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)",
+            "records": [
+              "BH-D016"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-15-outreach_call-1",
+            "date": "2026-01-15",
+            "week_start": "2026-01-12",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)",
+            "records": [
+              "BH-D016"
+            ]
+          },
+          {
+            "encounter": "HG-E109",
+            "date": "2026-01-16",
+            "week_start": "2026-01-12",
+            "service_type": "family_collateral",
+            "reason": "not a psychotherapy service (family_collateral)",
+            "records": [
+              "BH-D006",
+              "BH-D012"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-16-administrative-1",
+            "date": "2026-01-16",
+            "week_start": "2026-01-12",
+            "service_type": "administrative",
+            "reason": "not a psychotherapy service (administrative)",
+            "records": [
+              "BH-D013"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-16-other-1",
+            "date": "2026-01-16",
+            "week_start": "2026-01-12",
+            "service_type": "other",
+            "reason": "not a psychotherapy service (other)",
+            "records": [
+              "BH-D016"
+            ]
+          },
+          {
+            "encounter": "HG-E114",
+            "date": "2026-01-23",
+            "week_start": "2026-01-19",
+            "service_type": "care_coordination",
+            "reason": "not a psychotherapy service (care_coordination)",
+            "records": [
+              "BH-D109"
+            ]
+          },
+          {
+            "encounter": "HG-E116",
+            "date": "2026-01-27",
+            "week_start": "2026-01-26",
+            "service_type": "group_therapy",
+            "reason": "not attended (no_show)",
+            "records": [
+              "BH-D108",
+              "BH-D112"
+            ]
+          },
+          {
+            "encounter": "U-2026-01-27-outreach_call-1",
+            "date": "2026-01-27",
+            "week_start": "2026-01-26",
+            "service_type": "outreach_call",
+            "reason": "not a psychotherapy service (outreach_call)",
+            "records": [
+              "BH-D108"
+            ]
+          },
+          {
+            "encounter": "HG-E117",
+            "date": "2026-01-28",
+            "week_start": "2026-01-26",
+            "service_type": "individual_therapy",
+            "reason": "not attended (patient_cancelled)",
+            "records": [
+              "BH-D108"
+            ]
+          },
+          {
+            "encounter": "HG-E120",
+            "date": "2026-01-30",
+            "week_start": "2026-01-26",
+            "service_type": "medication_management",
+            "reason": "not a psychotherapy service (medication_management)",
+            "records": [
+              "BH-D114"
+            ]
+          }
+        ],
+        "conflicts": [
+          {
+            "subject": "HG-E115",
+            "field": "patient_present_interval",
+            "resolution": "disputed",
+            "candidates": [
+              {
+                "value": "09:00\u201309:50",
+                "minutes": 50,
+                "claim_ids": [
+                  "4b64c46a13b8:service_event:0"
+                ],
+                "documents": [
+                  "BH-D110"
+                ]
+              },
+              {
+                "value": "09:10\u201309:50",
+                "minutes": 40,
+                "claim_ids": [
+                  "d03451942797:service_event:0"
+                ],
+                "documents": [
+                  "BH-D111"
+                ]
+              }
+            ]
+          }
+        ],
+        "decisions": [
+          {
+            "subject": "HG-E101",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D002 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E101",
+            "rule": "R9",
+            "outcome": "counted_under_plan",
+            "reason": "session began before the plan signature (2026-01-05T13:05) on the plan's first effective day; counted because plan effectivity is by date"
+          },
+          {
+            "subject": "HG-E102",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D004 (clinical_note: attended), BH-D005 (attendance_record: attended_partial)"
+          },
+          {
+            "subject": "HG-E104",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D007 (clinical_note: attended_full), BH-D008 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E105",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D005 (attendance_record: attended_full), BH-D009 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E107",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D011 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)"
+          },
+          {
+            "subject": "HG-E111",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D105 (clinical_note: attended_full)"
+          },
+          {
+            "subject": "HG-E112",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D106 (clinical_note: attended), BH-D106 (platform_log: unknown)"
+          },
+          {
+            "subject": "HG-E113",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E115",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D110 (clinical_note: attended), BH-D111 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E115",
+            "rule": "R4",
+            "outcome": "minutes_disputed",
+            "reason": "tier-1 records give different patient-contact intervals and none corrects the other: 09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min; carried as bounds [40, 50]"
+          },
+          {
+            "subject": "HG-E118",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          },
+          {
+            "subject": "HG-E119",
+            "rule": "R4",
+            "outcome": "attended=yes",
+            "reason": "decided by tier-1 records: BH-D113 (clinical_note: attended_partial)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E110",
+            "rule": "R3",
+            "outcome": "field_corrected",
+            "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          },
+          {
+            "subject": "HG-E116",
+            "rule": "R2",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D112 (draft_template): draft/template text is not attendance evidence; it states disposition 'attended_full'"
+          },
+          {
+            "subject": "HG-E116",
+            "rule": "R2",
+            "outcome": "evidence_excluded",
+            "reason": "BH-D112 (billing): a billing/charge row is not attendance evidence"
+          }
+        ],
+        "evidence": [
+          {
+            "claim_id": "3b3f50db40b3:plan_requirement:0",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "plan_requirement",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Local treatment participation goal: at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday\u2013Sunday week."
+              }
+            ]
+          },
+          {
+            "claim_id": "3b3f50db40b3:plan_requirement:1",
+            "doc_id": "BH-D003",
+            "file": "signed_treatment_plan_jan05.txt",
+            "record_type": "plan_requirement",
+            "passages": [
+              {
+                "lines": "12",
+                "quote": "Patient-present individual, group, and family therapy contribute to the minute goal."
+              }
+            ]
+          }
+        ],
+        "notes": [],
+        "sql": [
+          {
+            "sql": "SELECT mrn, name, dob FROM patients WHERE mrn IN (?) ORDER BY mrn",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT * FROM plan_requirements WHERE mrn=? ORDER BY effective_start, metric",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND service_type IN (?,?,?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-11",
+              "HG-M042",
+              "family_therapy",
+              "group_therapy",
+              "individual_therapy"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND service_type IN (?,?,?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-12",
+              "2026-01-18",
+              "HG-M042",
+              "family_therapy",
+              "group_therapy",
+              "individual_therapy"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND service_type IN (?,?,?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-19",
+              "2026-01-25",
+              "HG-M042",
+              "family_therapy",
+              "group_therapy",
+              "individual_therapy"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) AND service_type IN (?,?,?) AND eligible != 'no' ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-26",
+              "2026-01-30",
+              "HG-M042",
+              "family_therapy",
+              "group_therapy",
+              "individual_therapy"
+            ]
+          },
+          {
+            "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, service_date, encounter_key",
+            "params": [
+              "2026-01-05",
+              "2026-01-30",
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:2",
+              "4521a120a4d7:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "4521a120a4d7:service_event:1",
+              "4521a120a4d7:service_event:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:5",
+              "95debafd3a72:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:7",
+              "5f3375f11c85:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5f3375f11c85:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5f3375f11c85:service_event:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "params": [
+              "0bf056f3769e:service_event:8",
+              "432c973d1a4d:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "300a30dbe42b:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "5f3375f11c85:service_event:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "069ea4112779:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "params": [
+              "805b2c69c7fa:service_event:1",
+              "b4390ed6b672:service_event:0",
+              "b4390ed6b672:service_event:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "805b2c69c7fa:service_event:2"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "805b2c69c7fa:service_event:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "9942bd886fcd:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) AND rule IN (?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|HG-E103",
+              "HG-M042|U-2026-01-08-outreach_call-1",
+              "HG-M042|HG-E106",
+              "HG-M042|HG-E108",
+              "HG-M042|U-2026-01-15-administrative-1",
+              "HG-M042|U-2026-01-15-outreach_call-1",
+              "HG-M042|HG-E109",
+              "HG-M042|U-2026-01-16-administrative-1",
+              "HG-M042|U-2026-01-16-other-1",
+              "HG-M042|HG-E114",
+              "HG-M042|HG-E116",
+              "HG-M042|U-2026-01-27-outreach_call-1",
+              "HG-M042|HG-E117",
+              "HG-M042|HG-E120",
+              "HG-M042|HG-E101",
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E104",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E107",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111",
+              "HG-M042|HG-E112",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E115",
+              "HG-M042|HG-E118",
+              "HG-M042|HG-E119",
+              "R2",
+              "R3"
+            ]
+          },
+          {
+            "sql": "SELECT * FROM plan_requirements WHERE mrn=? ORDER BY effective_start, metric",
+            "params": [
+              "HG-M042"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
+            "params": [
+              "HG-M042|HG-E101",
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E104",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E107",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111",
+              "HG-M042|HG-E112",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E115",
+              "HG-M042|HG-E118",
+              "HG-M042|HG-E119"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "4b64c46a13b8:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "d03451942797:service_event:0"
+            ]
+          },
+          {
+            "sql": "SELECT subject_key, rule, outcome, reason FROM decisions WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?) AND rule IN (?,?) ORDER BY subject_key, decision_id",
+            "params": [
+              "HG-M042|HG-E101",
+              "HG-M042|HG-E102",
+              "HG-M042|HG-E104",
+              "HG-M042|HG-E105",
+              "HG-M042|HG-E107",
+              "HG-M042|HG-E110",
+              "HG-M042|HG-E111",
+              "HG-M042|HG-E112",
+              "HG-M042|HG-E113",
+              "HG-M042|HG-E115",
+              "HG-M042|HG-E118",
+              "HG-M042|HG-E119",
+              "R4",
+              "R9"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?) ORDER BY c.doc_label, c.claim_id",
+            "params": [
+              "3b3f50db40b3:plan_requirement:0",
+              "3b3f50db40b3:plan_requirement:1"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "answer_markdown": "# Rowan (HG-M042): weekly therapy vs. treatment-plan goal, Jan 5\u201330, 2026\n\n**Short answer:** Rowan met the goal in 1 week and missed it in 2. One week can't be determined from the current record.\n\n- **Met:** week of Jan 19.\n- **Not met:** weeks of Jan 5 and Jan 12.\n- **Cannot be determined:** week of Jan 26, because two notes give different session times.\n\n**The goal:** The signed treatment plan sets a \"Local treatment participation goal: at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday\u2013Sunday week\" (BH-D003 L12). Individual, group and family therapy all count toward the minute goal (BH-D003 L12).\n\n| Week | Therapy days (goal \u2265 3) | Patient-present minutes (goal \u2265 150) | Encounters counted | Status |\n|---|---|---|---|---|\n| Jan 5\u201311 | 3 (met) | 140 = 50 + 45 + 45 (not met) | HG-E101, HG-E102, HG-E104 | **Not met** |\n| Jan 12\u201318 | 2 (not met) | 120 = 75 + 45 (not met) | HG-E105, HG-E107 | **Not met** |\n| Jan 19\u201325 | 3 (met) | 180 = 60 + 30 + 45 + 45 (met) | HG-E110, HG-E111, HG-E112, HG-E113 | **Met** |\n| Jan 26\u201330 (partial) | 3 (met) | 145\u2013155 = [40\u201350] + 75 + 30 (undetermined) | HG-E115, HG-E118, HG-E119 | **Cannot be determined** |\n\n## What the record doesn't settle\n- **Week of Jan 26, minutes:** Two clinical notes for HG-E115 give different patient-contact times: 09:00\u201309:50 (50 min) in BH-D110 and 09:10\u201309:50 (40 min) in BH-D111. Neither note corrects the other, so the week's total is carried as 145\u2013155 minutes. That range runs from below to above the 150-minute goal. The day goal (3 days) is met either way.\n- **Partial week:** Only Jan 26\u201330 (5 of 7 days) falls inside the period you asked about. Any therapy on Jan 31\u2013Feb 1 wasn't evaluated.\n- **Week of Jan 5:** HG-E101 started before the plan was signed (2026-01-05T13:05). It was still counted because the plan takes effect by date, starting Jan 5.\n\n## What was excluded and why\n- **Missed sessions (no-show or cancelled):**\n  - HG-E103, Jan 8: no-show (BH-D006, BH-D015)\n  - HG-E108, Jan 15: group cancelled by the clinic (BH-D006, BH-D016)\n  - HG-E116, Jan 27: group no-show (BH-D108, BH-D112)\n  - HG-E117, Jan 28: cancelled by the patient (BH-D108)\n- **Not psychotherapy:**\n  - Medication management: HG-E106, Jan 13 (BH-D006, BH-D010) and HG-E120, Jan 30 (BH-D114)\n  - Family collateral contact: HG-E109, Jan 16 (BH-D006, BH-D012)\n  - Care coordination: HG-E114, Jan 23 (BH-D109)\n  - Outreach calls on Jan 8, 15 and 27 (BH-D015, BH-D016, BH-D108)\n  - Administrative or other contacts on Jan 15\u201316 (BH-D013, BH-D016)\n- **Records not accepted as evidence:**\n  - HG-E116: BH-D112 says \"attended_full,\" but it is a draft/template and a billing row, so it doesn't count as attendance evidence. The no-show stands.\n  - HG-E110: BH-D104 is a retransmitted copy, so it isn't independent evidence. A correction (BH-D103) changed the departure time in BH-D102 and BH-D104 from 11:30 to 11:15. This leaves 60 counted minutes.\n\nThe statuses above only compare documented attendance and minutes with the plan's participation goal. They say nothing about Rowan's clinical progress.",
+  "unresolved": [
+    "HG-E115 (week of Jan 26): BH-D110 gives 09:00\u201309:50 (50 min) and BH-D111 gives 09:10\u201309:50 (40 min). Neither corrects the other, so the week's minutes are 145\u2013155 against a goal of at least 150. Status cannot be determined.",
+    "Week of Jan 26 was only evaluated through Jan 30. Jan 31\u2013Feb 1 fall outside the requested period."
+  ],
+  "caveats": [
+    "HG-E101 began before the plan was signed on Jan 5. It was counted because the plan takes effect by date.",
+    "Only patient-present individual, group and family therapy count toward the goal. Collateral, medication-management, outreach, care-coordination and administrative contacts were excluded.",
+    "Line numbers are only available for the plan document (BH-D003). Other documents are cited by ID only."
+  ],
+  "postcheck": {
+    "numbers_not_in_results": [],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ok": true
+  },
+  "timings_ms": {
+    "plan_llm": 2775,
+    "execute": 7.58,
+    "narrate_llm": 26319,
+    "total": 29101
+  },
+  "llm": {
+    "calls": 2,
+    "input_tokens": 13196,
+    "output_tokens": 3663,
+    "cost_usd": 0.0811404
+  },
+  "cached": false,
+  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
+  "created_at": "2026-11-12T11:57:55"
+}
