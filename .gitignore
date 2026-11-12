@@ -9,3 +9,8 @@ build/
 # duplicate of documents/ as downloaded
 documents-*.zip
 .playwright-mcp/
+# editor swap files (one was committed by accident under documents/)
+*.swp
+*.swo
+# subagent git worktrees
+.claude/worktrees/
