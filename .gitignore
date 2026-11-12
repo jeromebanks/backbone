@@ -8,3 +8,4 @@ build/
 *.egg-info/
 # duplicate of documents/ as downloaded
 documents-*.zip
+.playwright-mcp/

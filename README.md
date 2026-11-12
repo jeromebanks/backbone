@@ -18,6 +18,11 @@ question ─LLM─► QueryPlan (typed JSON DSL, validated) ─► 4 operators (
                                      LLM narrates ONLY from results ─► post-check (numbers, doc IDs, line refs)
 ```
 
+**Docs:** open [`docs/index.html`](docs/index.html) for a visual overview, including an interactive encounter timeline
+with the evidence behind every decision (self-contained, works offline). Agent and contributor guides are in
+[`AGENTS.md`](AGENTS.md) and [`docs/agents/`](docs/agents/README.md). The path to production (design, stack, choke points, phases)
+is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 ## Results on the development questions
 
 Full answers with citations, plans, arithmetic and evidence tables: [`out/answers/ANSWERS.md`](out/answers/ANSWERS.md)
@@ -309,4 +314,5 @@ backbone/intervals.py   interval algebra                      backbone/answer.py
 backbone/export.py      patient JSON + property graph         backbone/bench.py, ablation.py
 cache/extractions/      shipped extraction cache              out/                    db, answers, abstraction, benchmarks
 plans/                  hand-written QueryPlans (no LLM)      tests/                  rule unit tests + golden end-to-end tests
+docs/index.html         human overview (built by docs/build_site.py)   AGENTS.md, CLAUDE.md, docs/agents/   agent guides
 ```
