@@ -52,6 +52,25 @@ every entry: the 31 documents cost ~$1.38 at list price and take ~60 s at concur
 - Ingest runs extraction in a thread pool (`BACKBONE_CONCURRENCY`, default 6). A failed document is logged in the
   stats and does not stop the run.
 
+## Known extraction gaps
+
+These fields are not in the schema, so no question that needs them can be answered (see
+`docs/CLINICAL_QA_DESIGN.md` §5C). Verified against the current database: the authorization letter BH-D001 yields
+only a document-level claim, and the BH-D112 charge has no code, units or amount.
+
+- **Authorizations:** service, quantity, unit definition, period, authorization ID.
+- **Charges:** billing code, units, amount, and billable-vs-goal-countable (family therapy without the patient is
+  usually billable but does not count toward the plan's participation goal).
+- **Treatment-plan goals and objectives** (qualitative), and links from sessions to goals.
+- **Interventions** per session.
+- **Structured risk assessment items** per encounter.
+- **Diagnoses, medications and changes, vitals.**
+- **Discharge and aftercare plans.**
+- **Richer plan requirements:** frequency per service type, deadlines, assessment cadence.
+
+Add them together under **one** `EXTRACTOR_VERSION` bump, after the gold set covers them, to pay for re-extraction
+once (and only for the affected document types).
+
 ## Measured
 
 8,318 input tokens per document (≈90% fixed prompt + schema), 1,574 output, 13.2 s mean / 19.5 s p95, $0.045 list

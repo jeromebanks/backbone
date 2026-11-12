@@ -74,3 +74,12 @@ Report `definite` patients separately from `depends_on_unresolved` ones.
 ## Not expressible → say so
 Vital signs, medication lists, diagnoses and billing totals have no operator. Answer that the computed engine cannot
 answer it. Optionally offer quoted passages labelled **retrieved, not computed**.
+
+## Gap question: "How many no-shows and cancellations?" (no counting operator yet)
+```json
+{"question": "Missed and cancelled appointments, with reasons",
+ "steps": [{"op": "care", "group_by": "none",
+            "scope": {"patients": ["HG-M042"], "start": "2026-01-05", "end": "2026-01-30", "include_excluded": true}}]}
+```
+List the `EXCLUDED` rows whose reason is `not attended (...)` with their citations, and say the engine does not
+yet compute attendance counts (planned `attendance` operator, design §5). Do not count them yourself.

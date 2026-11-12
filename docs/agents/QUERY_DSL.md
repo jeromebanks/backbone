@@ -82,10 +82,14 @@ them in sync when the DSL changes.
 
 ## Roadmap
 
-See [`docs/CLINICAL_QA_DESIGN.md`](../CLINICAL_QA_DESIGN.md) §5:
+Question-coverage gaps (what clinicians will ask that we can't answer) are in
+[`docs/CLINICAL_QA_DESIGN.md`](../CLINICAL_QA_DESIGN.md) §5. The DSL roadmap that closes them is in §6:
 - versioned schema;
 - episode and relative scopes;
-- new operators (authorization, documentation gaps, providers, assessment change, cohorts);
+- new operators: `attendance`, `documentation`, `intervals`, `authorization`, `providers`, `coverage`,
+  `assessment_change`, `cohort`;
+- requirement types beyond weekly days/minutes/sessions (per-service frequency, deadlines, assessment cadence);
+- modality, provider and month grouping and filters;
 - step composition, normalization and plan caching;
 - explain/estimate;
 - SQL parity;
@@ -93,6 +97,11 @@ See [`docs/CLINICAL_QA_DESIGN.md`](../CLINICAL_QA_DESIGN.md) §5:
 - a labelled retrieval operator.
 
 ## Known gaps
+
+- **Coverage:** counts of no-shows, cancellations and non-therapy contacts; signature timeliness; authorization use;
+  care by provider; time between events; modality and month grouping; non-weekly requirement types. None of these
+  has an operator yet (see design §5). Until they exist, agents must **list** the relevant rows from the results and
+  say the count is not computed. Never count by hand.
 
 - There is no second planning round: if the first plan misses something, the narrator says what the results lack.
 - The post-check validates numbers and citations, not prose claims.

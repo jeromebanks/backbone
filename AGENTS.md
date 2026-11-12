@@ -49,6 +49,12 @@ Python ≥ 3.11, dependencies `pydantic` (+ `pytest`). SQLite at `out/backbone.d
 `BACKBONE_DB`). LLM backend: `BACKBONE_LLM=claude-cli` (default) or `anthropic-api` (needs `ANTHROPIC_API_KEY`;
 implemented, never exercised).
 
+## Where AI is used
+
+Only `extract.py` (document → claims), and in `answer.py` the planner (question → QueryPlan) and the narrator
+(results → answer). The `clinical-qa` skill makes Claude Code play the last two. Everything else is deterministic.
+Never move a clinical decision or calculation into a prompt. Details, model choice and costs: `docs/AI_USAGE.md`.
+
 ## Invariants — do not break these
 
 1. **The LLM never does arithmetic that reaches an answer.** Extraction records intervals and stated values.

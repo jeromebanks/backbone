@@ -89,6 +89,12 @@ Service types: `individual_therapy`, `group_therapy`, `family_therapy`, `family_
   copies or retransmissions, collateral or non-therapy contacts.
 - **Separate documented facts from interpretation.** Do not state improvement, causation, diagnosis or treatment
   advice beyond what cited observations and assessments say.
+- **Known coverage gaps** (see `docs/CLINICAL_QA_DESIGN.md` §5) include counts of no-shows, cancellations or
+  non-therapy contacts, signature timeliness, authorization use, care by provider, and time between events.
+  - For these, run a plan that **lists** the relevant rows (e.g. `care` with `include_excluded: true` gives EXCLUDED
+    lines with their reasons).
+  - Present the rows with citations, and state that the engine does not compute this count yet.
+  - Do not count or subtract by hand.
 - **If no operator can express the question** (e.g. vital signs, medications list), say so plainly. You may then
   offer clearly labelled "**retrieved, not computed**" passages, found by reading the relevant documents. Number them
   as quotes, never as computed results.

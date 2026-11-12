@@ -179,7 +179,9 @@ Durations are for a small team (2–3 engineers plus clinical SME time) and are 
 - S3 intake, document events, a normalisation service (PDF, OCR, HL7/FHIR) that preserves page and line maps.
 - Temporal workflows for extraction with real-time and batch lanes, prompt caching, model routing and refusal fallbacks.
 - **Gold set:** 200–500 documents labelled field by field across document types and sites, with an extraction-eval
-  harness. Choose the cheapest model mix that matches Opus on reconciled outcomes.
+  harness. Include the fields the question-coverage gaps need (authorizations, billing code/units, plan goals,
+  interventions, risk items, diagnoses, medications; see CLINICAL_QA_DESIGN.md §5C), so the extractor is extended
+  once, under one version bump. Choose the cheapest model mix that matches Opus on reconciled outcomes.
 - Multi-patient documents and patient matching (plus a review queue for ambiguous matches).
 - **Exit:** a 50K-document backfill completes within budget; field-level F1 at or above the target; cost and latency dashboards live.
 
@@ -195,8 +197,11 @@ Durations are for a small team (2–3 engineers plus clinical SME time) and are 
 Detailed design, including the DSL roadmap: **[CLINICAL_QA_DESIGN.md](CLINICAL_QA_DESIGN.md)**.
 - A FastAPI `QueryPlan` endpoint (authenticated, tenant-scoped), plan and answer caches scoped to patients in scope,
   and streaming narration with compacted inputs.
-- More operators as reviewers need them (authorisation utilisation, administrative findings such as charges without
-  attendance, provider-level views). Each comes with golden tests.
+- Close the question-coverage gaps in [CLINICAL_QA_DESIGN.md §5](CLINICAL_QA_DESIGN.md), in priority order. Each
+  comes with golden tests.
+  - First, needing no re-extraction: `attendance` (no-shows, cancellations, contacts that aren't therapy) and
+    `documentation` (signature timeliness, drafts, conflicts, charges without attendance).
+  - Then `authorization`, `providers`, richer requirement types, `intervals` and `coverage`.
 - Answer eval: post-check pass rate, a citation-validity sample, and a reviewer feedback loop.
 - **Exit:** per-patient deterministic queries under 200 ms p95; narrated answers under 20 s p95; post-check pass ≥ 99%.
 

@@ -64,6 +64,18 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
 | E104 (Jan 9 family) | two clinician notes, one group → one session |
 | PHQ-9 Jan 16 | D013 primary; D014 import copy (form HG-Q116) → one assessment |
 
+## Planned rules (not implemented)
+
+- **R10, clinicians on encounters.** Carry `clinicians` from tier-1 records onto the encounter, with credentials.
+  Merge names only on exact normalised match plus credential. Never merge on surname: "N. Ellis" (desk staff) is not
+  "Nora Ellis, LCSW". Needed for `providers` and credential questions.
+- **R11, reconciled charges.** Billing rows become `charges` linked to encounters. A charge with
+  `attended = no` (e.g. CH-116 for the Jan 27 no-show) is a documentation finding, not attendance evidence (R2 is
+  unchanged). Needed for "billed without attendance" and, once codes and units are extracted, for time-supports-code
+  checks.
+- **Requirement types** (in `project.py`): per-service-type frequency, deadlines, assessment cadence. These use the
+  same three-valued bounds logic.
+
 ## Adding a rule
 
 1. Write the failing fixture first in `tests/test_rules.py`. `tests/helpers.py` provides `event()`, `relation()`,

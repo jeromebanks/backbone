@@ -106,6 +106,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);font-si
   <a href="#traps">Traps in the record</a>
   <a href="#rules">Reconciliation rules</a>
   <a href="#uncertainty">Uncertainty</a>
+  <a href="#ai">Where AI is used</a>
   <a href="#dsl">Query DSL</a>
   <a href="#answers">Answers</a>
   <a href="#experiment">Design experiment</a>
@@ -231,6 +232,21 @@ both ends, <span class="pill NOT_MET">NOT MET</span> if it holds at neither, and
 look certain.</p>
 <div class="card" id="bounds"></div>
 
+<h2 id="ai">Where AI is used, and where it isn't</h2>
+<p>The language model reads documents and talks to people. Everything that decides a clinical number is
+deterministic code. Full detail, model choice and cost projections are in <code>docs/AI_USAGE.md</code>.</p>
+<div class="tablewrap"><table>
+<tr><th>Stage</th><th>AI?</th><th>What the AI may decide</th><th>Guardrail</th></tr>
+<tr><td>Extraction (one call per document)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>What each document asserts: intervals, dispositions, signatures, corrections, assessments, with quotes</td><td>Quotes verified by code; no durations or conflict resolution; cached per document hash</td></tr>
+<tr><td>Quote verification, claims, reconciliation (R0–R9), interval arithmetic, plan verdicts, SQL operators</td><td><span class="pill MET">Deterministic</span></td><td>n/a</td><td>Versioned rules; golden tests; byte-identical reruns</td></tr>
+<tr><td>Planner (question → QueryPlan)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>Which operations and scope answer the question</td><td>Schema-validated plan only; no SQL or code; the plan is shown with every answer</td></tr>
+<tr><td>Narrator (results → answer)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>Wording and which computed facts to present</td><td>Post-check: every number in the results, every citation backed by evidence</td></tr>
+<tr><td>Post-check, caches, verification, exports</td><td><span class="pill MET">Deterministic</span></td><td>n/a</td><td>n/a</td></tr>
+</table></div>
+<p class="small muted">Measured: extraction $0.045 per document (list-price equivalent, Opus 5.5); answers $0.08–0.62 per new
+question, dominated by narration. Estimated: a 1M-document batched backfill costs ~$15K with Opus, ~$7.7K with Sonnet
+and ~$0.4K with Haiku, with the model mix decided by a gold-set eval.</p>
+
 <h2 id="dsl">The query DSL</h2>
 <p>Questions compile to a typed, validated plan. The model never writes SQL or code. Each step shares one
 <code>Scope</code> (patients or "all", dates, service types, include excluded records, include evidence) and runs one
@@ -298,6 +314,17 @@ measuring field-level stability, and stricter handling of mentions.</li>
 <li>There is no second planning round if the first query plan is insufficient.</li>
 <li>Provider identities are not merged, deliberately: "N. Ellis" at the desk is not assumed to be "Nora Ellis, LCSW".</li>
 <li>The API-key LLM backend is implemented but not exercised; all results used a Claude subscription via Claude Code.</li>
+<li><b>Question coverage.</b> Realistic review questions with no operator yet:
+  <ul>
+    <li>no-show and cancellation counts;</li>
+    <li>signature timeliness and drafts;</li>
+    <li>authorization use (the authorized quantity wasn't extracted);</li>
+    <li>care by provider;</li>
+    <li>time between events;</li>
+    <li>non-weekly requirements;</li>
+    <li>plan goals, interventions, diagnoses and medications.</li>
+  </ul>
+  Prioritized in <code>docs/CLINICAL_QA_DESIGN.md</code> §5.</li>
 </ul>
 
 <h2 id="run">Running it</h2>

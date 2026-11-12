@@ -227,8 +227,11 @@ data to choose the cheapest model that preserves this corpus's reconciled result
 - The narrator can still phrase interpretations. The post-check verifies numbers, documents and line references,
   not prose.
 - There is no second planning round if the first plan is insufficient.
-- Administrative findings (7 groups scheduled vs 8 authorized in D001; a posted charge for a no-show group) are
-  visible in the abstraction but have no dedicated operator.
+- **Question coverage is narrower than a real review.**
+  - There is no operator yet for: no-show and cancellation counts, signature timeliness, authorization use (the
+    "8 authorized group sessions" in D001 was not extracted), care by provider, or time between events.
+  - The posted charge for the no-show group is kept only as excluded evidence.
+  - Ranked by priority in [`docs/CLINICAL_QA_DESIGN.md`](docs/CLINICAL_QA_DESIGN.md) §5.
 
 ## Performance (measured)
 
@@ -283,6 +286,20 @@ group, which is quadratic. It took 0.7 s at 500 synthetic patients and minutes a
   Reconciliation is already per patient (4 ms) and partitions cleanly behind a queue of "dirty" patient IDs.
 - **Narration tokens.** The narrator receives full evidence JSON (13K–97K input tokens per answer, measured).
   - Fix: pass totals plus capped evidence, and let the narrator request more.
+
+## AI and LLM usage (summary)
+
+The LLM is used in exactly three runtime places:
+1. **per-document extraction**, which records what each document asserts, with verified quotes;
+2. **question → QueryPlan planning**;
+3. **narrating** computed results.
+
+Everything that decides a clinical number is deterministic: hashing, quote verification, reconciliation rules,
+interval arithmetic, plan verdicts, SQL operators and the post-check. Extraction is the only AI step that feeds
+numbers. It is guarded by code-verified quotes, interval-only extraction, cross-checks and golden tests.
+
+Model choice, cost projections (for example, an estimated ~$15K with Opus or ~$7.7K with Sonnet for a 1M-document
+batched backfill) and the risks are in **[`docs/AI_USAGE.md`](docs/AI_USAGE.md)**.
 
 ## Models, settings and assistance
 
