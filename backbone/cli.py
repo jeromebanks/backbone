@@ -5,7 +5,7 @@
   python -m backbone ask "question"               # question -> QueryPlan -> deterministic results -> cited answer
   python -m backbone answer questions.json        # answer a question file into out/answers/
   python -m backbone plan plan.json               # execute a hand-written QueryPlan (no LLM at all)
-  python -m backbone verify-answers               # re-execute saved answers' plans (no LLM); results must match
+  python -m backbone verify-answers [--rewrite]   # re-execute saved plans (no LLM, read-only); results + post-check
   python -m backbone directory | schema           # patient directory; QueryPlan JSON schema
   python -m backbone plan - --summary --out r.json   # plan from stdin; compact readout; full results to r.json
   python -m backbone postcheck answer.md --results r.json   # verify numbers/citations in a written answer
@@ -83,11 +83,11 @@ def cmd_answer(args):
 
 def cmd_verify(args):
     from .answer import verify_answers
-    rep = verify_answers(db_path=args.db)
+    rep = verify_answers(db_path=args.db, rewrite=args.rewrite)
     for r in rep:
         print(f"{r['id']}: results identical={r['results_identical']} postcheck_ok={r['postcheck_ok']}"
               + ("" if r["postcheck_ok"] else f"  {r['postcheck']}"))
-    if not all(r["results_identical"] for r in rep):
+    if not all(r["results_identical"] and r["postcheck_ok"] for r in rep):
         sys.exit(1)
 
 
@@ -162,7 +162,10 @@ def main(argv=None):
     p = sub.add_parser("schema"); p.set_defaults(fn=cmd_schema)
     p = sub.add_parser("postcheck"); p.add_argument("answer"); p.add_argument("--results", required=True)
     p.set_defaults(fn=cmd_postcheck)
-    p = sub.add_parser("verify-answers"); p.set_defaults(fn=cmd_verify)
+    p = sub.add_parser("verify-answers", help="read-only; exits 1 if any result differs or any post-check fails")
+    p.add_argument("--rewrite", action="store_true",
+                   help="also refresh each saved answer's post-check field and Markdown (results stay as saved)")
+    p.set_defaults(fn=cmd_verify)
     p = sub.add_parser("export"); p.add_argument("--patient", required=True); p.set_defaults(fn=cmd_export)
     p = sub.add_parser("benchmark"); p.add_argument("--synthetic-patients", type=int, default=10000)
     p.set_defaults(fn=cmd_benchmark)

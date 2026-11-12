@@ -31,7 +31,8 @@ question  → LLM → QueryPlan (typed JSON DSL) → 4 operators (read-only SQL)
 
 ```bash
 python -m pytest -q                                    # full test suite, no LLM, ~1 s — run after every change
-python -m backbone verify-answers                      # saved answers must reproduce byte-identically (no LLM)
+python -m backbone verify-answers                      # read-only, no LLM: saved results identical + post-check OK, else exit 1
+python -m backbone verify-answers --rewrite            # also refresh saved answers' post-check field and Markdown
 python -m backbone plan plans/weekly_compliance.json   # run a hand-written QueryPlan (no LLM)
 python -m backbone stats | reconcile | export --patient HG-M042 | benchmark
 python -m backbone directory | schema                 # patients in the abstraction; QueryPlan JSON schema
@@ -84,7 +85,9 @@ Never move a clinical decision or calculation into a prompt. Details, model choi
 | operator/projection output | `QUERY_VERSION` | invalidates the answer cache; run `verify-answers` to see whether outputs changed |
 | planner/narrator prompts | `PROMPT_VERSION` (`answer.py`) | invalidates the answer cache |
 
-If a change leaves results identical (check with `verify-answers`), the saved answers stay valid.
+If a change leaves results identical (check with `verify-answers`), the saved answers stay valid. The answer-cache
+fingerprint also hashes the abstraction's content (documents, committed extractions, claims, derived tables), so
+ingest and reconcile changes invalidate cached answers by themselves; an identical rebuild does not.
 Regenerating answers costs ~$2–3 at list price (11 questions) and needs the user's OK.
 
 ## Answering clinical questions in this repo

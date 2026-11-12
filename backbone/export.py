@@ -14,6 +14,7 @@ from . import EXTRACTOR_VERSION, RULESET_VERSION
 from .answer import fingerprint
 from .db import ROOT
 from .intervals import fmt
+from .paths import safe_output_path
 from .project import SqlLog, weekly_compliance
 from .query import Scope
 
@@ -151,10 +152,9 @@ def build_graph(ab: dict) -> dict:
 
 
 def export_patient(conn, mrn: str) -> list[Path]:
+    p1, p2 = safe_output_path(OUT, mrn, ".json"), safe_output_path(OUT, mrn, ".graph.json")   # before any work
     OUT.mkdir(parents=True, exist_ok=True)
     ab = build_abstraction(conn, mrn)
-    p1 = OUT / f"{mrn}.json"
     p1.write_text(json.dumps(ab, indent=2, default=str))
-    p2 = OUT / f"{mrn}.graph.json"
     p2.write_text(json.dumps(build_graph(ab), indent=2, default=str))
     return [p1, p2]

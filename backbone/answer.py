@@ -2,7 +2,9 @@
 
 The LLM only (1) chooses operations and parameters and (2) explains computed results. Numbers come from the
 operators; the post-check flags any number or citation in the narrative that is not present in the results.
-Answers are cached by (question, abstraction fingerprint, prompt version), so repeated questions cost nothing.
+Answers are cached by (question, abstraction fingerprint, prompt version), so repeated questions cost nothing. A
+narration that fails the post-check is regenerated once with the failures fed back; if it still fails, the answer is
+returned flagged and is not cached.
 """
 from __future__ import annotations
 
@@ -17,11 +19,12 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 from . import EXTRACTOR_VERSION, QUERY_VERSION, RULESET_VERSION
-from .db import ROOT, connect
+from .db import ROOT, connect, connect_readonly
 from .llm import complete_json
+from .paths import safe_output_path
 from .query import QueryPlan, execute_plan
 
-PROMPT_VERSION = "a1"
+PROMPT_VERSION = "a2"
 OUT_DIR = ROOT / "out" / "answers"
 
 PLANNER_SYSTEM = """You translate a question about clinical records into a QueryPlan: a list of typed operations that \
@@ -57,8 +60,10 @@ NARRATOR_SYSTEM = """You write the final answer to a question about clinical rec
 provided (produced by deterministic software from source documents). Rules:
 - Every number you state must appear in the results. Do not compute new numbers (no new sums, differences, averages \
 or conversions); quote the computed values, including [low–high] bounds.
-- Cite sources inline as (DOC-ID L<lines>) using the evidence entries, e.g. (BH-D103 L7). Cite only documents and \
-lines that appear in the results.
+- Cite sources inline as (DOC-ID L<lines>) using the evidence entries, e.g. (BH-D103 L7). Cite only documents that \
+appear in the results, and only line numbers listed in that document's evidence passages (their "lines" field). A \
+range is allowed only when every line in it is listed: never join non-adjacent lines into a range. If the listed lines \
+are 6, 7 and 9, write (BH-D103 L6–7, L9), not (BH-D103 L6–9). Prefix every line number with L.
 - Lead with the direct answer, then supporting detail (a compact markdown table is good for per-week or per-type \
 numbers), then what the record does not settle (bounds, disputes, UNDETERMINED weeks, missing documentation), and \
 the records that were excluded or merged and why (duplicates, corrections, drafts, billing, copies, collateral or \
@@ -89,9 +94,44 @@ def directory(conn) -> str:
                      for r in rows)
 
 
+# What an answer is computed from: the evidence layer (documents, which extractions were committed, claims) and the
+# derived clinical layer. Each table is hashed minus the columns that change when identical content is rebuilt
+# (rowids, timestamps, LLM timing/cost) or that another hashed column identifies (document text by its sha256; the
+# raw extraction JSON by the claims built from it). Every other column is hashed, including columns added later.
+_FP_TABLES = {
+    "documents": {"text", "ingested_at"},
+    "extractions": {"raw_json", "latency_ms", "input_tokens", "output_tokens", "cost_usd", "from_cache", "created_at"},
+    "claims": set(),
+    "patients": {"reconciled_at"},
+    "encounters": set(),
+    "encounter_intervals": set(),
+    "plan_requirements": set(),
+    "assessments": set(),
+    "observations": set(),
+    "decisions": {"decision_id"},
+    "conflicts": {"conflict_id"},
+}
+
+
 def fingerprint(conn) -> str:
-    shas = [r[0] for r in conn.execute("SELECT sha256 FROM documents ORDER BY sha256")]
-    return hashlib.sha256(json.dumps([EXTRACTOR_VERSION, RULESET_VERSION, QUERY_VERSION, PROMPT_VERSION, shas]).encode()).hexdigest()
+    """Content hash of the abstraction that answers are computed from, plus the code versions. It changes when an
+    extraction is committed (e.g. a failed one is retried, or a document is re-extracted with another model), when
+    claims change, or when reconciliation produces different derived rows. An identical rebuild leaves it unchanged.
+    Rows are streamed into the hash in a content-defined order (the primary key where it is stable, else every hashed
+    column): one scan per table, nothing materialised. About 2 ms on the supplied corpus."""
+    h = hashlib.sha256(json.dumps([EXTRACTOR_VERSION, RULESET_VERSION, QUERY_VERSION, PROMPT_VERSION]).encode())
+    tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    for table, volatile in _FP_TABLES.items():
+        if table not in tables:
+            continue
+        info = list(conn.execute(f"PRAGMA table_info({table})"))       # (cid, name, type, notnull, default, pk)
+        cols = [f'"{r[1]}"' for r in info if r[1] not in volatile]
+        pk = [r[1] for r in sorted(info, key=lambda r: r[5]) if r[5] > 0]
+        order = [f'"{c}"' for c in pk] if pk and not set(pk) & volatile else cols
+        h.update(f"\x1e{table}({','.join(cols)})".encode())
+        for row in conn.execute(f"SELECT {','.join(cols)} FROM {table} ORDER BY {','.join(order)}"):
+            h.update(repr(tuple(row)).encode() + b"\n")
+    return h.hexdigest()
 
 
 def _slim(results: dict) -> dict:
@@ -107,13 +147,16 @@ _NUM = re.compile(r"(?<![\w-])\d+(?:\.\d+)?(?![\w-])")
 
 def _computed_blob(results: dict) -> str:
     """The results envelope minus everything that did not come from the abstraction: the question and plan echo
-    whatever the asker typed, and SQL text holds literals. Numbers and documents in the answer must be backed by
-    what is left (totals, groups, facts, calculations, exclusions, decisions, evidence quotes, notes)."""
+    whatever the asker typed, each step's `params` echo the plan's arguments (thresholds, dates, run lengths), and
+    SQL text holds literals. Numbers and documents in the answer must be backed by what is left (totals, groups,
+    facts, calculations, exclusions, decisions, evidence quotes, notes). A parameter value is admitted only where the
+    operator also states it in that computed output."""
     out = json.loads(json.dumps(results, default=str))
     out.pop("question", None)
     out.pop("plan", None)
     for r in out.get("results", []):
         r.pop("sql", None)
+        r.pop("params", None)
     return json.dumps(out)
 
 
@@ -167,14 +210,28 @@ def postcheck(conn, answer_md: str, results: dict) -> dict:
             "ok": not (unknown or bad_docs or not_in_results or bad_lines)}
 
 
+def _narration_prompt(question: str, results: dict) -> str:
+    return f"Question:\n{question}\n\nComputed results (JSON):\n{json.dumps(_slim(results), indent=1, default=str)}"
+
+
+def _retry_feedback(answer_md: str, pc: dict) -> str:
+    failures = {k: v for k, v in pc.items() if k != "ok" and v}
+    return ("\n\nYour previous answer (below) failed the automatic post-check. Rewrite it so that it passes: state "
+            "only numbers that appear in the computed results, cite only documents that appear in them, and cite only "
+            "line numbers listed in that document's evidence passages (list non-adjacent lines separately, never as "
+            "one range).\n\nPost-check failures (JSON):\n" + json.dumps(failures, indent=1)
+            + "\n\nPrevious answer:\n" + answer_md)
+
+
 def answer_question(question: str, *, db_path=None, use_cache: bool = True, qid: str | None = None) -> dict:
     conn = connect(db_path)
-    key = hashlib.sha256((question + fingerprint(conn)).encode()).hexdigest()
+    fp = fingerprint(conn)
+    key = hashlib.sha256((question + fp).encode()).hexdigest()
     if use_cache:
+        t0 = time.monotonic()
         row = conn.execute("SELECT result_json FROM answer_cache WHERE cache_key=?", (key,)).fetchone()
-        if row:
-            t0 = time.monotonic()
-            res = json.loads(row["result_json"])
+        res = json.loads(row["result_json"]) if row else None
+        if res and (res.get("postcheck") or {}).get("ok"):   # an answer that failed its post-check is never served
             res["cached"] = True
             res["timings_ms_original"] = res["timings_ms"]
             res["timings_ms"] = {"cache_lookup": round((time.monotonic() - t0) * 1000, 2)}
@@ -196,32 +253,51 @@ def answer_question(question: str, *, db_path=None, use_cache: bool = True, qid:
     t1 = time.monotonic()
     results = execute_plan(conn, plan)
     t2 = time.monotonic()
-    if not plan.steps:
+    first_failure = None
+    if not plan.steps:      # no narrator to regenerate: the planner's reason is post-checked as it stands
         answer = {"answer_markdown": f"**Not answerable with the supported operations.** {plan.unsupported_reason}",
                   "unresolved": [], "caveats": None}
+        pc, attempts = postcheck(conn, answer["answer_markdown"], results), 1
     else:
-        nr = complete_json(NARRATOR_SYSTEM, f"Question:\n{question}\n\nComputed results (JSON):\n"
-                           f"{json.dumps(_slim(results), indent=1, default=str)}", NarrativeOut, effort="medium")
+        prompt = _narration_prompt(question, results)
+        nr = complete_json(NARRATOR_SYSTEM, prompt, NarrativeOut, effort="medium")
         acc(nr)
         answer = nr.data.model_dump()
+        pc, attempts = postcheck(conn, answer["answer_markdown"], results), 1
+        if not pc["ok"]:    # the post-check is a gate: regenerate once, same results, with the failures fed back
+            first_failure = pc
+            nr = complete_json(NARRATOR_SYSTEM, prompt + _retry_feedback(answer["answer_markdown"], pc),
+                               NarrativeOut, effort="medium")
+            acc(nr)
+            answer = nr.data.model_dump()
+            pc, attempts = postcheck(conn, answer["answer_markdown"], results), 2
     t3 = time.monotonic()
     res = {
         "id": qid, "question": question, "plan": plan.model_dump(mode="json"), "plan_explain": plan.explain(),
         "results": results, "answer_markdown": answer["answer_markdown"], "unresolved": answer["unresolved"],
-        "caveats": answer.get("caveats"), "postcheck": postcheck(conn, answer["answer_markdown"], results),
+        "caveats": answer.get("caveats"), "postcheck": pc, "postcheck_attempts": attempts,
+        "postcheck_first_attempt": first_failure,
         "timings_ms": {"plan_llm": int((t1 - t0) * 1000), "execute": round((t2 - t1) * 1000, 2),
                        "narrate_llm": int((t3 - t2) * 1000), "total": int((t3 - t0) * 1000)},
-        "llm": llm, "cached": False, "fingerprint": fingerprint(conn),
+        "llm": llm, "cached": False, "fingerprint": fp,
         "created_at": datetime.now().isoformat(timespec="seconds"),
     }
-    conn.execute("INSERT OR REPLACE INTO answer_cache VALUES (?,?,?,?)",
-                 (key, question, json.dumps(res, default=str), res["created_at"]))
-    conn.commit()
+    if pc["ok"]:            # a failing answer is returned (flagged by its post-check) but never cached as good
+        conn.execute("INSERT OR REPLACE INTO answer_cache VALUES (?,?,?,?)",
+                     (key, question, json.dumps(res, default=str), res["created_at"]))
+        conn.commit()
     return res
 
 
+POSTCHECK_FAILED_BANNER = ("> **Post-check failed:** this answer states numbers or citations that the computed results "
+                           "do not back. Read the post-check section before relying on it.")
+
+
 def render_markdown(res: dict) -> str:
-    lines = [f"# {res.get('id') or 'Answer'}", "", f"> {res['question']}", "", res["answer_markdown"], ""]
+    lines = [f"# {res.get('id') or 'Answer'}", "", f"> {res['question']}", ""]
+    if not res["postcheck"].get("ok", True):
+        lines += [POSTCHECK_FAILED_BANNER, ""]
+    lines += [res["answer_markdown"], ""]
     if res.get("unresolved"):
         lines += ["## Not settled by the record", ""] + [f"- {u}" for u in res["unresolved"]] + [""]
     lines += ["## How this was computed", "", "```", res["plan_explain"], "```", ""]
@@ -248,11 +324,13 @@ def render_markdown(res: dict) -> str:
     return "\n".join(lines)
 
 
-def verify_answers(*, db_path=None, rewrite: bool = True) -> list[dict]:
+def verify_answers(*, db_path=None, rewrite: bool = False) -> list[dict]:
     """Re-execute every saved answer's QueryPlan against the current abstraction (no LLM) and confirm the results are
-    identical to those the narrative was written from; re-run the post-check. Reproducibility check for reviewers."""
-    from .db import connect_readonly
-    conn, ro = connect(db_path), connect_readonly(db_path)
+    identical to those the narrative was written from; re-run the post-check. Reproducibility check for reviewers.
+
+    Read-only by default: the database is opened read-only and no file is written. rewrite=True refreshes each saved
+    answer's post-check field and its Markdown; the results and the narrative are never changed."""
+    ro = connect_readonly(db_path)
     report = []
     for p in sorted(OUT_DIR.glob("*.json")):
         res = json.loads(p.read_text())
@@ -261,7 +339,7 @@ def verify_answers(*, db_path=None, rewrite: bool = True) -> list[dict]:
         plan = QueryPlan.model_validate(res["plan"])
         fresh = json.loads(json.dumps(execute_plan(ro, plan), default=str))
         same = json.dumps(fresh, sort_keys=True) == json.dumps(res["results"], sort_keys=True, default=str)
-        pc = postcheck(conn, res["answer_markdown"], res["results"])
+        pc = postcheck(ro, res["answer_markdown"], res["results"])
         report.append({"id": res.get("id"), "results_identical": same, "postcheck_ok": pc["ok"], "postcheck": pc})
         if rewrite:
             res["postcheck"] = pc
@@ -272,18 +350,25 @@ def verify_answers(*, db_path=None, rewrite: bool = True) -> list[dict]:
 
 def answer_file(path: str, *, db_path=None, use_cache: bool = True) -> list[dict]:
     qs = json.loads(Path(path).read_text())
+    # Every question ID becomes a file name: validate them all before the first (paid) LLM call.
+    ids = [q.get("id") for q in qs]
+    targets = [(safe_output_path(OUT_DIR, i, ".json"), safe_output_path(OUT_DIR, i, ".md")) for i in ids]
+    dupes = sorted({i for i in ids if ids.count(i) > 1})
+    if dupes:
+        raise ValueError(f"duplicate question ids would overwrite each other's answers: {dupes}")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = []
-    for q in qs:
-        res = answer_question(q["question"], db_path=db_path, use_cache=use_cache, qid=q.get("id"))
-        res["id"] = q.get("id")
-        (OUT_DIR / f"{q['id']}.json").write_text(json.dumps(res, indent=2, default=str))
-        (OUT_DIR / f"{q['id']}.md").write_text(render_markdown(res))
+    for q, (pj, pm) in zip(qs, targets):
+        res = answer_question(q["question"], db_path=db_path, use_cache=use_cache, qid=q["id"])
+        res["id"] = q["id"]
+        pj.write_text(json.dumps(res, indent=2, default=str))
+        pm.write_text(render_markdown(res))
         print(f"{q['id']}: total {res['timings_ms']} cached={res['cached']} postcheck_ok={res['postcheck']['ok']}")
         out.append(res)
     combined = [f"# Answers: {Path(path).name}", ""]
     for r in out:
-        combined += [f"## {r['id']}", "", f"> {r['question']}", "", r["answer_markdown"], "",
+        flag = [POSTCHECK_FAILED_BANNER, ""] if not r["postcheck"]["ok"] else []
+        combined += [f"## {r['id']}", "", f"> {r['question']}", "", *flag, r["answer_markdown"], "",
                      f"_Details, plan, calculations and evidence: [{r['id']}.md]({r['id']}.md)_", ""]
     name = "ANSWERS.md" if Path(path).name == "questions.json" else f"ANSWERS_{Path(path).stem}.md"
     (OUT_DIR / name).write_text("\n".join(combined))

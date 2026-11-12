@@ -54,21 +54,36 @@ Rules for operators:
 - The planner (effort `medium`) produces a `QueryPlan`, and `question` is overwritten with the user's text. If
   there are no steps and `unsupported_reason` is set, the answer is "Not answerable with the supported operations".
 - The narrator (effort `medium`) produces `NarrativeOut{answer_markdown, unresolved[], caveats}`. It is given rules:
-  only numbers from the results, no new arithmetic, cite `(DOC-ID L<lines>)`, separate fact from interpretation, and
-  list exclusions.
-- `postcheck` checks these things against the results **minus the echoed `question`, `plan` and SQL text**, so a
-  number or document the asker typed cannot back itself:
+  only numbers from the results, no new arithmetic, cite `(DOC-ID L<lines>)` using only listed line numbers (never a
+  range over non-adjacent lines: `L6–7, L9`, not `L6–9`), separate fact from interpretation, and list exclusions.
+- `postcheck` checks these things against the results **minus the echoed `question`, `plan`, each step's
+  `params` and SQL text**, so a number or document the asker typed cannot back itself. A parameter value counts only
+  where the operator also states it in its computed output:
   - Every number in the narrative (excluding IDs, line refs, ISO dates, clock times and month-name dates) must
     appear in the results (totals, groups, facts, calculations, exclusions, decisions, evidence quotes, notes).
   - Cited labels are matched against **the corpus's own document labels**. A cited document that does not appear
     in the results (`documents_not_in_results`) fails the check.
   - Every line of every `L<a>` or `L<a>–<b>` in a citation group must fall inside an evidence passage for that
-    document. Adjacent passages may together cover a range; a reversed range fails. Problems are reported, not
-    auto-fixed.
-- Cache key: `sha256(question + fingerprint)`, where the fingerprint covers the extractor, ruleset, query and prompt
-  versions plus all document hashes.
+    document. Adjacent passages may together cover a range; a reversed range fails.
+- The post-check is a gate in `answer_question`. A failing narration is regenerated once, on the same results, with
+  the failures and the previous answer in the prompt. If it still fails, the answer is returned with
+  `postcheck.ok = false`, a warning banner in its Markdown, and is **not** cached. A cached answer that failed its
+  post-check is treated as a miss. `postcheck_attempts` and `postcheck_first_attempt` record what happened.
+- Cache key: `sha256(question + fingerprint)`. The fingerprint hashes the extractor, ruleset, query and prompt
+  versions plus the abstraction's content: documents (minus text and timestamps), committed extraction identities
+  (sha256, extractor version, model), claims, and every derived clinical table, excluding rowids and timestamps.
+  A retried extraction, another model, or a reconcile that changes derived rows invalidates the cache; an identical
+  rebuild does not. It costs ~2 ms on the supplied corpus, and ~1 s for a 10K-patient synthetic clone (260K
+  encounters, no claims). At real scale claims dominate; persisting per-patient content hashes at reconcile and
+  ingest time would make it O(patients). Tables are listed explicitly in `_FP_TABLES`, so a new derived table must be
+  added there.
 - `verify_answers()` / `python -m backbone verify-answers` re-executes every saved plan, requires identical results
-  JSON, and re-runs the post-check.
+  JSON, and re-runs the post-check. It is read-only (read-only DB connection, no files written) and exits 1 if any
+  result differs or any post-check fails. `--rewrite` (`rewrite=True`) refreshes each saved answer's post-check
+  field and Markdown.
+- Output file names come from question IDs (`answer_file`) and MRNs (`export`). `backbone/paths.safe_output_path`
+  accepts only `[A-Za-z0-9][A-Za-z0-9._-]*` without `..`, and requires the resolved path to stay inside the output
+  directory. `answer_file` validates every ID (and rejects missing or duplicate IDs) before the first LLM call.
 
 ## Agent workflow (Claude Code)
 
