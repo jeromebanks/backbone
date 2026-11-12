@@ -66,6 +66,32 @@ Rules for operators:
 - `verify_answers()` / `python -m backbone verify-answers` re-executes every saved plan, requires identical results
   JSON, and re-runs the post-check.
 
+## Agent workflow (Claude Code)
+
+The `clinical-qa` skill (`.claude/skills/clinical-qa/`) answers questions with Claude as the planner and narrator,
+and runs no LLM inside the CLI:
+
+1. `python -m backbone directory`
+2. write a QueryPlan
+3. `python -m backbone plan <file|-> --summary --out r.json`
+4. write the answer
+5. `python -m backbone postcheck answer.md --results r.json`
+
+The skill's example plans are validated by `tests/test_pipeline.py::test_skill_example_plans_stay_valid`; keep
+them in sync when the DSL changes.
+
+## Roadmap
+
+See [`docs/CLINICAL_QA_DESIGN.md`](../CLINICAL_QA_DESIGN.md) §5:
+- versioned schema;
+- episode and relative scopes;
+- new operators (authorization, documentation gaps, providers, assessment change, cohorts);
+- step composition, normalization and plan caching;
+- explain/estimate;
+- SQL parity;
+- permission stamping;
+- a labelled retrieval operator.
+
 ## Known gaps
 
 - There is no second planning round: if the first plan misses something, the narrator says what the results lack.

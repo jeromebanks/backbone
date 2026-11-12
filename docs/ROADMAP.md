@@ -170,7 +170,7 @@ Durations are for a small team (2–3 engineers plus clinical SME time) and are 
 
 ### Phase 0: Foundations (2 weeks)
 - Confirm the LLM provider and **BAA**, the data-residency and retention rules, and the tenancy model.
-- Containerise; CI (lint, type-check, the existing 34 tests, `verify-answers`); Terraform skeleton; secrets in KMS.
+- Containerise; CI (lint, type-check, the existing test suite, `verify-answers`); Terraform skeleton; secrets in KMS.
 - Port the schema to Postgres (Alembic migrations): add `tenant_id`, `episode_id`, per-claim `patient_ref`,
   bitemporal columns, and an audit-log table. Keep SQLite as the test backend behind a thin repository layer.
 - **Exit:** the prototype's golden results reproduce on Postgres in CI.
@@ -192,6 +192,7 @@ Durations are for a small team (2–3 engineers plus clinical SME time) and are 
   1M documents in under 10 s.
 
 ### Phase 3: Query and answer service (3–4 weeks)
+Detailed design, including the DSL roadmap: **[CLINICAL_QA_DESIGN.md](CLINICAL_QA_DESIGN.md)**.
 - A FastAPI `QueryPlan` endpoint (authenticated, tenant-scoped), plan and answer caches scoped to patients in scope,
   and streaming narration with compacted inputs.
 - More operators as reviewers need them (authorisation utilisation, administrative findings such as charges without

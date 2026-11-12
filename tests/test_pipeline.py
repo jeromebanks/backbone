@@ -254,3 +254,44 @@ def test_conflicting_same_start_goals_become_undetermined(db):
     assert w["2026-01-19"]["status"] == "UNDETERMINED"          # 180: meets 150, misses 200
     assert any("conflicting requirements" in n for n in w["2026-01-19"]["notes"])
     assert w["2026-01-05"]["status"] == "NOT_MET"                # 140 misses both
+
+
+# ---------------------------------------------------------------- agent-facing CLI helpers (used by the clinical-qa skill)
+
+def test_plan_summary_and_postcheck_cli(db, tmp_path):
+    dbp = str(tmp_path / "t.db")
+    plan_obj = json.loads((ROOT / "plans" / "weekly_compliance.json").read_text())
+    for st in plan_obj["steps"]:
+        st["scope"]["include_evidence"] = True          # citations must be backed by evidence in the results
+    plan = json.dumps(plan_obj)
+    out = subprocess.run([sys.executable, "-m", "backbone", "--db", dbp, "plan", "-", "--summary",
+                          "--out", str(tmp_path / "r.json")], input=plan, capture_output=True, text=True, cwd=ROOT)
+    assert out.returncode == 0, out.stderr
+    assert "WEEK 2026-01-26 [UNDETERMINED]" in out.stdout and "CONFLICT HG-E115" in out.stdout
+    good = tmp_path / "good.md"
+    good.write_text("Week of Jan 26: 145–155 minutes, UNDETERMINED (BH-D110 L7; BH-D111 L7).")
+    bad = tmp_path / "bad.md"
+    bad.write_text("Week of Jan 26: 162 minutes (BH-D110 L99).")
+    run = lambda f: subprocess.run([sys.executable, "-m", "backbone", "--db", dbp, "postcheck", str(f), "--results",
+                                    str(tmp_path / "r.json")], capture_output=True, text=True, cwd=ROOT)
+    assert run(good).returncode == 0
+    r = run(bad)
+    assert r.returncode == 1 and "162" in r.stdout and "BH-D110 L99" in r.stdout
+
+
+def test_invalid_plan_cli_fails_loudly(db, tmp_path):
+    out = subprocess.run([sys.executable, "-m", "backbone", "--db", str(tmp_path / "t.db"), "plan", "-", "--summary"],
+                         input='{"question":"x","steps":[{"op":"sql","q":"DROP TABLE claims"}]}',
+                         capture_output=True, text=True, cwd=ROOT)
+    assert out.returncode == 2 and "INVALID PLAN" in out.stderr
+
+
+def test_skill_example_plans_stay_valid(db):
+    """Every QueryPlan example shipped in the clinical-qa skill must validate and execute."""
+    import re
+    txt = (ROOT / ".claude" / "skills" / "clinical-qa" / "reference" / "plan-examples.md").read_text()
+    blocks = re.findall(r"```json\n(.*?)```", txt, re.S)
+    assert len(blocks) >= 8
+    for b in blocks:
+        res = execute_plan(db[0], QueryPlan.model_validate_json(b))
+        assert res["results"]

@@ -185,7 +185,7 @@ measurement.</b></p>
 <div class="steps">
   <div class="step"><div class="n">1</div><div><h4>State machine inside the current codebase <span class="tag">~1–2 wks</span></h4>
     <p>Add a <code>document_jobs</code> table with per-stage idempotency keys. Hash once at intake. Runs locally on SQLite or Postgres.</p>
-    <p class="exit">Exit: the 34 tests pass; re-ingest touches 0 files; duplicate-delivery, shuffled-order and crash-injection property tests pass.</p></div></div>
+    <p class="exit">Exit: the existing test suite passes; re-ingest touches 0 files; duplicate-delivery, shuffled-order and crash-injection property tests pass.</p></div></div>
   <div class="step"><div class="n">2</div><div><h4>Object storage, events, two lanes <span class="tag">~3–4 wks</span></h4>
     <p>S3 intake, transactional outbox, Temporal workflows, the interactive lane with a token bucket, and the bulk lane via Message Batches.</p>
     <p class="exit">Exit: a 50K-document backfill within budget; interactive p95 under 2 minutes.</p></div></div>

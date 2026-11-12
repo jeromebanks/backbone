@@ -1,11 +1,11 @@
 # Verification
 
-## Test suites (`python -m pytest -q`: 34 tests, ~1 s, zero LLM calls)
+## Test suites (`python -m pytest -q`: ~1 s, zero LLM calls)
 
 | File | What | How |
 |---|---|---|
 | `tests/test_rules.py` | interval algebra, quote verification, R0–R8 and verdict logic | hand-built claims via `tests/helpers.py`; no DB |
-| `tests/test_pipeline.py` | golden end-to-end results, idempotency, near-duplicates, second patient, restart, determinism, DSL parity, plan revisions | temp DB rebuilt from `cache/extractions/` (LLM calls monkeypatched to fail) |
+| `tests/test_pipeline.py` | golden end-to-end results, idempotency, near-duplicates, second patient, restart, determinism, DSL parity, plan revisions, agent CLI (`plan --summary`, `postcheck`, invalid plans), skill example plans | temp DB rebuilt from `cache/extractions/` (LLM calls monkeypatched to fail) |
 
 ## Golden values (derived by hand from `documents/` before coding; they live ONLY in `test_pipeline.py`)
 

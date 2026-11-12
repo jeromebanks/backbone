@@ -2,7 +2,7 @@
 
 Guide for coding agents (Claude Code, Codex, others). `CLAUDE.md` imports this file; keep it as the single source.
 Deeper references live in [`docs/agents/`](docs/agents/README.md). Production plans: [`docs/ROADMAP.md`](docs/ROADMAP.md),
-[`docs/INGESTION_PIPELINE.md`](docs/INGESTION_PIPELINE.md). Human-facing docs: `docs/index.html`, `docs/ingestion.html`.
+[`docs/INGESTION_PIPELINE.md`](docs/INGESTION_PIPELINE.md), [`docs/CLINICAL_QA_DESIGN.md`](docs/CLINICAL_QA_DESIGN.md). Human-facing docs: `docs/index.html`, `docs/ingestion.html`.
 
 ## Confidentiality (read first)
 
@@ -30,10 +30,13 @@ question  → LLM → QueryPlan (typed JSON DSL) → 4 operators (read-only SQL)
 ## Commands
 
 ```bash
-python -m pytest -q                                    # 34 tests, no LLM, ~1 s — run after every change
+python -m pytest -q                                    # full test suite, no LLM, ~1 s — run after every change
 python -m backbone verify-answers                      # saved answers must reproduce byte-identically (no LLM)
 python -m backbone plan plans/weekly_compliance.json   # run a hand-written QueryPlan (no LLM)
 python -m backbone stats | reconcile | export --patient HG-M042 | benchmark
+python -m backbone directory | schema                 # patients in the abstraction; QueryPlan JSON schema
+python -m backbone plan - --summary --out /tmp/r.json  # plan from stdin → compact readout + full results
+python -m backbone postcheck answer.md --results /tmp/r.json   # numbers/citations in an answer must be backed
 python -m backbone.ablation                            # naive-rule experiment → out/ablation.md
 python docs/build_site.py                              # regenerate docs/index.html from the DB + benchmarks
 # LLM-backed (uses Claude Opus 5.5 via `claude -p` = the user's subscription; costs usage — ask first):
@@ -77,6 +80,12 @@ implemented, never exercised).
 
 If a change leaves results identical (check with `verify-answers`), the saved answers stay valid.
 Regenerating answers costs ~$2–3 at list price (11 questions) and needs the user's OK.
+
+## Answering clinical questions in this repo
+
+Use the **`clinical-qa` skill** (`.claude/skills/clinical-qa/SKILL.md`). The agent writes a QueryPlan, the CLI
+computes it, and the agent writes a cited answer that must pass `postcheck`. Never compute clinical numbers by hand,
+and never answer from raw `documents/`. Design for the production version: `docs/CLINICAL_QA_DESIGN.md`.
 
 ## Where to make common changes
 

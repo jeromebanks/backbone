@@ -64,6 +64,16 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     - **Design:** two extraction lanes (interactive and Message Batches); reconciliation coalesced per patient-episode.
     - Spec: `docs/INGESTION_PIPELINE.md`.
 
+16. **Clinician Q&A keeps the QueryPlan DSL as the only bridge from language to computation.**
+    - Production adds a template fast path for common intents, compact digests for narration, streaming, a
+      verification gate (regenerate, then template fallback) and three labelled answer tiers
+      (computed / retrieved / unsupported).
+    - Follow-ups edit the previous plan.
+    - The Claude Code `clinical-qa` skill is the single-user form of the same contract.
+    - Design: `docs/CLINICAL_QA_DESIGN.md`.
+17. **A post-check line citation must be backed by an evidence passage in the results.** A document with no
+    passages cannot back any line reference. (Earlier, unbacked citations to such documents passed unchecked.)
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K

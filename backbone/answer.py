@@ -140,7 +140,9 @@ def postcheck(conn, answer_md: str, results: dict) -> dict:
             seg = re.split(r"[);\]]", answer_md[m.end():seg_end], maxsplit=1)[0]
             for a, b in re.findall(r"L(\d+)(?:\s*[-–]\s*L?(\d+))?", seg):
                 for ln in {int(a), int(b or a)}:
-                    if m.group(1) in spans and not any(x <= ln <= y for x, y in spans[m.group(1)]):
+                    # a line citation must be backed by an evidence passage in the results; documents with no
+                    # passages in the results cannot back any line reference
+                    if not any(x <= ln <= y for x, y in spans.get(m.group(1), [])):
                         bad_lines.append(f"{m.group(1)} L{ln}")
     return {"numbers_not_in_results": unknown, "unknown_documents": bad_docs,
             "documents_not_in_results": not_in_results, "line_refs_outside_evidence": sorted(set(bad_lines)),

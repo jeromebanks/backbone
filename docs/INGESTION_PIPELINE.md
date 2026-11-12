@@ -176,7 +176,7 @@ price reported by the CLI; 0.53 docs/s at concurrency 8.
 
 | Step | Build | Exit criteria |
 |---|---|---|
-| 1 | `document_jobs` state machine inside the current codebase; hash once at intake; no rescans | the existing 34 tests pass; re-ingest touches 0 files; crash/duplicate property tests pass |
+| 1 | `document_jobs` state machine inside the current codebase; hash once at intake; no rescans | the existing test suite passes; re-ingest touches 0 files; crash/duplicate property tests pass |
 | 2 | S3 + outbox events + Temporal; interactive and bulk lanes; token bucket | 50K-doc backfill within budget; interactive p95 < 2 min |
 | 3 | Normalization (PDF/OCR/HL7), bundle splitting, classification, near-duplicate linking | gold set covers PDF and fax; skip and link rates measured; no clinical document wrongly skipped in the audit sample |
 | 4 | Fairness, autoscaling, quality gates, dashboards, 1M load test | SLOs met under load; drift gates trip in fault-injection tests |

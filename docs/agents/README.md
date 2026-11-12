@@ -12,4 +12,6 @@ Start with [`/AGENTS.md`](../../AGENTS.md) (invariants, commands, confidentialit
 | [DECISIONS.md](DECISIONS.md) | about to propose a design change (what was chosen, rejected, and why) |
 | [RUNBOOK.md](RUNBOOK.md) | preparing for or running the live review session with Backbone |
 | [../INGESTION_PIPELINE.md](../INGESTION_PIPELINE.md) | designing or building production ingestion: stages, idempotency keys, lanes, coalescing, backfills |
+| [../CLINICAL_QA_DESIGN.md](../CLINICAL_QA_DESIGN.md) | building natural-language Q&A for clinicians at scale; the DSL roadmap |
+| [../../.claude/skills/clinical-qa/SKILL.md](../../.claude/skills/clinical-qa/SKILL.md) | answering a clinical question yourself in this repo (agent workflow) |
 | [../ROADMAP.md](../ROADMAP.md) | planning production work: target design, tech stack, scalability choke points, phases |

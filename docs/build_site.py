@@ -410,7 +410,7 @@ measuring field-level stability, and stricter handling of mentions.</li>
 </ul>
 
 <h2 id="run">Running it</h2>
-<pre><code>python -m pytest -q                                   # 34 tests, no LLM calls
+<pre><code>python -m pytest -q                                   # full test suite, no LLM calls
 python -m backbone verify-answers                     # saved answers reproduce exactly
 python -m backbone plan plans/weekly_compliance.json  # hand-written plan, no LLM
 python -m backbone ingest path/to/new_doc.txt         # extracts only new docs; re-reconciles that patient

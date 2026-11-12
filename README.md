@@ -21,7 +21,8 @@ question ─LLM─► QueryPlan (typed JSON DSL, validated) ─► 4 operators (
 **Docs:** open [`docs/index.html`](docs/index.html) for a visual overview, including an interactive encounter timeline
 with the evidence behind every decision (self-contained, works offline). Agent and contributor guides are in
 [`AGENTS.md`](AGENTS.md) and [`docs/agents/`](docs/agents/README.md). The path to production (design, stack, choke points, phases)
-is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+is in [`docs/ROADMAP.md`](docs/ROADMAP.md), with deeper designs for [ingestion](docs/INGESTION_PIPELINE.md) and
+[clinician Q&A](docs/CLINICAL_QA_DESIGN.md). In Claude Code, ask clinical questions via the `clinical-qa` skill.
 
 ## Results on the development questions
 
@@ -68,7 +69,7 @@ Requires Python ≥ 3.11 with `pydantic` (and `pytest` for tests). No other serv
 pip install -e '.[dev]'          # or: uv sync --extra dev
 
 # Everything below works offline: the extraction cache (cache/) and the database (out/) ship with the repo.
-python -m pytest -q                                   # 34 tests, no LLM calls
+python -m pytest -q                                   # full test suite, no LLM calls
 python -m backbone stats                              # what is in the abstraction
 python -m backbone plan plans/weekly_compliance.json  # run a hand-written query plan (no LLM at all)
 python -m backbone verify-answers                     # re-execute every saved answer's plan: results must be identical

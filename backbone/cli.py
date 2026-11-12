@@ -6,6 +6,9 @@
   python -m backbone answer questions.json        # answer a question file into out/answers/
   python -m backbone plan plan.json               # execute a hand-written QueryPlan (no LLM at all)
   python -m backbone verify-answers               # re-execute saved answers' plans (no LLM); results must match
+  python -m backbone directory | schema           # patient directory; QueryPlan JSON schema
+  python -m backbone plan - --summary --out r.json   # plan from stdin; compact readout; full results to r.json
+  python -m backbone postcheck answer.md --results r.json   # verify numbers/citations in a written answer
   python -m backbone export --patient HG-M042     # patient abstraction JSON + graph JSON
   python -m backbone benchmark                    # measured timings -> out/benchmarks.json
   python -m backbone stats
@@ -87,11 +90,41 @@ def cmd_verify(args):
 
 
 def cmd_plan(args):
-    from .query import QueryPlan, execute_plan
     from .db import connect_readonly
-    plan = QueryPlan.model_validate_json(open(args.file).read())
+    from .query import QueryPlan, execute_plan
+    from .summary import summarize
+    raw = sys.stdin.read() if args.file == "-" else open(args.file).read()
+    try:
+        plan = QueryPlan.model_validate_json(raw)
+    except Exception as e:  # invalid plans fail loudly with the validation message
+        print(f"INVALID PLAN: {e}", file=sys.stderr)
+        sys.exit(2)
+    res = execute_plan(connect_readonly(args.db), plan)
+    if args.out:
+        with open(args.out, "w") as f:
+            json.dump(res, f, indent=2, default=str)
     print(plan.explain())
-    print(json.dumps(execute_plan(connect_readonly(args.db), plan), indent=2, default=str))
+    print(summarize(json.loads(json.dumps(res, default=str))) if args.summary
+          else json.dumps(res, indent=2, default=str))
+
+
+def cmd_directory(args):
+    from .answer import directory
+    print(directory(connect(args.db)))
+
+
+def cmd_schema(args):
+    from .query import QueryPlan
+    print(json.dumps(QueryPlan.model_json_schema(), indent=1))
+
+
+def cmd_postcheck(args):
+    from .answer import postcheck
+    res = json.load(open(args.results))
+    pc = postcheck(connect(args.db), open(args.answer).read(), res)
+    print(json.dumps(pc, indent=2))
+    if not pc["ok"]:
+        sys.exit(1)
 
 
 def cmd_export(args):
@@ -120,7 +153,13 @@ def main(argv=None):
     p.add_argument("--no-cache", action="store_true"); p.set_defaults(fn=cmd_ask)
     p = sub.add_parser("answer"); p.add_argument("file"); p.add_argument("--no-cache", action="store_true")
     p.set_defaults(fn=cmd_answer)
-    p = sub.add_parser("plan"); p.add_argument("file"); p.set_defaults(fn=cmd_plan)
+    p = sub.add_parser("plan"); p.add_argument("file", help="QueryPlan JSON file, or - for stdin")
+    p.add_argument("--summary", action="store_true", help="compact readout instead of full JSON")
+    p.add_argument("--out", help="also write the full results JSON here"); p.set_defaults(fn=cmd_plan)
+    p = sub.add_parser("directory"); p.set_defaults(fn=cmd_directory)
+    p = sub.add_parser("schema"); p.set_defaults(fn=cmd_schema)
+    p = sub.add_parser("postcheck"); p.add_argument("answer"); p.add_argument("--results", required=True)
+    p.set_defaults(fn=cmd_postcheck)
     p = sub.add_parser("verify-answers"); p.set_defaults(fn=cmd_verify)
     p = sub.add_parser("export"); p.add_argument("--patient", required=True); p.set_defaults(fn=cmd_export)
     p = sub.add_parser("benchmark"); p.add_argument("--synthetic-patients", type=int, default=10000)
