@@ -105,8 +105,20 @@ def _slim(results: dict) -> dict:
 _NUM = re.compile(r"(?<![\w-])\d+(?:\.\d+)?(?![\w-])")
 
 
+def _computed_blob(results: dict) -> str:
+    """The results envelope minus everything that did not come from the abstraction: the question and plan echo
+    whatever the asker typed, and SQL text holds literals. Numbers and documents in the answer must be backed by
+    what is left (totals, groups, facts, calculations, exclusions, decisions, evidence quotes, notes)."""
+    out = json.loads(json.dumps(results, default=str))
+    out.pop("question", None)
+    out.pop("plan", None)
+    for r in out.get("results", []):
+        r.pop("sql", None)
+    return json.dumps(out)
+
+
 def postcheck(conn, answer_md: str, results: dict) -> dict:
-    blob = json.dumps(results, default=str)
+    blob = _computed_blob(results)
     known = {float(x) for x in re.findall(r"\d+(?:\.\d+)?", blob)}
     text = re.sub(r"\b[A-Z]{2,}-[A-Z]?\d+\b", " ", answer_md)          # drop IDs like BH-D103, HG-E110
     text = re.sub(r"\bL\d+(?:[-–]\d+)?\b", " ", text)                    # drop line refs
@@ -120,7 +132,7 @@ def postcheck(conn, answer_md: str, results: dict) -> dict:
     labels = sorted({r[0] for r in conn.execute("SELECT doc_label FROM documents")}, key=len, reverse=True)
     label_re = re.compile(r"(?<![\w-])(" + "|".join(map(re.escape, labels)) + r")(?![\w-])") if labels else None
     cited = sorted({m.group(1) for m in label_re.finditer(answer_md)}) if label_re else []
-    in_results = {lab for lab in cited if lab in blob}
+    in_results = {m.group(1) for m in label_re.finditer(blob)} if label_re else set()
     not_in_results = [c for c in cited if c not in in_results]
     # Things that look like document citations "(XYZ-123 L4)" but name no document in the corpus.
     known_ids = set(labels) | set(re.findall(r"[A-Z]{1,}-[A-Z]?\d+", blob))
@@ -139,14 +151,20 @@ def postcheck(conn, answer_md: str, results: dict) -> dict:
             seg_end = matches[i + 1].start() if i + 1 < len(matches) else len(answer_md)
             seg = re.split(r"[);\]]", answer_md[m.end():seg_end], maxsplit=1)[0]
             for a, b in re.findall(r"L(\d+)(?:\s*[-–]\s*L?(\d+))?", seg):
-                for ln in {int(a), int(b or a)}:
-                    # a line citation must be backed by an evidence passage in the results; documents with no
-                    # passages in the results cannot back any line reference
+                lo, hi = int(a), int(b or a)
+                if lo > hi:
+                    bad_lines.append((m.group(1), lo, f"L{lo}-{hi}"))
+                    continue
+                # Every line of a cited range must be inside some evidence passage for that document (passages
+                # may be adjacent; their union must cover the range). Documents with no passages in the results
+                # cannot back any line reference.
+                for ln in range(lo, hi + 1):
                     if not any(x <= ln <= y for x, y in spans.get(m.group(1), [])):
-                        bad_lines.append(f"{m.group(1)} L{ln}")
+                        bad_lines.append((m.group(1), ln, f"L{ln}"))
+    bad_lines = [f"{doc} {ref}" for doc, _, ref in sorted(set(bad_lines))]
     return {"numbers_not_in_results": unknown, "unknown_documents": bad_docs,
-            "documents_not_in_results": not_in_results, "line_refs_outside_evidence": sorted(set(bad_lines)),
-            "ok": not (unknown or bad_docs or bad_lines)}
+            "documents_not_in_results": not_in_results, "line_refs_outside_evidence": bad_lines,
+            "ok": not (unknown or bad_docs or not_in_results or bad_lines)}
 
 
 def answer_question(question: str, *, db_path=None, use_cache: bool = True, qid: str | None = None) -> dict:
@@ -213,6 +231,7 @@ def render_markdown(res: dict) -> str:
     pc = res["postcheck"]
     lines += ["## Post-check", "", f"- numbers in the answer not found in computed results: {pc['numbers_not_in_results'] or 'none'}",
               f"- cited documents not in the corpus: {pc['unknown_documents'] or 'none'}",
+              f"- cited documents not in the computed results: {pc.get('documents_not_in_results') or 'none'}",
               f"- line references outside the evidence passages: {pc['line_refs_outside_evidence'] or 'none'}", ""]
     ev = {}
     for r in res["results"].get("results", []):

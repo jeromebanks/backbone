@@ -52,9 +52,16 @@ def build_claims(sha: str, label: str, text: str, ex: Extraction, mrn: str | Non
     idx = DocumentIndex(text)
     claims: list[dict] = []
 
-    def add(kind: str, i: int, subject: str | None, payload: dict, quotes: list[str], evidence_type: str | None = None):
-        spans = [idx.locate(q).as_dict() for q in quotes if q]
-        verified = int(all(s["match"] != "missing" for s in spans))
+    def add(kind: str, i: int, subject: str | None, payload: dict, quotes: list[str], evidence_type: str | None = None,
+            supporting: list[str] = ()):
+        # Every clinical claim needs at least one non-blank quote of its own, and every quote must be located.
+        # Blank quotes are kept as "missing" spans (not dropped), so they fail verification and R0 rejects the
+        # claim. `supporting` quotes (e.g. a break inside a session) are verified too but cannot stand in for the
+        # claim's own evidence. The document claim carries no quotes and is not subject to R0.
+        own = [idx.locate(q).as_dict() for q in quotes]
+        spans = own + [idx.locate(q).as_dict() for q in supporting]
+        grounded = kind == "document" or any((q or "").strip() for q in quotes)
+        verified = int(grounded and all(s["match"] != "missing" for s in spans))
         claims.append({
             "claim_id": f"{sha[:12]}:{kind}:{i}", "sha256": sha, "doc_label": label, "patient_mrn": mrn,
             "kind": kind, "subject_key": subject, "evidence_type": evidence_type,
@@ -68,8 +75,8 @@ def build_claims(sha: str, label: str, text: str, ex: Extraction, mrn: str | Non
         add("relation", i, r.get("encounter_id") or r.get("form_id"), r, [r["quote"]])
     for i, ev in enumerate(ex.service_events):
         d = ev.model_dump()
-        quotes = list(ev.quotes) + [n.quote for n in ev.nontherapeutic_intervals]
-        add("service_event", i, ev.encounter_id, d, quotes, ev.evidence_type)
+        add("service_event", i, ev.encounter_id, d, list(ev.quotes), ev.evidence_type,
+            supporting=[n.quote for n in ev.nontherapeutic_intervals])
     for i, a in enumerate(ex.assessments):
         add("assessment", i, a.form_id or f"{a.instrument}@{a.completed_date}", a.model_dump(), [a.quote])
     for i, o in enumerate(ex.observations):

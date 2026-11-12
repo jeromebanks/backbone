@@ -2,8 +2,9 @@
 
 We never trust model-reported locations. A quote is accepted if it matches the document after
 light normalisation (whitespace, dash and quote-mark variants, case), or - as a fallback - if a
-contiguous window of the document is >= 0.92 similar. Anything else is unverified, and claims with
-unverified quotes are excluded from reconciliation (and reported).
+contiguous window of the document is >= 0.92 similar AND every digit-bearing token (times, minutes, IDs) agrees
+exactly. Anything else is unverified, and claims with unverified quotes are excluded from reconciliation (and
+reported).
 """
 from __future__ import annotations
 
@@ -67,7 +68,7 @@ class DocumentIndex:
         if not quote or not quote.strip():
             return Span(quote, None, None, "missing")
         q = self.normalize(quote)
-        idx = self.norm.find(q)
+        idx = self._find(q)
         if idx >= 0:
             ls, le = self._span(idx, idx + len(q))
             match = "exact" if quote in self.text else "normalized"
@@ -77,7 +78,7 @@ class DocumentIndex:
         if len(parts) > 1:
             pos, first, last = 0, None, None
             for p in parts:
-                i = self.norm.find(p, pos)
+                i = self._find(p, pos)
                 if i < 0:
                     break
                 first = i if first is None else first
@@ -100,7 +101,39 @@ class DocumentIndex:
                     r = difflib.SequenceMatcher(None, q, self.norm[i:i + len(q)], autojunk=False).ratio()
                     if r > best:
                         best, best_i = r, i
-            if best >= 0.92:
-                ls, le = self._span(best_i, best_i + len(q))
+            end = min(len(self.norm), best_i + len(q))   # the refined window may run past the document's end
+            if best >= 0.92 and self._same_numbers(q, best_i, end):
+                ls, le = self._span(best_i, end)
                 return Span(quote, ls, le, "fuzzy")
         return Span(quote, None, None, "missing")
+
+    def _find(self, needle: str, pos: int = 0) -> int:
+        """`str.find` that will not start or end a match in the middle of a word or number, so "5 minutes" does
+        not verify against "45 minutes". A needle edge that is punctuation or space may abut anything."""
+        n = len(needle)
+        while (i := self.norm.find(needle, pos)) >= 0:
+            j = i + n
+            if not (needle[0].isalnum() and i > 0 and self.norm[i - 1].isalnum()) and \
+               not (needle[-1].isalnum() and j < len(self.norm) and self.norm[j].isalnum()):
+                return i
+            pos = i + 1
+        return -1
+
+    def _same_numbers(self, q: str, start: int, end: int) -> bool:
+        """Fuzzy matching may forgive prose typos, never a changed number or identifier: every token containing a
+        digit (times, minutes, scores, dates, IDs like hg-e110) must appear unchanged and in the same order in the
+        matched window. The window is widened to whole tokens first, so an edge cut mid-token cannot cause a miss."""
+        while start > 0 and not self.norm[start - 1].isspace():
+            start -= 1
+        while end < len(self.norm) and not self.norm[end].isspace():
+            end += 1
+        want, have = _numeric_tokens(q), _numeric_tokens(self.norm[start:end])
+        return any(have[i:i + len(want)] == want for i in range(len(have) - len(want) + 1))
+
+
+_TOKEN = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+
+
+def _numeric_tokens(s: str) -> list[str]:
+    s = re.sub(r"\s*-\s*", "-", s)          # "10:00 - 10:30" and "10:00-10:30" tokenize alike
+    return [t for t in _TOKEN.findall(s) if any(c.isdigit() for c in t)]

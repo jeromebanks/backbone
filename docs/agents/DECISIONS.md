@@ -73,6 +73,8 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     - Design: `docs/CLINICAL_QA_DESIGN.md`.
 17. **A post-check line citation must be backed by an evidence passage in the results.** A document with no
     passages cannot back any line reference. (Earlier, unbacked citations to such documents passed unchecked.)
+    A range `L6–9` is backed only if every line 6..9 is inside some passage; checking only the endpoints let
+    `L1–10` pass on passages L1 and L10 (#16).
 
 ## Open questions / likely next decisions
 

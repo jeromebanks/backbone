@@ -28,8 +28,14 @@ a platform log; D112 has a draft template plus a billing row. Each record type b
 
 `DocumentIndex` normalises whitespace, dash and quote variants, and case, keeping a map back to original line numbers.
 `locate()` tries, in order: an exact/normalised match, then ellipsis-joined fragments in order, then a fuzzy
-same-length window (≥ 0.92 similarity). Spans go into `claims.evidence` as `{quote, line_start, line_end, match}`.
-`claims.verified = 1` only if every quote was found. Unverified claims are dropped by R0. In this corpus 254 claims
+same-length window (≥ 0.92 similarity). Exact and fragment matches may not start or end inside a word or number
+(`5 minutes` does not verify against `45 minutes`). A fuzzy match is accepted only if every token containing a digit (times,
+minutes, scores, dates, IDs such as `HG-E110`) appears unchanged and in the same order in the matched window, so
+typos are forgiven but a changed number is not. Spans go into `claims.evidence` as
+`{quote, line_start, line_end, match}`. `claims.verified = 1` only if the claim has at least one non-blank quote of its
+own and every quote was found. A blank quote is a `missing` span, not something to skip. A service event's
+nontherapeutic-interval quotes are verified too, but they cannot stand in for the event's own `quotes`. The document
+claim carries no quotes and is exempt. Unverified claims are dropped by R0. In this corpus 254 claims
 were extracted, with 0 fuzzy matches and 0 unverified.
 
 ## Cache

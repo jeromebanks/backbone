@@ -55,12 +55,15 @@ Rules for operators:
 - The narrator (effort `medium`) produces `NarrativeOut{answer_markdown, unresolved[], caveats}`. It is given rules:
   only numbers from the results, no new arithmetic, cite `(DOC-ID L<lines>)`, separate fact from interpretation, and
   list exclusions.
-- `postcheck` checks three things:
+- `postcheck` checks these things against the results **minus the echoed `question`, `plan` and SQL text**, so a
+  number or document the asker typed cannot back itself:
   - Every number in the narrative (excluding IDs, line refs, ISO dates, clock times and month-name dates) must
-    appear in the results.
-  - Cited labels are matched against **the corpus's own document labels**.
-  - Every `L<n>` in a citation group must fall inside an evidence passage for that document. Problems are reported,
-    not auto-fixed.
+    appear in the results (totals, groups, facts, calculations, exclusions, decisions, evidence quotes, notes).
+  - Cited labels are matched against **the corpus's own document labels**. A cited document that does not appear
+    in the results (`documents_not_in_results`) fails the check.
+  - Every line of every `L<a>` or `L<a>–<b>` in a citation group must fall inside an evidence passage for that
+    document. Adjacent passages may together cover a range; a reversed range fails. Problems are reported, not
+    auto-fixed.
 - Cache key: `sha256(question + fingerprint)`, where the fingerprint covers the extractor, ruleset, query and prompt
   versions plus all document hashes.
 - `verify_answers()` / `python -m backbone verify-answers` re-executes every saved plan, requires identical results

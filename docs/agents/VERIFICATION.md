@@ -5,6 +5,7 @@
 | File | What | How |
 |---|---|---|
 | `tests/test_rules.py` | interval algebra, quote verification, R0–R8 and verdict logic | hand-built claims via `tests/helpers.py`; no DB |
+| `tests/test_grounding.py` | evidence grounding: claims without quotes fail R0, fuzzy matches can't change digits or IDs, post-check rejects question-only numbers, uncited documents and partially covered ranges | hand-built extractions, temp DB; no cache needed |
 | `tests/test_pipeline.py` | golden end-to-end results, idempotency, near-duplicates, second patient, restart, determinism, DSL parity, plan revisions, agent CLI (`plan --summary`, `postcheck`, invalid plans), skill example plans | temp DB rebuilt from `cache/extractions/` (LLM calls monkeypatched to fail) |
 
 ## Golden values (derived by hand from `documents/` before coding; they live ONLY in `test_pipeline.py`)
