@@ -250,12 +250,12 @@ def timeline(conn, step: TimelineStep) -> dict:
         rows = log.run(conn, f"SELECT c.claim_id, c.doc_label, c.evidence_type, c.subject_key, c.payload, c.sha256 "
                              f"FROM claims c WHERE c.claim_id IN ({','.join('?' * len(ids))}) ORDER BY c.doc_label", ids)
         enc_of = {c: e["encounter_key"] for e in encs for c in e["claim_ids"]}
-        per_doc: dict[str, dict] = {}
+        per_doc: dict[str, dict] = {}           # keyed by sha256: doc_label is not unique (across or within patients)
         for r in rows:
             meta = log.run(conn, "SELECT payload FROM claims WHERE sha256=? AND kind='document'", (r["sha256"],))
             dm = json.loads(meta[0]["payload"]) if meta else {}
             p = json.loads(r["payload"])
-            d = per_doc.setdefault(r["doc_label"], {"kind": "document", "doc_id": r["doc_label"], "title": dm.get("title"),
+            d = per_doc.setdefault(r["sha256"], {"kind": "document", "doc_id": r["doc_label"], "title": dm.get("title"),
                                                      "signed_at": dm.get("signed_at"), "received_at": dm.get("received_at"),
                                                      "finality": dm.get("finality"), "assertions": []})
             d["assertions"].append({"encounter": _short(enc_of[r["claim_id"]]), "record_type": r["evidence_type"],
@@ -265,14 +265,22 @@ def timeline(conn, step: TimelineStep) -> dict:
                                     "nontherapeutic": [f"{i['kind']} {i['start']}–{i['end']}" for i in p.get("nontherapeutic_intervals") or []],
                                     "stated_minutes": p.get("stated_minutes")})
             claim_ids.append(r["claim_id"])
-        rel = log.run(conn, "SELECT doc_label, payload FROM claims WHERE kind='relation' AND subject_key IN "
-                            f"({','.join('?' * len(encs))})", [e["encounter_id"] or "" for e in encs])
+        # Relations a shown document states about an in-scope encounter. Encounter IDs are unique only within a
+        # patient, so match on (patient, encounter ID); attach to the stating document by sha256, never by label.
+        pairs = sorted({(e["mrn"], e["encounter_id"]) for e in encs if e["encounter_id"]})
+        shas = sorted(per_doc)
+        rel = log.run(conn, "SELECT sha256, payload FROM claims WHERE kind='relation' AND verified=1 "
+                            f"AND sha256 IN ({','.join('?' * len(shas))}) "
+                            f"AND (patient_mrn, subject_key) IN (VALUES {','.join(['(?,?)'] * len(pairs))}) "
+                            "ORDER BY subject_key, claim_id",
+                      shas + [x for pr in pairs for x in pr]) if pairs and shas else []
         for r in rel:
             p = json.loads(r["payload"])
-            if r["doc_label"] in per_doc and p["type"] in ("corrects_field", "retransmits_original", "companion_record"):
-                per_doc[r["doc_label"]].setdefault("relations", []).append(
+            if p["type"] in ("corrects_field", "retransmits_original", "companion_record"):
+                per_doc[r["sha256"]].setdefault("relations", []).append(
                     {k: v for k, v in p.items() if v is not None and k != "quote"})
-        facts += sorted(per_doc.values(), key=lambda d: (d.get("signed_at") or d.get("received_at") or "", d["doc_id"]))
+        facts += [d for _, d in sorted(per_doc.items(), key=lambda kv: (
+            kv[1].get("signed_at") or kv[1].get("received_at") or "", kv[1]["doc_id"], kv[0]))]
     assess = []
     if "assessments" in step.kinds:
         q = ("SELECT * FROM assessments WHERE completed_date BETWEEN ? AND ?"

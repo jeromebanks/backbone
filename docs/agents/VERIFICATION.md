@@ -6,7 +6,9 @@
 |---|---|---|
 | `tests/test_rules.py` | interval algebra, quote verification, R0–R8 and verdict logic | hand-built claims via `tests/helpers.py`; no DB |
 | `tests/test_grounding.py` | evidence grounding: claims without quotes fail R0, fuzzy matches can't change digits or IDs, post-check rejects question-only numbers, uncited documents and partially covered ranges | hand-built extractions, temp DB; no cache needed |
-| `tests/test_pipeline.py` | golden end-to-end results, idempotency, near-duplicates, second patient, restart, determinism, DSL parity, plan revisions, agent CLI (`plan --summary`, `postcheck`, invalid plans), skill example plans | temp DB rebuilt from `cache/extractions/` (LLM calls monkeypatched to fail) |
+| `tests/test_pipeline.py` | golden end-to-end results, no corpus document quarantined, idempotency, near-duplicates, second patient, restart, determinism, DSL parity, plan revisions, agent CLI (`plan --summary`, `postcheck`, invalid plans), skill example plans | temp DB rebuilt from `cache/extractions/` (LLM calls monkeypatched to fail) |
+| `tests/test_attribution.py` | patient attribution at ingest: MRN-less patients stay separate (quarantined), name match must be unique, multi-MRN rosters quarantined, the guard matches no corpus document text, re-extraction that moves a document clears the former patient (issues #1, #5) | temp DB, hand-built `Extraction`s via a monkeypatched `extract_document`; no LLM |
+| `tests/test_isolation.py` | query-layer isolation: two patients sharing an encounter ID and a document label, and two same-label documents of one patient; timeline relations stay with their own patient and document | temp DB from hand-built `Extraction`s (`extract_document` monkeypatched); no cache, no LLM |
 
 ## Golden values (derived by hand from `documents/` before coding; they live ONLY in `test_pipeline.py`)
 

@@ -1,7 +1,9 @@
 # Reconciliation (`backbone/reconcile.py`, `RULESET_VERSION`)
 
 `reconcile_patient(mrn, claims) -> Result` is **pure**: no database and no LLM. `persist()` replaces that patient's
-derived rows inside one transaction. Every consequential choice calls `res.decide(subject, rule, outcome, reason,
+derived rows inside one transaction. `reconcile_patients` also deletes the `patients` row of an MRN that has no
+claims and no documents left (its document was re-attributed or quarantined), so the directory has no empty patients.
+Claims of quarantined documents have `patient_mrn` NULL and are never loaded. Every consequential choice calls `res.decide(subject, rule, outcome, reason,
 claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The answers cite these.
 
 ## Pipeline inside `reconcile_patient`

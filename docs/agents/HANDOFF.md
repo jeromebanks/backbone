@@ -89,7 +89,7 @@ gaps, `docs/CLINICAL_QA_DESIGN.md` §5). Neither needs LLM calls or re-extractio
   - PHQ-9: 18 → 14 → 10 (D014 is a copy).
 
   These live only in `tests/test_pipeline.py`.
-- **Versions:** `EXTRACTOR_VERSION=x1`, `RULESET_VERSION=r1`, `QUERY_VERSION=q4`, `PROMPT_VERSION=a1`.
+- **Versions:** `EXTRACTOR_VERSION=x1`, `RULESET_VERSION=r1`, `QUERY_VERSION=q5`, `PROMPT_VERSION=a1`.
 - **Measured:** extraction $0.045/doc, 13.2 s/doc; answers $0.08–0.62 each; execution 7–10 ms; 10K-patient
   synthetic: collection compliance 6.2 s.
 - **Doc map:**

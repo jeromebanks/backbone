@@ -63,6 +63,8 @@ def cmd_stats(args):
               "plan_requirements", "assessments", "observations", "decisions", "conflicts"]:
         out[t] = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
     out["unverified_claims"] = conn.execute("SELECT COUNT(*) FROM claims WHERE verified=0").fetchone()[0]
+    out["quarantined_documents"] = {r[0]: r[1] for r in conn.execute(
+        "SELECT status, COUNT(*) FROM quarantine GROUP BY status ORDER BY status")}
     print(json.dumps(out, indent=2))
 
 

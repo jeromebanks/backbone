@@ -1,6 +1,8 @@
-"""Ingest documents: hash -> dedupe -> extract (cached) -> verified claims.
+"""Ingest documents: hash -> dedupe -> extract (cached) -> attribute to a patient -> verified claims.
 
-Returns the set of patient MRNs whose evidence changed, so only those patients are re-reconciled.
+Returns the set of patient MRNs whose evidence changed (new owners and former owners of re-extracted documents), so
+only those patients are re-reconciled. A document that cannot be attributed to exactly one patient is quarantined:
+its claims are stored with no patient and take part in no patient's reconciliation.
 """
 from __future__ import annotations
 
@@ -21,6 +23,8 @@ from .llm import DEFAULT_MODEL
 from .schema import Extraction
 
 HEADER_ID = re.compile(r"^\s*Document ID:\s*(\S+)", re.MULTILINE)
+# A labelled MRN value ("MRN HG-1", "MRN: hg-1", "MRN #HG-1"); the value must contain a digit so prose isn't matched.
+MRN_LABEL = re.compile(r"\bMRN\b[ \t:#]*([A-Za-z0-9-]*[0-9][A-Za-z0-9-]*)")
 
 
 def sha256_bytes(b: bytes) -> str:
@@ -31,6 +35,40 @@ def norm_mrn(mrn: str | None) -> str | None:
     if not mrn:
         return None
     return re.sub(r"\s+", "", mrn).upper()
+
+
+def mrns_in_text(text: str) -> set[str]:
+    """Distinct normalised MRN values labelled in the raw document text (deterministic multi-patient guard)."""
+    return {norm_mrn(m.strip("-")) for m in MRN_LABEL.findall(text) if m.strip("-")}
+
+
+def attribute(conn: sqlite3.Connection, text: str, ex: Extraction) -> tuple[str | None, dict | None]:
+    """Decide which patient a document belongs to: (mrn, None), or (None, quarantine record).
+
+    Never invents an identity merge: without an MRN the document must match exactly one known patient by name (and DOB
+    when stated). The extraction holds one patient per document, so text naming several MRNs is not attributed at all.
+    """
+    labelled = sorted(mrns_in_text(text))
+    if len(labelled) > 1:
+        return None, {"status": "multi_patient", "candidates": labelled,
+                      "reason": f"document text labels {len(labelled)} distinct MRNs; extraction holds one patient "
+                                "per document, so its claims cannot be attributed"}
+    mrn = norm_mrn(ex.document.patient_mrn)
+    if mrn:
+        return mrn, None
+    name, dob = ex.document.patient_name, ex.document.patient_dob
+    if not name:
+        return None, {"status": "no_patient_identity", "candidates": [], "reason": "no MRN and no patient name"}
+    hits = sorted(r["mrn"] for r in conn.execute(
+        "SELECT mrn FROM patients WHERE name=? AND (dob=? OR ? IS NULL)", (name, dob, dob)))
+    key = "name + DOB" if dob else "name (no DOB)"
+    if len(hits) == 1:
+        return hits[0], None
+    if hits:
+        return None, {"status": "ambiguous_patient", "candidates": hits,
+                      "reason": f"no MRN; {key} matches {len(hits)} known patients"}
+    return None, {"status": "no_patient_identity", "candidates": [],
+                  "reason": f"no MRN; {key} matches no known patient"}
 
 
 def _now() -> str:
@@ -94,7 +132,7 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
     workers = workers or int(os.environ.get("BACKBONE_CONCURRENCY", "6"))
     todo: dict[str, tuple[Path, str]] = {}
     stats = {"files": len(files), "new_documents": 0, "duplicate_files": 0, "extracted_llm": 0,
-             "extracted_cache": 0, "already_ingested": 0, "failed": [], "affected_patients": set(),
+             "extracted_cache": 0, "already_ingested": 0, "failed": [], "affected_patients": set(), "quarantined": [],
              "llm_cost_usd": 0.0, "llm_input_tokens": 0, "llm_output_tokens": 0, "llm_latency_ms": []}
 
     for f in files:
@@ -137,22 +175,32 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
             try:
                 results.append(fut.result())
                 _, _, meta = results[-1]
-                src = "cache" if meta.get("from_cache") else f"LLM {meta['latency_ms']/1000:.1f}s"
+                src = "cache" if meta.get("from_cache") else f"LLM {(meta.get('latency_ms') or 0)/1000:.1f}s"
                 log(f"  extracted {todo[sha][0].name} ({src})")
             except Exception as e:  # one bad document must not sink the run
                 stats["failed"].append({"file": str(todo[sha][0]), "error": str(e)[:300]})
                 log(f"  FAILED {todo[sha][0].name}: {str(e)[:200]}")
 
-    for sha, ex, meta in sorted(results, key=lambda r: r[0]):
+    # Documents carrying an MRN first, so a name-only document in the same batch can match a patient they create.
+    for sha, ex, meta in sorted(results, key=lambda r: (norm_mrn(r[1].document.patient_mrn) is None, r[0])):
         label = conn.execute("SELECT doc_label FROM documents WHERE sha256=?", (sha,)).fetchone()["doc_label"]
         text = todo[sha][1]
-        mrn = norm_mrn(ex.document.patient_mrn)
-        if mrn is None and ex.document.patient_name:
-            hit = conn.execute("SELECT mrn FROM patients WHERE name=? AND (dob=? OR ? IS NULL)",
-                               (ex.document.patient_name, ex.document.patient_dob, ex.document.patient_dob)).fetchone()
-            mrn = hit["mrn"] if hit else None
-        mrn = mrn or "UNRESOLVED"
+        # Former owners of this document's evidence (re-extraction may move or quarantine it): they must be
+        # re-reconciled too, or they keep derived rows built from claims that no longer belong to them.
+        former = {r[0] for r in conn.execute(
+            "SELECT DISTINCT patient_mrn FROM claims WHERE sha256=? AND patient_mrn IS NOT NULL", (sha,))}
+        former |= {r[0] for r in conn.execute(
+            "SELECT patient_mrn FROM documents WHERE sha256=? AND patient_mrn IS NOT NULL", (sha,))}
+        stats["affected_patients"] |= former
+        mrn, quarantine = attribute(conn, text, ex)
         conn.execute("UPDATE documents SET patient_mrn=? WHERE sha256=?", (mrn, sha))
+        conn.execute("DELETE FROM quarantine WHERE sha256=?", (sha,))
+        if quarantine:
+            conn.execute("INSERT INTO quarantine VALUES (?,?,?,?,?,?)",
+                         (sha, label, quarantine["status"], quarantine["reason"],
+                          json.dumps(quarantine["candidates"]), _now()))
+            stats["quarantined"].append({"file": str(todo[sha][0]), "doc_label": label, **quarantine})
+            log(f"  QUARANTINED {todo[sha][0].name}: {quarantine['reason']}")
         conn.execute("DELETE FROM claims WHERE sha256=?", (sha,))
         for c in build_claims(sha, label, text, ex, mrn):
             conn.execute("INSERT INTO claims VALUES (:claim_id,:sha256,:doc_label,:patient_mrn,:kind,:subject_key,"
@@ -161,10 +209,11 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
                      (sha, EXTRACTOR_VERSION, model, json.dumps(ex.model_dump()), meta.get("latency_ms"),
                       meta.get("input_tokens"), meta.get("output_tokens"), meta.get("cost_usd"),
                       int(bool(meta.get("from_cache"))), _now()))
-        if not conn.execute("SELECT 1 FROM patients WHERE mrn=?", (mrn,)).fetchone():
-            conn.execute("INSERT INTO patients(mrn, name, dob) VALUES (?,?,?)",
-                         (mrn, ex.document.patient_name, ex.document.patient_dob))
-        stats["affected_patients"].add(mrn)
+        if mrn:
+            if not conn.execute("SELECT 1 FROM patients WHERE mrn=?", (mrn,)).fetchone():
+                conn.execute("INSERT INTO patients(mrn, name, dob) VALUES (?,?,?)",
+                             (mrn, ex.document.patient_name, ex.document.patient_dob))
+            stats["affected_patients"].add(mrn)
         if meta.get("from_cache"):
             stats["extracted_cache"] += 1
         else:
@@ -175,5 +224,6 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
             stats["llm_latency_ms"].append(meta.get("latency_ms") or 0)
     conn.commit()
     stats["affected_patients"] = sorted(stats["affected_patients"])
+    stats["quarantined"].sort(key=lambda q: q["file"])
     stats["duration_ms"] = int((time.monotonic() - t0) * 1000)
     return stats

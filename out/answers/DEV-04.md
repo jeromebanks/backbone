@@ -62,6 +62,7 @@ QueryPlan: Reconstruct the care on January 19 and January 21. How many therapy c
 
 - numbers in the answer not found in computed results: none
 - cited documents not in the corpus: none
+- cited documents not in the computed results: none
 - line references outside the evidence passages: none
 
 ## Evidence passages

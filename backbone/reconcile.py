@@ -539,9 +539,15 @@ def persist(conn: sqlite3.Connection, res: Result) -> None:
 def reconcile_patients(conn: sqlite3.Connection, mrns) -> dict:
     out = {}
     for mrn in sorted(set(mrns)):
-        res = reconcile_patient(mrn, load_claims(conn, mrn))
+        claims = load_claims(conn, mrn)
+        res = reconcile_patient(mrn, claims)
         with conn:
-            persist(conn, res)
+            persist(conn, res)              # with no claims this clears every derived row of the patient
+            orphan = not claims and not conn.execute("SELECT 1 FROM documents WHERE patient_mrn=?", (mrn,)).fetchone()
+            if orphan:                      # e.g. its only document was re-attributed or quarantined
+                conn.execute("DELETE FROM patients WHERE mrn=?", (mrn,))
         out[mrn] = {"encounters": len(res.encounters), "decisions": len(res.decisions),
                     "conflicts": len(res.conflicts), "assessments": len(res.assessments)}
+        if orphan:
+            out[mrn]["patient_removed"] = True
     return out

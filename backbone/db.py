@@ -1,6 +1,6 @@
 """SQLite persistence. Two layers:
 
-evidence layer   documents, extractions, claims            (append-only; produced by ingest/extract)
+evidence layer   documents, extractions, claims, quarantine (append-only; produced by ingest/extract)
 clinical layer   patients, encounters, encounter_intervals,  (derived; rebuilt per patient by reconcile.py)
                  plan_requirements, assessments, observations, decisions, conflicts
 projection       v_encounter_week, v_patient_week            (SQL views over the clinical layer)
@@ -57,6 +57,17 @@ CREATE TABLE IF NOT EXISTS claims (
 CREATE INDEX IF NOT EXISTS ix_claims_patient ON claims(patient_mrn, kind);
 CREATE INDEX IF NOT EXISTS ix_claims_subject ON claims(subject_key);
 CREATE INDEX IF NOT EXISTS ix_claims_doc ON claims(sha256);
+
+-- Documents ingest could not attribute to exactly one patient. Their claims are kept with patient_mrn NULL, so they
+-- are evidence but take part in no patient's reconciliation. Cleared when a re-extraction attributes the document.
+CREATE TABLE IF NOT EXISTS quarantine (
+    sha256         TEXT PRIMARY KEY REFERENCES documents(sha256),
+    doc_label      TEXT NOT NULL,
+    status         TEXT NOT NULL,             -- no_patient_identity | ambiguous_patient | multi_patient
+    reason         TEXT NOT NULL,
+    candidates     TEXT NOT NULL,             -- JSON list of candidate MRNs (empty when none)
+    quarantined_at TEXT NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS patients (
     mrn   TEXT PRIMARY KEY,

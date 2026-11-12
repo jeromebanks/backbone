@@ -40,7 +40,15 @@ cli.py         argparse entry point (python -m backbone …)
 - **Claim ID**: `<sha256[:12]>:<kind>:<index>`. Kinds: `document`, `relation`, `service_event`, `assessment`,
   `observation`, `plan_requirement`.
 - **Encounter key**: `<MRN>|<ENCOUNTER_ID>`, or `<MRN>|U-<date>-<service_type>-<n>` for contacts without an ID.
-- **Patient**: keyed by normalised MRN. If the MRN is missing it falls back to name + DOB, then `UNRESOLVED`.
+- **Patient**: keyed by normalised MRN (`ingest.attribute`). Without an MRN, the document must match exactly one
+  known patient by name (+ DOB when stated). Otherwise it is **quarantined**: its claims keep `patient_mrn` NULL,
+  it gets a `quarantine` row (`no_patient_identity`, `ambiguous_patient` or `multi_patient`), and it takes part
+  in no patient's reconciliation. `multi_patient` means the text labels more than one distinct MRN value
+  (a roster): the extraction holds one patient per document, so no claim is attributed. Ingest reports
+  quarantines in `stats["quarantined"]`, and `python -m backbone stats` counts them. There is no `UNRESOLVED` pool.
+- **Re-attribution**: when a re-extraction moves (or quarantines) a document, its former owner is also returned in
+  `affected_patients`. `reconcile_patients` then rebuilds that patient from its remaining claims. A patient left
+  with no claims and no documents loses its derived rows and its `patients` row.
 
 ## The results envelope (every operator)
 

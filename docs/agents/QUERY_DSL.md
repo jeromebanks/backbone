@@ -37,6 +37,7 @@ Rules for operators:
 - Cap per-row detail with `_cap` (`DETAIL_LIMIT = 200`), with a note. Totals stay complete. Keep `IN (...)` lists
   bounded, since SQLite has a variable limit.
 - Output must be deterministic: sort everything, and include no timestamps.
+- Identity: `documents.sha256` identifies a document (`doc_label` is display only and not unique), and an encounter ID is unique only within a patient. Join and group by sha256, and match encounter IDs together with the MRN (or use the `mrn|id` encounter key). `tests/test_isolation.py` covers this for `timeline`.
 
 ## Adding an operator
 

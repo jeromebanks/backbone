@@ -170,6 +170,11 @@ def test_restart_new_process_reuses_abstraction(db, tmp_path):
     assert '"UNDETERMINED"' in out.stdout and '"low": 585' in out.stdout
 
 
+def test_corpus_has_no_quarantined_documents(db):
+    stats = db[1]
+    assert stats["quarantined"] == [] and stats["affected_patients"] == [MRN]
+
+
 def test_reingest_is_noop(db, monkeypatch):
     conn = db[0]
     stats = ingest(conn, [DOCS], log=lambda *a: None)

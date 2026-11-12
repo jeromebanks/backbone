@@ -4968,9 +4968,16 @@
             ]
           },
           {
-            "sql": "SELECT doc_label, payload FROM claims WHERE kind='relation' AND subject_key IN (?,?)",
+            "sql": "SELECT sha256, payload FROM claims WHERE kind='relation' AND verified=1 AND sha256 IN (?,?,?,?,?) AND (patient_mrn, subject_key) IN (VALUES (?,?),(?,?)) ORDER BY subject_key, claim_id",
             "params": [
+              "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
+              "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
+              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
+              "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
+              "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
+              "HG-M042",
               "HG-E110",
+              "HG-M042",
               "HG-E111"
             ]
           },
