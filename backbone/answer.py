@@ -24,22 +24,24 @@ from .llm import complete_json
 from .paths import safe_output_path
 from .query import QueryPlan, execute_plan
 
-PROMPT_VERSION = "a3"
+PROMPT_VERSION = "a4"
 OUT_DIR = ROOT / "out" / "answers"
 
 PLANNER_SYSTEM = """You translate a question about clinical records into a QueryPlan: a list of typed operations that \
 software executes deterministically over a reconciled clinical abstraction. You do not answer the question and you \
 never do arithmetic; you only choose operations and parameters. The JSON schema is enforced.
 
-Operations (every step has a scope: patients = list of MRNs or "all", start/end dates, optional service_types, \
-include_excluded, include_evidence):
+Operations (every step has a scope: patients = list of MRNs or "all", start/end dates, optional service_types \
+(every step except compliance), include_excluded, include_evidence):
 - care(group_by: none|service_type|day|week|patient): therapy sessions that count, distinct therapy days, \
 patient-present minutes and hours, each as [low, high] bounds, broken down by service type; with include_excluded=true \
 it also lists every encounter that does NOT count and why, and the reconciliation decisions about duplicate, \
 corrected, draft, billing or copied records.
 - compliance(consecutive_below: N|null): for each Monday–Sunday week, the treatment-plan goal in effect, the delivered \
 therapy days/minutes, and MET / NOT_MET / UNDETERMINED with reasons; consecutive_below=N finds runs of N+ weeks below \
-goal (and whether a patient's inclusion depends on unresolved documentation).
+goal (and whether a patient's inclusion depends on unresolved documentation). Never set service_types on a \
+compliance step (the plan is rejected): each goal counts the service types its treatment plan states. For delivered \
+care of particular service types, add a care step with service_types.
 - timeline(kinds ⊆ [encounters, documents, decisions, assessments, observations], observation_domains): chronological \
 facts. Use a one-day scope (start = end) with kinds [encounters, documents, decisions] to reconstruct what happened on \
 a date and how each record (attendance, notes, corrections, copies, telehealth logs) affects it. Use assessments + \

@@ -255,8 +255,9 @@ def fabricated(tmp_path, monkeypatch):
     bad = _doc("bad.txt", "BAD", "P1", [
         _event("E1", "2026-01-07", "Patient attended E1 for the full hour and was engaged throughout."),
         _event("E2", "2026-01-08", "Patient attended E2 for ninety minutes of family therapy work.")],
-        extra_lines=["This record contains only administrative text about scheduling."])
-    bad["lines"] = bad["lines"][-1:]                  # neither event quote is in BAD's text
+        extra_lines=["This record contains only administrative text about scheduling on 2026-01-07 and 2026-01-08."])
+    # neither event quote is in BAD's text; the dates are, so the rejections keep them (an unstated date is #68's case)
+    bad["lines"] = bad["lines"][-1:]
     return _build(tmp_path, monkeypatch, [good, bad])
 
 

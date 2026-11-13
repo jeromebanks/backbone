@@ -11,7 +11,6 @@ from datetime import date
 from pathlib import Path
 
 from . import EXTRACTOR_VERSION, RULESET_VERSION
-from .answer import fingerprint
 from .db import ROOT
 from .intervals import fmt
 from .operators import _batches
@@ -47,7 +46,9 @@ def _claim_docs(conn, ids) -> dict[str, dict]:
 
 
 def build_abstraction(conn, mrn: str) -> dict:
-    p = dict(conn.execute("SELECT * FROM patients WHERE mrn=?", (mrn,)).fetchone())
+    # Content only: reconciled_at (a timestamp) and the database-wide answer-cache fingerprint (which also hashes
+    # other patients and the query/prompt versions) would change the committed export without a content change (#60).
+    p = dict(conn.execute("SELECT mrn, name, dob, ruleset_version FROM patients WHERE mrn=?", (mrn,)).fetchone())
     docs = []
     for r in conn.execute("SELECT d.sha256, d.doc_label, d.paths, c.payload FROM documents d LEFT JOIN claims c "
                           "ON c.sha256=d.sha256 AND c.kind='document' WHERE d.patient_mrn=? ORDER BY d.doc_label", (mrn,)):
@@ -106,8 +107,7 @@ def build_abstraction(conn, mrn: str) -> dict:
     unmatched = {k: v for k, v in decisions.items() if not any(k == e["encounter_key"] for e in encounters)
                  and not k.startswith(f"{mrn}|PHQ") and "|plan|" not in k}
     return {
-        "patient": p, "abstraction_version": {"extractor": EXTRACTOR_VERSION, "ruleset": RULESET_VERSION,
-                                              "fingerprint": fingerprint(conn)},
+        "patient": p, "abstraction_version": {"extractor": EXTRACTOR_VERSION, "ruleset": RULESET_VERSION},
         "documents": docs, "treatment_plan_requirements": plans, "weeks": weeks, "encounters": encounters,
         "assessments": assessments, "observations": observations, "other_decisions": unmatched,
     }

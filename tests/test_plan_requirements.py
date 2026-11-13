@@ -240,6 +240,9 @@ def test_compliance_does_not_silently_ignore_a_service_type_scope(tmp_path):
         session("E1", "2026-02-02", "individual_therapy", "09:00", "09:50"),
         session("E2", "2026-02-03", "group_therapy", "10:00", "11:00"),
     ))
-    r = compliance(conn, service_types=["individual_therapy"])
+    # ComplianceStep rejects service_types at validation (#47); the operator's own guard covers unvalidated steps
+    step = ComplianceStep.model_construct(op="compliance", consecutive_below=None, scope=Scope(
+        patients=["P1"], include_evidence=False, service_types=["individual_therapy"], **WEEK))
+    r = execute_plan(conn, QueryPlan.model_construct(question="t", steps=[step], unsupported_reason=None))["results"][0]
     assert r["groups"] == [] and r["totals"].get("unsupported")
     assert any("service_types" in n for n in r["notes"])

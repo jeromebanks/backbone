@@ -150,14 +150,20 @@ def complete_json(
     schema = _sanitize(model_cls.model_json_schema())
     fn = _anthropic_api if BACKEND == "anthropic-api" else _claude_cli
     last: Exception | None = None
+    attempt_prompt = prompt
     for attempt in range(1, retries + 2):
         try:
-            res = fn(system, prompt, schema, model, effort, timeout)
+            res = fn(system, attempt_prompt, schema, model, effort, timeout)
             res.data = model_cls.model_validate(res.data)
             res.attempts = attempt
             return res
         except (LLMError, ValidationError, subprocess.TimeoutExpired, json.JSONDecodeError) as e:
             last = e
+            if isinstance(e, ValidationError):
+                # Re-asking the same prompt tends to repeat the same invalid output (e.g. a QueryPlan option a
+                # validator rejects): tell the next attempt what failed. Transport errors are retried unchanged.
+                attempt_prompt = (prompt + "\n\nYour previous output failed validation; return corrected JSON that "
+                                  "satisfies the schema and these errors:\n" + str(e)[:2000])
             if "not a valid JSON Schema" in str(e):   # deterministic; retrying cannot help
                 break
             time.sleep(2 * attempt)

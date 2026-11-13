@@ -10,13 +10,21 @@ import sqlite3
 from collections import defaultdict
 from datetime import date, timedelta
 
-from .project import (SqlLog, aggregate, consecutive_runs, group_key, patients_in_scope, plan_change_dates,
-                      plan_requirements, select_encounters, weekly_compliance)
-from .query import CareStep, ComplianceStep, CompareStep, Scope, TimelineStep
+from .project import (INF, SqlLog, aggregate, consecutive_runs, contribution, group_key, patients_in_scope,
+                      plan_change_dates, plan_requirements, select_encounters, weekly_compliance)
+from .query import COMPLIANCE_SERVICE_TYPES_REJECTED, CareStep, ComplianceStep, CompareStep, Scope, TimelineStep
 
 
 def _short(key: str) -> str:
     return key.split("|", 1)[1] if "|" in key else key
+
+
+def _new_log(cache: dict | None) -> SqlLog:
+    """A step's SQL log. `cache` is the plan-wide lookup cache from `execute_plan` (#57), or None for a direct call."""
+    log = SqlLog()
+    if cache is not None:
+        log.__dict__["_plan_cache"] = cache
+    return log
 
 
 def _envelope(step, log: SqlLog, **kw) -> dict:
@@ -51,17 +59,30 @@ def _marks(n: int) -> str:
     return ",".join("?" * n)
 
 
+_SHARED_LABELS_SQL = "SELECT doc_label FROM documents GROUP BY doc_label HAVING COUNT(*) > 1"
+
+
 def _shared_labels(conn, labels, log: SqlLog) -> set[str]:
     """The subset of `labels` that more than one document in the corpus carries (doc_label is not an identity).
-    One scan per operator call, on first need, cached on the call's SqlLog (there is no index on doc_label, so a
-    per-label lookup would scan the table every time)."""
+
+    The set is computed once per plan, on first need, and reused by the plan's later steps (#57); a direct operator
+    call computes it once per call. Every step that uses it lists the statement in its `sql`, whether that step ran
+    it or an earlier step did: `sql` records the statements a result depends on, so a step's envelope does not
+    depend on which steps ran before it. The cache lives only for one `execute_plan` call, so it cannot go stale."""
     labels = set(labels)
     if not labels:
         return set()
-    if "_shared_labels" not in log.__dict__:
-        log.__dict__["_shared_labels"] = {r["doc_label"] for r in log.run(
-            conn, "SELECT doc_label FROM documents GROUP BY doc_label HAVING COUNT(*) > 1")}
-    return labels & log.__dict__["_shared_labels"]
+    state = log.__dict__
+    if "_shared_labels" not in state:
+        cache = state.get("_plan_cache")
+        if cache is not None and "shared_labels" in cache:
+            log.statements.append({"sql": _SHARED_LABELS_SQL, "params": []})     # what SqlLog.run would record
+            state["_shared_labels"] = cache["shared_labels"]
+        else:
+            state["_shared_labels"] = {r["doc_label"] for r in log.run(conn, _SHARED_LABELS_SQL)}
+            if cache is not None:
+                cache["shared_labels"] = state["_shared_labels"]
+    return labels & state["_shared_labels"]
 
 
 def _doc_ref(label: str, sha: str, shared: set[str]) -> str:
@@ -136,19 +157,31 @@ def _docs_of(conn, claim_ids: list[str], log: SqlLog) -> list[str]:
     return sorted(_doc_ref(lab, sha, shared) for lab, sha in pairs)
 
 
-def _claim_date(kind: str, p: dict) -> tuple[str | None, str | None]:
-    """The [first, last] day a claim is about, from the claim's own payload (None = open/unknown)."""
-    if kind == "plan_requirement":
-        return p.get("effective_start"), p.get("effective_end")
-    d = {"service_event": p.get("service_date"), "assessment": p.get("completed_date"),
-         "observation": p.get("date"), "relation": p.get("original_date")}.get(kind)
-    return d, d
+_DATE_FIELDS = {"plan_requirement": ("effective_start", "effective_end"), "service_event": ("service_date",),
+                "assessment": ("completed_date",), "observation": ("date",), "relation": ("original_date",)}
 
 
-def _rejections(conn, sc: Scope, log: SqlLog, kinds: tuple | None = None) -> list[dict]:
+def _claim_date(kind: str, p: dict, unstated: frozenset = frozenset()) -> tuple[str | None, str | None]:
+    """The [first, last] day a claim is about, from the claim's own payload (None = open/unknown). A date field in
+    `unstated` (its document never states it, so it was inferred: ingest's `unverified_absent`, #52) is unknown."""
+    days = [None if f in unstated else p.get(f) for f in _DATE_FIELDS.get(kind, ())]
+    return (days[0], days[-1]) if days else (None, None)
+
+
+def _unstated_dates(evidence: str) -> list[str]:
+    """Date fields ingest found stated nowhere in the claim's document (the grounding entry's `unverified_absent`)."""
+    spans = json.loads(evidence)
+    return sorted(spans[-1].get("unverified_absent") or []) if spans and spans[-1].get("match") == "grounding" else []
+
+
+def _rejections(conn, sc: Scope, log: SqlLog, notes: list, kinds: tuple | None = None) -> list[dict]:
     """Claims that rule R0 rejected (a quote could not be located in the source) for the patients in scope (#39).
-    The rejection is dated by the claim's own date; undated claims are always listed, since they cannot be placed.
-    `kinds` restricts the claim kinds; a claim that states a service type must match `scope.service_types`."""
+    The rejection is dated by the claim's own date, but only by a date its document states: a date field ingest
+    found nowhere in the document (`unverified_absent`, #52) was inferred, so it is treated as unknown and never
+    reaches the results (#68); such rows name the fields in `unstated_dates`. A claim with no known date cannot be
+    placed in or out of any scope, so it is listed for every scope of its patient, flagged `undated: true`, after
+    the dated ones and with a note saying so (#60). `kinds` restricts the claim kinds; a claim that states a
+    service type must match `scope.service_types`."""
     rows = []
     sql = ("SELECT d.mrn, d.reason, c.claim_id, c.kind, c.doc_label, c.sha256, c.payload FROM decisions d "
            "JOIN claims c ON c.claim_id = json_extract(d.claim_ids, '$[0]') WHERE d.rule = 'R0'")
@@ -159,37 +192,66 @@ def _rejections(conn, sc: Scope, log: SqlLog, kinds: tuple | None = None) -> lis
             rows += log.run(conn, sql + f" AND d.mrn IN ({_marks(len(b))}) ORDER BY d.mrn, c.claim_id", b)
     lo, hi = str(sc.start), str(sc.end)
     shared = _shared_labels(conn, {r["doc_label"] for r in rows}, log) if rows else set()
+    unstated: dict[str, list[str]] = {}      # grounding is read only when there are rejections (no SQL otherwise)
+    for b in (_batches(conn, sorted({r["claim_id"] for r in rows})) if rows else []):
+        for g in log.run(conn, f"SELECT claim_id, evidence FROM claims WHERE claim_id IN ({_marks(len(b))}) "
+                               "ORDER BY claim_id", b):
+            unstated[g["claim_id"]] = _unstated_dates(g["evidence"])
     out = []
     for r in rows:
         p = json.loads(r["payload"])
-        first, last = _claim_date(r["kind"], p)
+        absent = unstated.get(r["claim_id"], [])
+        first, last = _claim_date(r["kind"], p, frozenset(absent))
         if (first and first > hi) or (last and last < lo) or (kinds and r["kind"] not in kinds):
             continue
         if sc.service_types and p.get("service_type") and p["service_type"] not in sc.service_types:
             continue
         # shaped like an encounter exclusion (encounter/date/service_type/reason/records) so readers treat it alike
+        undated = first is None and last is None
         out.append({"encounter": p.get("encounter_id"), "date": first, "service_type": p.get("service_type"),
                     "reason": r["reason"], "records": [_doc_ref(r["doc_label"], r["sha256"], shared)],
-                    "rule": "R0", "patient": r["mrn"], "record_kind": r["kind"], "claim_id": r["claim_id"]})
-    return sorted(out, key=lambda x: (x["patient"], x["date"] or "", x["claim_id"]))
+                    "rule": "R0", "patient": r["mrn"], "record_kind": r["kind"], "claim_id": r["claim_id"],
+                    **({"undated": True} if undated else {}),
+                    **({"unstated_dates": [f for f in absent if f in _DATE_FIELDS.get(r["kind"], ())]}
+                       if any(f in _DATE_FIELDS.get(r["kind"], ()) for f in absent) else {})})
+    n = sum(1 for x in out if x.get("undated"))
+    if n:
+        notes.append(f"{n} rejected claim{'s' if n > 1 else ''} (R0) ha{'ve' if n > 1 else 's'} no date of "
+                     f"{'their' if n > 1 else 'its'} own (none stated, or one the document does not state; flagged "
+                     "undated): listed for every date scope of the patient, so not necessarily about this period")
+    return sorted(out, key=lambda x: (x["patient"], bool(x.get("undated")), x["date"] or "", x["claim_id"]))
+
+
+def _counted(e: dict) -> tuple[float, float]:
+    """What an encounter row contributes to minute totals, from project.contribution: an uncertain row (it may not
+    count at all) contributes 0..high even when its own minutes are established (#65)."""
+    return contribution(e)["minutes"]
 
 
 def _enc_fact(conn, e: dict, log: SqlLog) -> dict:
-    return {"encounter": _short(e["encounter_key"]), "patient": e["mrn"], "date": e["service_date"],
+    fact = {"encounter": _short(e["encounter_key"]), "patient": e["mrn"], "date": e["service_date"],
             "week_start": e["week_start"], "service_type": e["service_type"], "modality": e["modality"],
             "disposition": e["disposition"], "counts_as_therapy_session": e["eligible"],
             "exclusion_reason": e["exclusion_reason"],
             "patient_present_minutes": None if e["minutes_status"] == "not_applicable" and e["minutes_low"] is None
             else {"low": e["minutes_low"], "high": e["minutes_high"], "status": e["minutes_status"]},
             "calculation": e["calculation"], "records": _docs_of(conn, e["claim_ids"], log), "flags": e["flags"]}
+    if e["eligible"] == "uncertain":     # the measured minutes above count only if the session counts (#65)
+        lo, hi = _counted(e)
+        fact["counted_minutes"] = {"low": lo, "high": None if hi == INF else hi}
+    return fact
 
 
 DETAIL_LIMIT = 200   # per-encounter detail rows returned by collection-scale queries (totals are always complete)
 
 
-def _cap(items: list, notes: list, what: str) -> list:
+def _cap(items: list, notes: list, what: str, covered_by: str | None = None) -> list:
+    """Cap per-row detail at DETAIL_LIMIT with a note. `covered_by` names the envelope fields that are computed over
+    every row (e.g. "totals"); None says that nothing summarizes the rows that are not shown (#60)."""
     if len(items) > DETAIL_LIMIT:
-        notes.append(f"{what}: showing {DETAIL_LIMIT} of {len(items)} rows; totals and groups cover all rows")
+        rest = (f"{covered_by} cover all rows" if covered_by else
+                f"no totals are computed over these rows, so the other {len(items) - DETAIL_LIMIT} are not summarized")
+        notes.append(f"{what}: showing {DETAIL_LIMIT} of {len(items)} rows; {rest}")
         return items[:DETAIL_LIMIT]
     return items
 
@@ -206,9 +268,8 @@ def _minutes_expr(encs: list[dict], n: int = 60) -> str:
     for e in encs:
         if e["eligible"] == "no":
             continue
-        lo, hi = e["minutes_low"], e["minutes_high"]
-        lo_s = "0" if e["eligible"] == "uncertain" or lo is None else f"{lo:g}"
-        v = f"{lo:g}" if lo == hi and lo is not None else f"[{lo_s}–{'?' if hi is None else f'{hi:g}'}]"
+        lo, hi = _counted(e)             # the row's contribution, as the totals count it (#65)
+        v = f"{lo:g}" if lo == hi else f"[{lo:g}–{'?' if hi == INF else f'{hi:g}'}]"
         parts.append(f"{v} ({_short(e['encounter_key'])})")
     return " + ".join(parts) or "0"
 
@@ -219,8 +280,8 @@ def _fmt_bound(b: dict) -> str:
 
 # --------------------------------------------------------------------------------------------- operators
 
-def care(conn, step: CareStep) -> dict:
-    log, sc = SqlLog(), step.scope
+def care(conn, step: CareStep, *, cache: dict | None = None) -> dict:
+    log, sc = _new_log(cache), step.scope
     encs_all = select_encounters(conn, sc, log, include_excluded=True)
     encs = [e for e in encs_all if e["eligible"] != "no"]
     totals = aggregate(encs)
@@ -242,7 +303,7 @@ def care(conn, step: CareStep) -> dict:
         f"patient-present minutes = {_minutes_expr(encs)} = {_fmt_bound(totals['minutes'])} min "
         f"({_fmt_bound(totals['hours'])} h)",
     ]
-    shown = _cap(encs_all if sc.include_excluded else encs, notes, "facts")
+    shown = _cap(encs_all if sc.include_excluded else encs, notes, "facts", "totals and groups")
     excluded = _cap([e for e in encs_all if e["eligible"] == "no"], notes, "exclusions")
     shown_keys = [e["encounter_key"] for e in shown]
     facts = [_enc_fact(conn, e, log) for e in shown]
@@ -250,11 +311,12 @@ def care(conn, step: CareStep) -> dict:
                    "service_type": e["service_type"], "reason": e["exclusion_reason"],
                    "records": _docs_of(conn, e["claim_ids"], log)} for e in excluded] if sc.include_excluded else []
     if sc.include_excluded:                   # evidence rejected before reconciliation (R0) also does not count
-        exclusions += _cap(_rejections(conn, sc, log, kinds=("service_event", "relation")), notes, "rejected claims")
+        exclusions += _cap(_rejections(conn, sc, log, notes, kinds=("service_event", "relation")), notes,
+                           "rejected claims")
     env = _envelope(
         step, log,
         totals={**totals, "by_service_type": by_type},
-        groups=_cap(groups, notes, "groups") if step.group_by == "patient" else groups,
+        groups=_cap(groups, notes, "groups", "totals") if step.group_by == "patient" else groups,
         facts=facts,
         calculation=calc,
         exclusions=exclusions,
@@ -268,13 +330,13 @@ def care(conn, step: CareStep) -> dict:
     return env
 
 
-def compliance(conn, step: ComplianceStep) -> dict:
-    log, sc = SqlLog(), step.scope
+def compliance(conn, step: ComplianceStep, *, cache: dict | None = None) -> dict:
+    log, sc = _new_log(cache), step.scope
     if sc.service_types:
         # A plan's goals define which service types they count; judging them on a narrower selection would give a
-        # confident verdict the plan does not define. Refuse explicitly instead of ignoring the filter (#21).
-        reason = ("compliance does not accept scope.service_types: each treatment-plan requirement counts the service "
-                  "types the plan states. Drop service_types, or use care with service_types for delivered totals.")
+        # confident verdict the plan does not define. ComplianceStep rejects this at validation (#47); this guard
+        # covers steps built without validation (model_construct) and refuses instead of ignoring the filter (#21).
+        reason = COMPLIANCE_SERVICE_TYPES_REJECTED
         return _envelope(step, log, totals={"unsupported": reason}, notes=[reason])
     patients = patients_in_scope(conn, sc, log)
     weeks_all, runs, facts, calc = [], [], [], []
@@ -299,7 +361,7 @@ def compliance(conn, step: ComplianceStep) -> dict:
     for w in weeks_all:
         for ev in w["evaluations"]:
             ev["minutes_calculation"] = _minutes_expr(ev.pop("_rows"))
-    weeks_shown = _cap(weeks_all, notes, "weeks")
+    weeks_shown = _cap(weeks_all, notes, "weeks", "totals")
     enc_keys = sorted({k for w in weeks_shown for ev in w["evaluations"] for k in ev["encounters"]})
     for w in weeks_shown:
         for ev in w["evaluations"]:
@@ -324,7 +386,7 @@ def compliance(conn, step: ComplianceStep) -> dict:
             runs = [r for r in runs if r["status"] != "no"]
     shown_patients = sorted({w["mrn"] for w in weeks_shown})
     plan_ids = sorted({c for m in shown_patients for r in plan_requirements(conn, m, log) for c in r["claim_ids"]})
-    env = _envelope(step, log, totals=totals, groups=weeks_shown, facts=_cap(runs, notes, "runs"),
+    env = _envelope(step, log, totals=totals, groups=weeks_shown, facts=_cap(runs, notes, "runs", "totals"),
                     calculation=calc[:DETAIL_LIMIT], exclusions=exclusions,
                     conflicts=_conflicts(conn, enc_keys, log),
                     decisions=_decisions(conn, enc_keys, log, rules=("R4", "R9")) + evidence_decisions, notes=notes)
@@ -334,11 +396,30 @@ def compliance(conn, step: ComplianceStep) -> dict:
     return env
 
 
-def timeline(conn, step: TimelineStep) -> dict:
-    log, sc = SqlLog(), step.scope
+def _attribution(shown: list[dict]) -> dict[str, tuple[str, list[str]]]:
+    """claim_id -> (the shown encounter row its assertion is listed under, identity-alternative rows also shown).
+
+    Identity-alternative rows (`<key>~<date>-<type>`, #12) share their encounter's claim_ids, so a claim is listed
+    under the primary row when that row is shown, and the alternatives are named beside it (#67). When only an
+    alternative falls inside the scope, the claim stays with that alternative. Otherwise the first shown row wins."""
+    rows: dict[str, list[str]] = defaultdict(list)
+    for e in shown:
+        for c in e["claim_ids"]:
+            rows[c].append(e["encounter_key"])
+    out = {}
+    for c, keys in rows.items():
+        keys = list(dict.fromkeys(keys))
+        primary = next((k for k in keys if not any(k.startswith(o + "~") for o in keys if o != k)), keys[0])
+        base = primary.split("~", 1)[0]
+        out[c] = (primary, [k for k in keys if k != primary and k.startswith(base + "~")])
+    return out
+
+
+def timeline(conn, step: TimelineStep, *, cache: dict | None = None) -> dict:
+    log, sc = _new_log(cache), step.scope
     facts, claim_ids, notes = [], [], []
     encs = select_encounters(conn, sc, log, include_excluded=True) if {"encounters", "documents", "decisions"} & set(step.kinds) else []
-    shown = _cap(encs, notes, "encounters")          # per-row detail is capped; totals below cover every encounter
+    shown = _cap(encs, notes, "encounters", "totals")   # per-row detail is capped; totals below cover every encounter
     keys = [e["encounter_key"] for e in shown]
     if "encounters" in step.kinds:
         for e in shown:
@@ -350,12 +431,16 @@ def timeline(conn, step: TimelineStep) -> dict:
             rows += log.run(conn, f"SELECT c.claim_id, c.doc_label, c.evidence_type, c.subject_key, c.payload, c.sha256 "
                                   f"FROM claims c WHERE c.claim_id IN ({_marks(len(b))}) ORDER BY c.doc_label", b)
         rows.sort(key=lambda r: (r["doc_label"], r["claim_id"]))
-        enc_of = {c: e["encounter_key"] for e in shown for c in e["claim_ids"]}
+        enc_of = _attribution(shown)
+        meta: dict[str, dict] = {}              # document-level claim per document, fetched in one statement (#60)
+        for b in _batches(conn, sorted({r["sha256"] for r in rows})):
+            for m in log.run(conn, f"SELECT sha256, payload FROM claims WHERE kind='document' "
+                                   f"AND sha256 IN ({_marks(len(b))}) ORDER BY sha256, claim_id", b):
+                meta.setdefault(m["sha256"], json.loads(m["payload"]))
         per_doc: dict[str, dict] = {}           # keyed by sha256: doc_label is not unique (across or within patients)
         doc_claims: dict[str, list] = defaultdict(list)
         for r in rows:
-            meta = log.run(conn, "SELECT payload FROM claims WHERE sha256=? AND kind='document'", (r["sha256"],))
-            dm = json.loads(meta[0]["payload"]) if meta else {}
+            dm = meta.get(r["sha256"], {})
             p = json.loads(r["payload"])
             d = per_doc.setdefault(r["sha256"], {"kind": "document", "doc_id": r["doc_label"], "title": dm.get("title"),
                                                      "signed_at": dm.get("signed_at"), "received_at": dm.get("received_at"),
@@ -363,12 +448,14 @@ def timeline(conn, step: TimelineStep) -> dict:
             if "service_date" not in p:         # a correction relation (#23): it is listed under relations below
                 claim_ids.append(r["claim_id"])
                 continue
-            d["assertions"].append({"encounter": _short(enc_of[r["claim_id"]]), "record_type": r["evidence_type"],
+            enc_key, alternatives = enc_of[r["claim_id"]]
+            d["assertions"].append({"encounter": _short(enc_key), "record_type": r["evidence_type"],
                                     "disposition": p.get("disposition"), "arrival": p.get("patient_arrival"),
                                     "departure": p.get("patient_departure"),
                                     "contact_intervals": [f"{i['start']}–{i['end']}" for i in p.get("patient_contact_intervals") or []],
                                     "nontherapeutic": [f"{i['kind']} {i['start']}–{i['end']}" for i in p.get("nontherapeutic_intervals") or []],
-                                    "stated_minutes": p.get("stated_minutes")})
+                                    "stated_minutes": p.get("stated_minutes"),
+                                    **({"identity_alternatives": [_short(k) for k in alternatives]} if alternatives else {})})
             doc_claims[r["sha256"]].append(r["claim_id"])
         shared = _shared_labels(conn, {d["doc_id"] for d in per_doc.values()}, log)
         for sha, d in per_doc.items():
@@ -438,7 +525,7 @@ def timeline(conn, step: TimelineStep) -> dict:
     decisions = _decisions(conn, keys + assess, log) if ("decisions" in step.kinds or "encounters" in step.kinds
                                                          or "assessments" in step.kinds) else []
     conflicts = _conflicts(conn, keys + assess, log)
-    rejected = _cap(_rejections(conn, sc, log), notes, "rejected claims")     # R0: evidence that never counted
+    rejected = _cap(_rejections(conn, sc, log, notes), notes, "rejected claims")  # R0: evidence that never counted
     env = _envelope(step, log, facts=facts, decisions=decisions, conflicts=conflicts, exclusions=rejected,
                     notes=notes)
     if encs:
@@ -450,8 +537,8 @@ def timeline(conn, step: TimelineStep) -> dict:
     return env
 
 
-def compare(conn, step: CompareStep) -> dict:
-    log, sc = SqlLog(), step.scope
+def compare(conn, step: CompareStep, *, cache: dict | None = None) -> dict:
+    log, sc = _new_log(cache), step.scope
     notes, sides_all, used = [], [], []
     patients = patients_in_scope(conn, sc, log)
     for p in patients:
@@ -489,7 +576,7 @@ def compare(conn, step: CompareStep) -> dict:
                           "minutes_calculation": _minutes_expr(encs)})
             used += encs
         sides_all += sides
-    shown = _cap(used, notes, "facts")
+    shown = _cap(used, notes, "facts", "groups")         # compare's per-side groups are its totals
     keys = [e["encounter_key"] for e in shown]
     excluded = _cap([e for e in select_encounters(conn, sc, log, include_excluded=True) if e["eligible"] == "no"],
                     notes, "exclusions")

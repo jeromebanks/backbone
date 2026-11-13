@@ -46,11 +46,23 @@ class CareStep(Strict):
     group_by: Literal["none", "service_type", "day", "week", "patient"] = "none"
 
 
+COMPLIANCE_SERVICE_TYPES_REJECTED = (
+    "compliance does not accept scope.service_types: each treatment-plan requirement counts the service types the "
+    "plan states. Drop service_types, or use care with service_types for delivered totals.")
+
+
 class ComplianceStep(Strict):
-    """Per Mon–Sun week: treatment-plan goal in effect, delivered totals, MET / NOT_MET / UNDETERMINED."""
+    """Per Mon–Sun week: treatment-plan goal in effect, delivered totals, MET / NOT_MET / UNDETERMINED.
+    Its scope must not set service_types: each requirement counts the service types its plan states (#21, #47)."""
     op: Literal["compliance"] = "compliance"
     scope: Scope
     consecutive_below: Optional[int] = Field(default=None, ge=2, description="Also report runs of >= N consecutive weeks below goal")
+
+    @model_validator(mode="after")
+    def _no_service_types(self):
+        if self.scope.service_types:
+            raise ValueError(COMPLIANCE_SERVICE_TYPES_REJECTED)
+        return self
 
 
 class TimelineStep(Strict):
@@ -98,5 +110,6 @@ def execute_plan(conn, plan: QueryPlan) -> dict:
         return {"question": plan.question, "unsupported": plan.unsupported_reason, "results": []}
     fns = {"care": operators.care, "compliance": operators.compliance, "timeline": operators.timeline,
            "compare": operators.compare}
+    cache: dict = {}        # corpus-wide lookups shared by this plan's steps (#57); it lives for this call only
     return {"question": plan.question, "plan": plan.model_dump(mode="json"),
-            "results": [fns[s.op](conn, s) for s in plan.steps]}
+            "results": [fns[s.op](conn, s, cache=cache) for s in plan.steps]}
