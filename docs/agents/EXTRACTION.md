@@ -36,7 +36,7 @@ typos are forgiven but a changed number is not. Spans go into `claims.evidence` 
 own and every quote was found. A blank quote is a `missing` span, not something to skip. A service event's
 nontherapeutic-interval quotes are verified too, but they cannot stand in for the event's own `quotes`. The document
 claim carries no quotes and is exempt. Unverified claims are dropped by R0. In this corpus 254 claims
-were extracted, with 0 fuzzy matches and 0 unverified quotes (1 claim is unverified for an absent date; see below). <!-- FINAL-NUMBERS -->
+were extracted, with 0 fuzzy matches and 0 unverified quotes (1 claim is unverified for an absent date; see below).
 
 ## Value grounding (`evidence.ground_values`, `ingest.grounding_fields`) — a flag, not a filter (#36)
 

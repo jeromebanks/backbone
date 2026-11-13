@@ -47,7 +47,7 @@ justification in `DECISIONS.md` and an update to the README results.
 
 - `python -m backbone verify-answers` (read-only; `--rewrite` refreshes the saved post-check fields and Markdown):
   every saved plan must re-execute to identical results and every saved narrative must pass the current post-check,
-  else it exits 1 (also when there is nothing to verify). All 11 saved answers pass. <!-- FINAL-NUMBERS -->
+  else it exits 1 (also when there is nothing to verify). All 11 saved answers pass (six were regenerated after the post-check was tightened).
 - `python -m backbone benchmark [--synthetic-patients N]` writes `out/benchmarks.json`. The synthetic section
   clones the reconciled layer (the query layer only) and is labelled SYNTHETIC.
 - `python -m backbone.ablation` writes `out/ablation.{md,json}`: weekly verdicts under seven naive rules (six of

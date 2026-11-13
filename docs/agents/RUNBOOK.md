@@ -79,7 +79,7 @@ What to point out:
 | Completeness | all 5 questions plus 6 unseen ones answered |
 | Accuracy | golden tests; ablation |
 | Reproducible calculations | the `calculation` strings, `sql`, `verify-answers` |
-| Evidence quality | verified quotes with line numbers; 0 unverified claims | <!-- FINAL-NUMBERS -->
+| Evidence quality | verified quotes with line numbers; 1 unverified claim (an observation whose date the document never states) |
 | Uncertainty | bounds and UNDETERMINED; `depends_on_unresolved`; unsupported questions refused |
 | Follow-up performance | milliseconds to execute and to serve a cached answer; only new docs are extracted |
 | Research judgment | DECISIONS.md, the ablation, the limitations and the scale estimates in the README |

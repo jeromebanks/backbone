@@ -14,7 +14,7 @@
 | Planner | LLM writes a `QueryPlan` (typed JSON DSL, Pydantic-validated) | 2.8–4.7 s |
 | Executor | four deterministic operators over SQLite | 7–10 ms per question |
 | Narrator | LLM writes a cited answer from the full results JSON | 15–49 s; 13K–97K input tokens |
-| Verifier | post-check gate: numbers and dates must be stated in the results; cited documents must exist and be in the results (shared labels cited as `LABEL [sha12]`); every cited line must be inside an evidence passage. One regeneration on failure, then a flagged, uncached answer. Set membership only: no check of prose, causation, or which week/event a number belongs to | 11/11 saved answers pass | <!-- FINAL-NUMBERS -->
+| Verifier | post-check gate: numbers and dates must be stated in the results; cited documents must exist and be in the results (shared labels cited as `LABEL [sha12]`); every cited line must be inside an evidence passage. One regeneration on failure, then a flagged, uncached answer. Set membership only: no check of prose, causation, or which week/event a number belongs to | 11/11 saved answers pass (6 regenerated after the post-check was tightened; one needed the retry) |
 | Cache | per question + fingerprint (content hash of the whole abstraction + code versions); hits are post-checked again | 1.3 ms on a hit (before the content hash and re-check were added) |
 | Interfaces | `python -m backbone ask`, and the `clinical-qa` Claude Code skill (Claude Code is the planner and narrator; the CLI is the calculator) | |
 

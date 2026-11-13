@@ -27,7 +27,7 @@ is in [`docs/ROADMAP.md`](docs/ROADMAP.md), with deeper designs for [ingestion](
 ## Results on the development questions
 
 Full answers with citations, plans, arithmetic and evidence tables: [`out/answers/ANSWERS.md`](out/answers/ANSWERS.md)
-(and `out/answers/DEV-0x.md` per question). Every answer passed the post-check. <!-- FINAL-NUMBERS -->
+(and `out/answers/DEV-0x.md` per question). All 11 saved answers pass the current post-check and reproduce byte-identically (`verify-answers`).
 
 | Week (Mon–Sun) | Therapy sessions counted (patient-present minutes) | Days | Minutes | Goal ≥3 days & ≥150 min |
 |---|---|---|---|---|
@@ -132,7 +132,7 @@ Every claim carries verbatim quotes. `backbone/evidence.py` locates each quote i
 IDs) is unchanged. A claim is rejected (rule R0) when it has no quote of its own, a quote cannot be found, a service
 event's clock times or stated minutes are not in its own quotes, or a date it carries appears nowhere in its
 document. Other values not stated in the claim's own quotes (typically a date taken from the header) are flagged,
-not rejected. In this corpus 0 of the claims needed fuzzy matching and none were rejected. <!-- FINAL-NUMBERS -->
+not rejected. In this corpus 0 of the claims needed fuzzy matching, and 1 of 254 was rejected: a BH-D015 observation dated with a date its document never states (the extraction inferred it).
 
 Cross-document links use only keys the text states, because one call sees one document. For example, D103 states
 "departure for HG-E110 is 11:15, replacing 11:30", and D014 states "copied result from form HG-Q116 completed
@@ -152,7 +152,7 @@ Every consequential choice is written to `decisions`, and every unresolved disag
 
 | Rule | What it does | Where it matters in this corpus |
 |---|---|---|
-| R0 | reject claims without a quote of their own, with a quote not in the source, with service-event times or stated minutes not in their own quotes, or with a date absent from the document | (none rejected) | <!-- FINAL-NUMBERS -->
+| R0 | reject claims without a quote of their own, with a quote not in the source, with service-event times or stated minutes not in their own quotes, or with a date absent from the document | 1 rejected (BH-D015 observation: date not stated in its document) |
 | R1 | encounter identity by ID; an ID-less record joins the one encounter with the same date and type whose actual times overlap its own (when both state times); otherwise a separate contact. A disputed date or type becomes `uncertain` alternative rows, counted as at most one session, never a majority pick | D015/D103 mentions without IDs |
 | R2 | drafts, templates and billing rows are not attendance evidence; requirements from a draft plan are not operative | D112 unsigned template + posted charge for no-show E116 |
 | R3 | field-scoped explicit corrections (arrival, departure, disposition, contact interval, service type), resolved as a **graph** in any claim order: a chain ends at its last value; competing corrections or a cycle keep every alternative as disputed bounds plus a conflict; a correction that cannot be applied is reported. Retransmission and copy relations cover only the records they name. **Precedence follows relationships, never document date** | D103 corrects E110 departure; D104 (received later) is a resend of the uncorrected roster |
@@ -280,7 +280,7 @@ name-matched documents.
 | Per-patient operators on the real abstraction (median) | care by week 0.4 ms · compliance 0.7 ms · reconstruct day 0.2 ms · symptom course 1.6 ms · care with exclusions + evidence 0.8 ms |
 | Answering a new question end to end (5 dev questions) | **20–52 s**: plan 2.8–4.7 s (LLM) · **execute 7–10 ms** · narrate 15–49 s (LLM); list-price $0.08–0.62 per question |
 | Repeating a question (answer cache) | **1.3 ms** median |
-| Saved abstraction | 2.9 MB SQLite (`out/backbone.db`) + 136 KB extraction cache; 254 claims (0 unverified), 26 encounters, 77 decisions, 1 conflict | <!-- FINAL-NUMBERS -->
+| Saved abstraction | 1.2 MB SQLite (`out/backbone.db`) + 136 KB extraction cache; 254 claims (1 unverified), 26 encounters, 78 decisions, 1 conflict |
 
 **Collection scale (SYNTHETIC).** The real patient's reconciled layer was cloned per patient. Documents and claims
 were not cloned, so this measures the **query layer only**:

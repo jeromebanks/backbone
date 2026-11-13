@@ -39,7 +39,7 @@ prices per million tokens as of November 2026; re-check them before quoting.
 1. **Extraction is the only AI step that feeds numbers.** A misread time or disposition flows into reconciliation.
    Mitigations:
    - verbatim quotes are verified in code, and a fuzzy match must keep every token that contains a digit (R0;
-     0 unverified of 254 claims, measured); <!-- FINAL-NUMBERS -->
+     1 unverified of 254 claims, measured: an observation with an inferred date);
    - value grounding: a service event whose clock times or stated minutes are not in its own quotes, or a claim
      whose date appears nowhere in its document, is rejected (R0); other values not in the claim's own quotes
      (mostly header dates) are flagged and counted by `stats`;
@@ -110,9 +110,9 @@ prices per million tokens as of November 2026; re-check them before quoting.
 | What | Measured |
 |---|---|
 | Extraction, 31 documents | **$1.38 total**, **$0.045/doc**; 8,318 input + 1,574 output tokens per doc (≈90% of input is the fixed prompt + schema); 13.2 s mean per doc; 58 s wall clock at concurrency 8 |
-| Answering, 11 saved questions (planner + narrator) | **$2.06 total**; $0.08–0.62 per development question; $0.01 for a refused (unsupported) question; 3.6K–97K input tokens per question | <!-- FINAL-NUMBERS -->
-| Planner latency | 2.5–5.8 s | <!-- FINAL-NUMBERS -->
-| Narrator latency | 14–49 s; **dominates** answer time and cost | <!-- FINAL-NUMBERS -->
+| Answering, 11 saved questions (planner + narrator) | **$2.75 total** at list price for the 11 answers now saved (6 regenerated after the fixes, 5 from the first run); $0.11–1.02 per development question (DEV-02 needed the post-check retry, so two narrations); $0.01 for a refused (unsupported) question; 3.6K–111K input tokens per question. Paid through the Claude subscription, so no extra cost here |
+| Planner latency | 2.5–5.8 s (measured on the saved answers) |
+| Narrator latency | 14–68 s per answer (68 s includes one retry); **dominates** answer time and cost |
 | Execution (no AI) | 7–10 ms per question; 0.2–1.7 ms per operator |
 | Repeated question (cache) | ~1.3 ms, $0 (benchmark at `d38bc57`; a hit now also hashes the abstraction, ~2 ms, and re-runs the post-check) |
 | Whole development effort (estimate) | about $10–20 list-equivalent: one extraction pass plus several regenerations of the answer set |
