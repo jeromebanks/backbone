@@ -75,9 +75,10 @@ def test_service_type_tie_between_therapy_and_non_therapy_is_uncertain():
     res = reconcile_patient("P1", with_docs(
         event("note-a", stype="individual_therapy", contact=[("09:00", "10:00")]),
         event("note-b", stype="medication_management", contact=[("09:00", "10:00")])))
-    assert len(res.encounters) == 1
+    assert len({e["encounter_id"] for e in res.encounters}) == 1      # one encounter (#48: plus its medication row)
     e = res.encounters[0]
     assert e["eligible"] == "uncertain", e
+    assert [(x["service_type"], x["eligible"]) for x in res.encounters[1:]] == [("medication_management", "no")]
     assert any(c["field"] == "service_type" and c["resolution"] == "disputed" for c in res.conflicts)
 
 

@@ -7,8 +7,10 @@ reviewer can see why a session counted or not and which records contributed.
 Rules (RULESET_VERSION in __init__):
   R0  claims whose quotes cannot be located in the source text are excluded.
   R1  encounter identity: group by encounter ID; otherwise match on same date + service type (and overlapping
-      times if both known, arrival–departure included); otherwise keep as a separate unidentified contact. A
-      disputed date/type yields alternative 'uncertain' rows of the one encounter (never a majority pick).
+      times if both known, arrival–departure included; corrected service types included); a psychotherapy record
+      overlapping in time a psychotherapy contact of another type joins it with the type disputed; otherwise keep
+      as a separate unidentified contact. A disputed date/type yields alternative rows of the one encounter (never a
+      majority pick).
   R2  draft/template text, billing rows and unsigned drafts are not attendance evidence.
   R3  explicit field corrections replace the corrected value only for that field; retransmitted/copied records
       are linked to their original and carry no independent weight. Precedence never follows document date.
@@ -112,9 +114,10 @@ def _classify(c: Claim) -> None:
         c.tier = 2
 
 
-def _group_events(events: list[Claim], res: Result) -> dict[str, list[Claim]]:
+def _group_events(events: list[Claim], res: Result, corrections: dict[str, list[Claim]]) -> dict[str, list[Claim]]:
     groups: dict[str, list[Claim]] = defaultdict(list)
-    meta: dict[str, tuple[str, str, list]] = {}   # key -> (date, type, intervals)
+    meta: dict[str, tuple[set, list, list]] = {}  # key -> ({(date, type)}, stated times, actual times)
+    corrected: dict[str, set] = defaultdict(set)  # key -> (date, type) pairs reached only through a correction
     mrn = res.mrn
 
     def ivs(c: Claim):
@@ -127,28 +130,79 @@ def _group_events(events: list[Claim], res: Result) -> dict[str, list[Claim]]:
         out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
         return normalize(out)
 
+    def actual(c: Claim):
+        """Times the patient was actually in contact: contact intervals and arrival–departure (not the schedule)."""
+        p = c.payload
+        out = [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
+        out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
+        return normalize(out)
+
+    def type_edges(key: str) -> list[tuple]:
+        out = []
+        for r in corrections.get(key, ()):
+            if r.payload.get("field") == "service_type":
+                old, new = _corr_value("service_type", r.payload.get("old_value")), _corr_value("service_type", r.payload.get("new_value"))
+                if old is not None and new is not None and old != new:
+                    out.append((old, new, r))
+        return out
+
     ided = [c for c in events if _norm_id(c.payload.get("encounter_id"))]
     unided = [c for c in events if not _norm_id(c.payload.get("encounter_id"))]
     for c in ided:
         key = f"{mrn}|{_norm_id(c.payload['encounter_id'])}"
         groups[key].append(c)
-        md, mt, miv = meta.get(key, (c.payload["service_date"], c.payload["service_type"], []))
-        meta[key] = (md, mt, normalize(miv + ivs(c)))          # times of every record of the encounter
+    for key, cs in groups.items():
+        # Every (date, type) a record of the encounter states, and every service type a correction of the encounter
+        # turns it into (#61: matching before corrections missed an ID-less record of the corrected type; matching on
+        # the first record's type alone depended on claim order). The correcting document's own record is never
+        # corrected (R3), so its edges do not apply to it here either.
+        pairs, iv, act = set(), [], []
+        edges = type_edges(key)
+        for c in cs:
+            d, t = c.payload["service_date"], c.payload["service_type"]
+            pairs.add((d, t))
+            k0 = _corr_value("service_type", t)
+            mine = [e for e in edges if e[2].sha256 != c.sha256]
+            if k0 is not None and mine:
+                for t2 in _resolve(k0, mine):
+                    if (d, t2) not in pairs:
+                        corrected[key].add((d, t2))
+            iv = normalize(iv + ivs(c))                       # times of every record of the encounter
+            act = normalize(act + actual(c))
+        corrected[key] -= pairs
+        meta[key] = (pairs | corrected[key], iv, act)
     for c in sorted(unided, key=lambda c: c.claim_id):
         d, t, iv = c.payload["service_date"], c.payload["service_type"], ivs(c)
-        cands = [k for k, (md, mt, miv) in meta.items()
-                 if md == d and mt == t and (not iv or not miv or overlaps(iv, miv))]
+        act = actual(c)
+        cands = [k for k, (mp, miv, _) in meta.items()
+                 if (d, t) in mp and (not iv or not miv or overlaps(iv, miv))]
+        disputed = False
+        if not cands and t in THERAPY_TYPES and act:
+            # #74: the patient cannot attend two sessions at once. A psychotherapy record whose ACTUAL contact times
+            # (not a schedule) overlap those of a psychotherapy contact of another type on the same date is that
+            # contact with its type disputed (the #12 alternatives then carry both readings), not a second session.
+            cands = [k for k, (mp, _, mact) in meta.items()
+                     if mact and overlaps(act, mact) and any(md == d and mt in THERAPY_TYPES for md, mt in mp)]
+            disputed = True
         if len(cands) == 1:
             groups[cands[0]].append(c)
-            md, mt, miv = meta[cands[0]]
-            meta[cands[0]] = (md, mt, normalize(miv + iv))
+            mp, miv, mact = meta[cands[0]]
+            if disputed:
+                others = sorted({mt for md, mt in mp if md == d})
+            meta[cands[0]] = (mp | {(d, t)}, normalize(miv + iv), normalize(mact + act))
+            via = " (the service type a correction gives the encounter)" if (d, t) in corrected[cands[0]] else ""
             res.decide(cands[0], "R1", "matched_without_id",
-                       f"{c.doc_label} names no encounter ID; matched on date {d} + service type {t}", [c.claim_id])
+                       f"{c.doc_label} names no encounter ID; matched on date {d} + service type {t}{via}"
+                       if not disputed else
+                       f"{c.doc_label} names no encounter ID; matched on date {d} + overlapping contact times "
+                       f"{fmt_set(act)}: "
+                       f"it states {t} where the contact's records state {others}, so the service type is disputed",
+                       [c.claim_id])
             continue
         n = sum(1 for k in meta if k.startswith(f"{mrn}|U-{d}-{t}")) + 1
         key = f"{mrn}|U-{d}-{t}-{n}"
         groups[key].append(c)
-        meta[key] = (d, t, iv)
+        meta[key] = ({(d, t)}, iv, act)
         why = "ambiguous: several candidates" if cands else "no matching encounter"
         res.decide(key, "R1", "unidentified_contact", f"{c.doc_label}: {why} ({d}, {t}); kept as a separate contact",
                    [c.claim_id])
@@ -186,27 +240,36 @@ def _corr_label(fname: str, k) -> str:
     return fmt_set([k]) if fname == "contact_interval" else str(_corr_display(fname, k))
 
 
+def _reach(v0, succ: dict) -> list:
+    """Values reachable from v0 (v0 first), breadth-first, each once."""
+    order, seen = [v0], {v0}
+    for v in order:
+        for e in succ.get(v, ()):
+            if e[1] not in seen:
+                seen.add(e[1]); order.append(e[1])
+    return order
+
+
 def _resolve(v0, edges: list[tuple]) -> dict:
-    """Follow corrections (old, new, claim) from v0 and return {terminal value: [paths]}, a path being the edges
-    taken. Every branch is explored, so a chain ends in the same place whatever order the claims arrive in, and
-    competing corrections or a cycle leave several terminals instead of first-match-wins (#9)."""
+    """Follow corrections (old, new, claim) from v0 and return {terminal value: [the corrections that lead there]}.
+
+    By graph reachability over a visited set, not path enumeration (#63: many restatements of a chain, or a dense
+    graph, grew combinatorially). Terminals are the reachable values no correction replaces, plus every reachable
+    value on a cycle, so a chain ends in the same place whatever order the claims arrive in, and competing
+    corrections or a cycle leave several terminals instead of first-match-wins (#9). A terminal's corrections are
+    the reachable edges from whose new value the terminal can be reached, in breadth-first order (by claim id within
+    a value). `{v0: []}`: nothing corrects v0."""
     succ: dict = defaultdict(list)
-    for e in edges:
+    for e in sorted(edges, key=lambda e: e[2].claim_id):
         succ[e[0]].append(e)
-    out: dict = defaultdict(list)
-    stack = [(v0, [], (v0,))]
-    while stack:
-        v, path, seen = stack.pop()
-        nxt = sorted(succ.get(v, []), key=lambda e: e[2].claim_id)
-        if not nxt:
-            out[v].append(path)
-        for e in nxt:
-            if e[1] in seen:                       # a cycle: every value on it stays an alternative
-                for x in seen[seen.index(e[1]):]:
-                    out[x].append(path + [e])
-            else:
-                stack.append((e[1], path + [e], seen + (e[1],)))
-    return out
+    order = _reach(v0, succ)
+    live = [e for v in order for e in succ.get(v, ())]
+    if not live:
+        return {v0: []}
+    desc = {v: set(_reach(v, succ)) for v in order}            # v itself included
+    cyclic = {v for v in order if any(v in desc[e[1]] for e in succ.get(v, ()))}
+    terminals = [v for v in order if not succ.get(v) or v in cyclic]
+    return {t: [e for e in live if t in desc[e[1]]] for t in terminals}
 
 
 def _apply_corrections(group: list[Claim], corrections: list[Claim], key: str,
@@ -238,33 +301,45 @@ def _apply_corrections(group: list[Claim], corrections: list[Claim], key: str,
         else:
             edges[fname].append((old, new, corr))
     used: dict[str, Claim] = {}
+    reached_excluded: dict[str, set[str]] = defaultdict(set)   # correction -> excluded records it would change
     conflicts: dict[tuple, dict] = {}
-    for c in group:
+    # Records that contribute (tier 1/2) first: a correction counts as applied only when it changed one of them
+    # (#64). Excluded records (copies, drafts) then take the applied corrections too, so a later resend of the
+    # corrected record agrees with it, but a correction that reached ONLY an excluded record is not applied.
+    for c in [c for c in group if c.tier is not None] + [c for c in group if c.tier is None]:
+        contributes = c.tier is not None
         for fname, fedges in sorted(edges.items()):
             f = FIELD_MAP[fname]
             if c.eff.get(f) is None:
                 continue
             mine = [e for e in fedges if e[2].sha256 != c.sha256]
+            if not contributes:
+                for v in (c.eff[f] if fname == "contact_interval" else [c.eff[f]]):
+                    k0 = _corr_value(fname, v)
+                    for t, es in (_resolve(k0, mine) if k0 is not None else {}).items():
+                        for e in es:
+                            if e[2].claim_id not in used:
+                                reached_excluded[e[2].claim_id].add(c.doc_label)
+                mine = [e for e in mine if e[2].claim_id in used]
             per_value = []                         # per record value (one, or each contact interval): alternatives
             for v in (c.eff[f] if fname == "contact_interval" else [c.eff[f]]):
                 k0 = _corr_value(fname, v)
                 found = _resolve(k0, mine) if k0 is not None else {}
-                if not found or (list(found) == [k0] and found[k0] == [[]]):
+                if not found or found == {k0: []}:
                     per_value.append([v])
                     continue
                 alts = sorted(found, key=str)
-                path_ids = {t: {e[2].claim_id for pth in found[t] for e in pth} for t in alts}
-                for t in alts:
-                    for pth in found[t]:
-                        for _, _, corr in pth:
+                path_ids = {t: {e[2].claim_id for e in found[t]} for t in alts}
+                if contributes:
+                    for t in alts:
+                        for _, _, corr in found[t]:
                             used[corr.claim_id] = corr
                 if len(alts) == 1:
-                    for pth in sorted(found[alts[0]], key=lambda pth: [e[2].claim_id for e in pth]):
-                        for _, _, corr in pth:
-                            res.decide(key, "R3", "field_corrected",
-                                       f"{c.doc_label} {fname} {corr.payload['old_value']} replaced by "
-                                       f"{corr.payload['new_value']} per explicit correction in {corr.doc_label} "
-                                       "(correction applies to this field only)", [c.claim_id, corr.claim_id])
+                    for _, _, corr in found[alts[0]]:          # one decision per applied correction (#63)
+                        res.decide(key, "R3", "field_corrected",
+                                   f"{c.doc_label} {fname} {corr.payload['old_value']} replaced by "
+                                   f"{corr.payload['new_value']} per explicit correction in {corr.doc_label} "
+                                   "(correction applies to this field only)", [c.claim_id, corr.claim_id])
                 else:
                     labels = [_corr_label(fname, t) for t in alts]
                     res.decide(key, "R3", "correction_disputed",
@@ -289,9 +364,15 @@ def _apply_corrections(group: list[Claim], corrections: list[Claim], key: str,
                      + " vs ".join(x["value"] for x in entry["candidates"]))
     for fname, fedges in sorted(edges.items()):
         for _, _, corr in fedges:
-            if corr.claim_id not in used:
-                _not_applied(key, corr, f"no other record of this encounter has {fname} "
-                                        f"{corr.payload.get('old_value')}", flags, res)
+            if corr.claim_id in used:
+                continue
+            old = corr.payload.get("old_value")
+            if corr.claim_id in reached_excluded:
+                why = (f"{fname} {old} is held only by excluded record(s) "
+                       f"{', '.join(sorted(reached_excluded[corr.claim_id]))}, which do not count for this encounter")
+            else:
+                why = f"no other record of this encounter has {fname} {old}"
+            _not_applied(key, corr, why, flags, res)
     return flags, [used[k] for k in sorted(used)]
 
 
@@ -398,8 +479,8 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     sdate = sorted(dates.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
     accounts = sorted({(c.payload["service_date"], v["service_type"]) for c in pool for v in _variants(c)})
     therapy_accounts = [a for a in accounts if a[1] in THERAPY_TYPES]
-    if therapy_accounts and len(accounts) > 1:
-        sdate, stype = therapy_accounts[0]                 # a representative; the alternatives keep the others
+    if len(accounts) > 1:                                  # a representative; the alternatives keep the others
+        sdate, stype = (therapy_accounts or accounts)[0]   # (a psychotherapy account if there is one; never majority)
     for fld, counts in (("service_type", types), ("service_date", dates)):
         if len(counts) > 1:
             flags.append(f"{fld.replace('_', ' ')} disagreement: {dict(counts)}")
@@ -471,7 +552,10 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         reason = (f"{disputed} disputed between equal-precedence records ("
                   + "; ".join(f"{d} {t}" for d, t in accounts) + "); "
                   + (f"{reason}; " if reason else "") + "counted only within bounds")
-        alternatives = therapy_accounts[1:]
+    if len(accounts) > 1 and attended != "no" and present != "no":
+        # every other account gets its own row (#12), a non-psychotherapy one too: a goal that counts that type
+        # (e.g. medication management, #48) must see it within bounds
+        alternatives = [a for a in accounts if a != (sdate, stype)]
     res.decide(key, "R5", f"eligible={eligible}", reason or f"{stype}, attended, patient present", ids)
 
     # minutes (R6)
@@ -516,18 +600,41 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     for s, e, kind, cid in sorted(set(excl)):
         rows.append({"encounter_key": key, "kind": "excluded", "start_min": s, "end_min": e, "label": kind,
                      "claim_ids": [cid]})
-    sched = next(((to_min(c.payload["scheduled"]["start"]), to_min(c.payload["scheduled"]["end"]))
-                  for c in usable if c.payload.get("scheduled")), None)
-    if sched and None not in sched:
-        rows.append({"encounter_key": key, "kind": "scheduled", "start_min": sched[0], "end_min": sched[1],
-                     "label": "scheduled", "claim_ids": [c.claim_id for c in usable if c.payload.get("scheduled")]})
-    sched_ok = bool(sched) and None not in sched and sched[1] > sched[0]
+    # The scheduled interval is reconciled like any other account (#66), not taken from the first record: the first
+    # tier that states a schedule decides it; records of that tier that disagree are alternatives (a conflict), and
+    # every one of them reaches the bounds below. A lower tier's different schedule is logged, not used.
+    sched_by: dict[tuple, list[Claim]] = {}
+    for c in usable:
+        sc = c.payload.get("scheduled")
+        k = (to_min(sc.get("start")), to_min(sc.get("end"))) if sc else None
+        if k and None not in k:
+            sched_by.setdefault(k, []).append(c)
+    for k, cs in sched_by.items():
+        rows.append({"encounter_key": key, "kind": "scheduled", "start_min": k[0], "end_min": k[1],
+                     "label": "scheduled", "claim_ids": [c.claim_id for c in cs]})
+    s_tier = min((c.tier for cs in sched_by.values() for c in cs), default=None)
+    deciding_sched = {k: [c for c in cs if c.tier == s_tier] for k, cs in sched_by.items()}
+    deciding_sched = {k: cs for k, cs in deciding_sched.items() if cs}
+    scheds = sorted(k for k in deciding_sched if k[1] > k[0])           # valid same-day schedules
+    lower = [c for k, cs in sched_by.items() if k not in deciding_sched for c in cs]
+    if lower:
+        res.decide(key, "R4", "schedule_tier",
+                   f"{', '.join(sorted({c.doc_label for c in lower}))} (tier {s_tier + 1}) state(s) a different "
+                   f"schedule; the tier-{s_tier} records decide it "
+                   f"({', '.join(fmt_set([k]) for k in sorted(deciding_sched))})", [c.claim_id for c in lower])
+    if len(deciding_sched) > 1:
+        flags.append("scheduled interval disagreement: " + " vs ".join(
+            f"{fmt_set([k])} ({', '.join(sorted({c.doc_label for c in cs}))})" for k, cs in sorted(deciding_sched.items())))
+        res.conflicts.append({"subject_key": key, "field": "scheduled_interval", "resolution": "disputed",
+                              "candidates": [{"value": fmt_set([k]), "claim_ids": [c.claim_id for c in cs]}
+                                             for k, cs in sorted(deciding_sched.items())]})
     # Same-day interval algebra cannot represent an interval that crosses midnight or is inverted (#17). Such an
     # interval is never silently dropped (that turned an overnight session into an established 0): the minutes
     # become unknown, with no upper bound unless a valid schedule gives one, and the interval is flagged.
     bad_presence: list[str] = []
-    bad_sched = (f"scheduled {fmt_set([sched])} is not a valid same-day interval (overnight or inverted)"
-                 if sched and None not in sched and not sched_ok else None)
+    bad_scheds = [f"scheduled {fmt_set([k])} is not a valid same-day interval (overnight or inverted)"
+                  for k in sorted(deciding_sched) if not k[1] > k[0]]
+    sched_ok = bool(scheds) and not bad_scheds
 
     cands: dict[tuple, list[Claim]] = defaultdict(list)
     basis: dict[tuple, str] = {}
@@ -554,12 +661,16 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
             if msg not in bad_presence:
                 bad_presence.append(msg)
     full = [c for c in t1 if c.eff.get("disposition") == "attended_full"]
-    if not cands and not bad_presence and full and bad_sched:
-        bad_presence.append(bad_sched)                     # the schedule would have been the presence account
+    if not cands and not bad_presence and full and bad_scheds:
+        bad_presence += bad_scheds                         # a schedule would have been the presence account
     elif not cands and sched_ok and full:
-        cands[(sched,)] = full
-        basis[(sched,)] = "attended full scheduled session"
-    flags += ([bad_sched] if bad_sched and bad_sched not in bad_presence else []) + bad_presence + bad_excl
+        for c in full:                                     # its own schedule, else every deciding schedule (#66)
+            sc = c.payload.get("scheduled") or {}
+            own = (to_min(sc.get("start")), to_min(sc.get("end")))
+            for k in ([own] if own in scheds else scheds):
+                _add_cand(cands, (k,), c)
+                basis[(k,)] = "attended full scheduled session"
+    flags += [m for m in bad_scheds if m not in bad_presence] + bad_presence + bad_excl
 
     m_low = m_high = None
     calc = None
@@ -586,13 +697,15 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
                          + (f" − {' − '.join(ex)}" if ex and total(list(iv)) != m else "") + src + f" = {m} min")
         calc = " | ".join(parts)
         if len(cands) > 1:
+            what = ("scheduled intervals for an attended-full session" if all(
+                basis[iv] == "attended full scheduled session" for iv in cands) else "patient-contact intervals")
             res.conflicts.append({"subject_key": key, "field": "patient_present_interval", "resolution": "disputed",
                                   "candidates": [{"value": fmt_set(list(iv)),
                                                   "minutes": mins[(iv, 0)] if len(accts) == 1
                                                   else sorted({mins[(iv, ai)] for ai in range(len(accts))}),
                                                   "claim_ids": [x.claim_id for x in cs]} for iv, cs in cands.items()]})
             res.decide(key, "R4", "minutes_disputed",
-                       "tier-1 records give different patient-contact intervals and none corrects the other: " + calc
+                       f"tier-1 records give different {what} and none corrects the other: " + calc
                        + f"; carried as bounds [{m_low}, {m_high}]", [x.claim_id for cs in cands.values() for x in cs])
         if len(accts) > 1:
             split = [(k, a) for k, a in kind_alts if len(a) > 1]
@@ -618,12 +731,14 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     else:
         status = "unknown"
         m_low = 0
-        m_high = max(total(subtract([sched], a)) for a in acct_ivs) if sched_ok else None   # least subtraction
+        m_high = (max(total(subtract([k], a)) for k in scheds for a in acct_ivs)   # largest schedule, least
+                  if sched_ok else None)                                          # subtraction (#66)
         if m_high is not None and cands:                   # valid accounts beside an invalid one (#17)
             m_high = max([m_high] + [total(subtract(list(iv), a)) for iv in cands for a in acct_ivs])
         calc = ("no patient arrival/departure or contact interval documented; bounds 0.." if not bad_presence else
                 f"patient-present time cannot be computed ({'; '.join(bad_presence)}); bounds 0..")
-        calc += f"{m_high} (scheduled {fmt_set([sched])} minus exclusions)" if m_high is not None else "unbounded"
+        calc += (f"{m_high} (scheduled {' / '.join(fmt_set([k]) for k in scheds)} minus exclusions)"
+                 if m_high is not None else "unbounded")
         res.decide(key, "R6", "minutes_unknown", calc, ids)
     if calc and status == "established":
         res.decide(key, "R6", f"minutes={m_low}", calc, [x.claim_id for cs in cands.values() for x in cs]
@@ -654,8 +769,9 @@ def _add_cand(cands: dict, k: tuple, c: Claim) -> None:
 
 def _add_identity_alternatives(encs: list[dict], res: Result) -> list[dict]:
     """Alternative rows of encounters whose service date or type is disputed between equal-precedence records
-    (#12). One row carries one date and one type, so each further psychotherapy (date, type) account becomes its own
-    'uncertain' row (key `<encounter key>~<date>-<type>`, same intervals), and the dispute reaches the bounds of
+    (#12). One row carries one date and one type, so each further (date, type) account becomes its own row (key
+    `<encounter key>~<date>-<type>`, same intervals; 'uncertain' for psychotherapy, 'no' for any other type, which
+    only a goal counting that type sees, #48), and the dispute reaches the bounds of
     every week and every per-type goal it could belong to. The rows share `encounter_id`; `project.aggregate` counts
     them as at most one session (and the larger of their minutes), so they never add up to more than the single
     encounter they are. R7 does not compare them with each other (same `_identity`)."""
@@ -665,10 +781,15 @@ def _add_identity_alternatives(encs: list[dict], res: Result) -> list[dict]:
         rows = [r for r in res.intervals if r["encounter_key"] == enc["encounter_key"]] if enc["_alternatives"] else []
         for d, t in enc["_alternatives"]:
             k = f"{enc['encounter_key']}~{d}-{t}"
+            # a non-psychotherapy account is never an eligible session (R5); it exists for goals counting its type
+            other = {} if t in THERAPY_TYPES else {
+                "is_therapy": 0, "eligible": "no", "exclusion_reason": f"not a psychotherapy service ({t})",
+                "minutes_low": None, "minutes_high": None, "minutes_status": "not_applicable", "calculation": None,
+                "_present_sets": []}
             out.append({**enc, "encounter_key": k, "service_date": d, "service_type": t,
                         "flags": enc["flags"] + [f"alternative identity of {enc['encounter_key']} ({enc['service_date']} "
                                                  f"{enc['service_type']}): service date/type disputed"],
-                        "_superseded": [], "_alternatives": []})
+                        "_superseded": [], "_alternatives": [], **other})
             res.intervals.extend({**r, "encounter_key": k} for r in rows)
             res.decide(k, "R1", "identity_alternative",
                        f"records of {enc['encounter_key']} disagree on its service date/type; this row is the {d} {t} "
@@ -767,6 +888,33 @@ def _plans(plan_claims: list[Claim], res: Result) -> None:
             res.decide(same[0][0], "R3", "plan_restated",
                        f"{len(same)} documents ({', '.join(row['doc_label'] for _, row, _ in same)}) state the same "
                        f"{same[0][1]['metric']} requirement; it counts once", [c.claim_id for _, _, cs in same for c in cs])
+    _goals_not_restated(res)
+
+
+def _goals_not_restated(res: Result) -> None:
+    """R9 note (#49): a later requirement for the same metric that does not restate an earlier goal (same metric,
+    counted types and period) leaves it unclear whether that goal lapsed. Nothing in the record says the revision
+    replaces the whole plan, so the projection evaluates both possibilities (`project.requirement_sets_on`); this
+    decision makes that visible once per goal, at the first revision that omits it."""
+    def gk(p):
+        return (p["metric"], tuple(p["counted_types"]), p["period"])
+
+    for p in res.plans:
+        start, end = p["effective_start"] or "", p["effective_end"]
+        later = sorted({q["effective_start"] or "" for q in res.plans
+                        if q["metric"] == p["metric"] and gk(q) != gk(p) and (q["effective_start"] or "") > start
+                        and (end is None or (q["effective_start"] or "") <= end)})
+        for d in later:
+            if any(gk(q) == gk(p) and start < (q["effective_start"] or "") <= d for q in res.plans):
+                break                                   # restated (superseded) before this revision: not lapsing
+            rev = [q for q in res.plans if q["metric"] == p["metric"] and (q["effective_start"] or "") == d]
+            res.decide(p["requirement_key"], "R9", "goal_not_restated",
+                       f"{p['doc_label']}'s {p['metric']} {p['comparator']} {p['threshold']:g} goal over "
+                       f"{p['counted_types']} ({p['period']}, effective {p['effective_start']}) is not restated by "
+                       f"{', '.join(sorted({q['doc_label'] for q in rev}))} (effective {d}), which revises "
+                       f"{p['metric']}; from {d} it may have lapsed or may continue, so it is evaluated both ways",
+                       p["claim_ids"] + [i for q in rev for i in q["claim_ids"]])
+            break
 
 
 def _assessments(acl: list[Claim], copy_docs: dict[str, list], res: Result) -> None:
@@ -815,7 +963,25 @@ def _observations(ocl: list[Claim], res: Result) -> None:
 
 # --------------------------------------------------------------------------------------------- entry points
 
+def _rejection_reason(c: Claim) -> str:
+    """Why ingest left a claim unverified, from its evidence (#68). A date that is stated nowhere in the document
+    (#52) is named as such: its quote WAS found, so "quote not found" would be false. A located quote failure keeps
+    the generic text. The inferred value itself is not repeated: it must not reach results as if it were a date
+    of the record."""
+    grounding = next((s for s in reversed(c.evidence or []) if s.get("match") == "grounding"), {})
+    absent = grounding.get("unverified_absent") or []
+    why = []
+    if any(s.get("match") == "missing" for s in c.evidence or []) or not absent:
+        why.append("quote not found in source text")
+    why += [f"the {f.replace('_', ' ')} is not stated anywhere in the document (the extracted value was inferred)"
+            for f in absent]
+    return "; ".join(why)
+
+
 def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
+    # One canonical order (claim id, the order `load_claims` reads), so every decision reason, flag, conflict and
+    # first-record choice is a function of the claim SET, not of the order a caller passes it in (#62).
+    claims = sorted(claims, key=lambda c: c.claim_id)
     res = Result(mrn)
     docs = {c.sha256: c.payload for c in claims if c.kind == "document"}
     for c in claims:
@@ -826,7 +992,7 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
             # (so operators attach it to that encounter), else a per-claim key under the patient.
             eid = _norm_id(c.payload.get("encounter_id")) if c.kind in ("service_event", "relation") else None
             res.decide(f"{mrn}|{eid}" if eid else f"{mrn}|claim|{c.claim_id}", "R0", "claim_rejected",
-                       f"{c.doc_label} {c.kind}: quote not found in source text", [c.claim_id])
+                       f"{c.doc_label} {c.kind}: {_rejection_reason(c)}", [c.claim_id])
     claims = [c for c in claims if c.verified or c.kind == "document"]
     rel = [c for c in claims if c.kind == "relation"]
     corrections = defaultdict(list)
@@ -846,7 +1012,7 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
                             events, "encounter_id", "service_date")
     copy_docs = _scopes([r for r in rel if r.payload["type"] == "copies_measurement"], "form_id",
                         acl, "form_id", "completed_date")
-    groups = _group_events(events, res)
+    groups = _group_events(events, res, corrections)
     encs = []
     for key in sorted(groups):
         enc, rows = _reconcile_encounter(key, groups[key], corrections.get(key, []), retransmitted, res)
@@ -920,11 +1086,28 @@ def persist(conn: sqlite3.Connection, res: Result) -> None:
                  (datetime.now().isoformat(timespec="seconds"), RULESET_VERSION, mrn))
 
 
+def _attribution_decisions(conn: sqlite3.Connection, res: Result, claims: list[Claim]) -> None:
+    """R1 provenance for documents attributed to the patient on a basis other than the extracted MRN (#71): the
+    text's printed MRN (#55) or another document's recorded MRN correction (#53). `attribution_notes` is
+    evidence-layer bookkeeping written by ingest; a database without it has no such documents."""
+    try:
+        notes = conn.execute("SELECT a.sha256, a.basis, a.reason, d.doc_label FROM attribution_notes a "
+                             "JOIN documents d ON d.sha256 = a.sha256 WHERE a.mrn = ? ORDER BY d.doc_label, a.sha256",
+                             (res.mrn,)).fetchall()
+    except sqlite3.OperationalError:
+        return
+    for sha, basis, reason, label in notes:
+        res.decide(f"{res.mrn}|attribution|{label}", "R1", f"attributed_by_{basis}",
+                   f"{label} is attributed to {res.mrn} by {basis.replace('_', ' ')}: {reason}",
+                   [c.claim_id for c in claims if c.sha256 == sha])
+
+
 def reconcile_patients(conn: sqlite3.Connection, mrns) -> dict:
     out = {}
     for mrn in sorted(set(mrns)):
         claims = load_claims(conn, mrn)
         res = reconcile_patient(mrn, claims)
+        _attribution_decisions(conn, res, claims)
         with conn:
             persist(conn, res)              # with no claims this clears every derived row of the patient
             orphan = not claims and not conn.execute("SELECT 1 FROM documents WHERE patient_mrn=?", (mrn,)).fetchone()

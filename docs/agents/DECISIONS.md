@@ -112,6 +112,50 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     - **Rejected:** reading `end < start` as crossing midnight. It can't be told apart from a typo, and minutes and
       R7 work on one service date.
 
+24. **A revision supersedes per goal; a goal it does not restate is evaluated both ways (#49, #50).**
+    - **Decision:** a goal is (metric, counted service types, period). A later requirement with the same goal key
+      supersedes it from its effective date. Different goal keys are independent goals, from one document or
+      several: a weekly and a monthly goal, or individual and group sessions. Suppose a later requirement for the
+      same metric does not restate an earlier goal. The record doesn't say whether that goal lapsed. So the sets
+      with and without it are both evaluated, and disagreement gives UNDETERMINED. An R9 `goal_not_restated`
+      decision and a week note say so.
+    - **Why:** extraction has no "replaces the whole plan" signal. Dropping the goal turns a possibly missed goal
+      into a confident MET. Keeping it turns a possibly retired goal into a confident NOT_MET. Both are picks.
+    - **Not the rejected ANDing (decision 10):**
+      - A restated goal is still superseded, never ANDed with its earlier statement.
+      - An omitted goal is never required outright. It only stops a verdict when the two readings disagree.
+    - **Rejected:**
+      - supersession per metric, the earlier behaviour (#49);
+      - per (metric, counted types) without the period (#50);
+      - a full replacement whenever a document restates any goal of the metric.
+    - **Later:** if extraction records an explicit full replacement, apply it.
+25. **Reconciliation output is a function of the claim set (#62).** `reconcile_patient` sorts the claims by
+    `claim_id` first.
+    - **Rejected:** sorting each reason's records by label, as #62 suggested. It rewrites the corpus's E113 and E118
+      R4 reasons (BH-D108 is listed before BH-D107 because its claim id sorts first), and it would still leave flag,
+      conflict and first-record order to the caller.
+26. **Correction resolution is reachability, and "applied" means "changed a contributing record" (#63, #64).**
+    - Terminals are the reachable values that nothing corrects, plus every reachable value on a cycle. That is the
+      same set as path enumeration, with no combinatorial growth: a chain restated by 30 documents and a dense
+      20-value graph resolve in milliseconds.
+    - With a cycle, a terminal's provenance is every reachable edge that can lead back to it. That is a superset of
+      the simple-path edges.
+    - A correction that only an excluded copy matched is reported as not applied, and it is not cited as evidence.
+27. **Schedules are accounts like any other (#66).** The first tier that states one decides it. A disagreement in
+    that tier is a conflict whose alternatives reach the bounds.
+    - **Rejected:** the first record's schedule. It was last-write-wins by claim order.
+28. **Overlapping psychotherapy contacts of different types are one encounter with a disputed type (#74).** This
+    uses the #12 alternative rows, so the bounds cover both readings. The patient can't attend two sessions at once.
+    - **Rejected:** keeping two eligible sessions plus only an R7 flag. That counted 2 sessions and 100 established
+      minutes for one contact.
+29. **Goals over non-psychotherapy types are counted, not left as lower bounds (#48).**
+    - Such a row counts like R5 without the psychotherapy condition: attended and present is `yes`.
+    - A disputed date or type is `uncertain`. Every account of a disputed encounter now has a row, a
+      non-psychotherapy one too (`eligible = 'no'`, so psychotherapy totals are unchanged).
+    - Minutes of those types are still not computed. A minutes goal over them stays a lower bound.
+      - **Why:** computing them would change the corpus's non-therapy encounter rows.
+      - **Later:** compute them, with a ruleset bump.
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K

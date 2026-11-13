@@ -40,12 +40,22 @@ def week_start(day: date) -> date:
 
 # --------------------------------------------------------------------------------------------- selection
 
+def _batches(conn, items: list, *, reserved: int = 0) -> list[list]:
+    """`operators._batches` (#58): an explicit patient list longer than SQLite's variable limit is split into
+    sorted, contiguous batches; a list that fits is one batch, unchanged, so the logged SQL stays the same.
+    Imported here, not at module level, because `operators` imports this module."""
+    from .operators import _batches as batches
+    return batches(conn, list(items), reserved=reserved)
+
+
 def patients_in_scope(conn, scope, log: SqlLog) -> list[dict]:
     if scope.patients == "all":
         rows = log.run(conn, "SELECT mrn, name, dob FROM patients ORDER BY mrn")
     else:
-        q = ",".join("?" * len(scope.patients))
-        rows = log.run(conn, f"SELECT mrn, name, dob FROM patients WHERE mrn IN ({q}) ORDER BY mrn", scope.patients)
+        rows = []
+        for b in _batches(conn, scope.patients):      # batches are mrn-sorted ranges: concatenation stays ordered
+            rows += log.run(conn, f"SELECT mrn, name, dob FROM patients WHERE mrn IN ({','.join('?' * len(b))}) "
+                                  "ORDER BY mrn", b)
     return [dict(r) for r in rows]
 
 
@@ -55,22 +65,25 @@ def select_encounters(conn, scope, log: SqlLog, *, include_excluded: bool | None
     sql = ("SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, "
            "attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, "
            "minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ?")
-    params: list = [str(scope.start), str(scope.end)]
-    if scope.patients != "all":
-        sql += f" AND mrn IN ({','.join('?' * len(scope.patients))})"
-        params += list(scope.patients)
-    types = service_types if service_types is not None else scope.service_types
-    if types:
-        sql += f" AND service_type IN ({','.join('?' * len(types))})"
-        params += list(types)
-    if not include_excluded:
-        sql += " AND eligible != 'no'"
-    sql += " ORDER BY mrn, service_date, encounter_key"
-    out = []
-    for r in log.run(conn, sql, params):
-        e = dict(r)
-        e["claim_ids"], e["flags"] = json.loads(e["claim_ids"]), json.loads(e["flags"])
-        out.append(e)
+    out: list[dict] = []
+    types = list(service_types if service_types is not None else scope.service_types or ())
+    # mrn-sorted batches when the patient list exceeds the variable limit (#58); ORDER BY mrn first, so the
+    # concatenated batches are in the single statement's order
+    for b in (_batches(conn, scope.patients, reserved=2 + len(types)) if scope.patients != "all" else [None]):
+        q, params = sql, [str(scope.start), str(scope.end)]
+        if b is not None:
+            q += f" AND mrn IN ({','.join('?' * len(b))})"
+            params += b
+        if types:
+            q += f" AND service_type IN ({','.join('?' * len(types))})"
+            params += types
+        if not include_excluded:
+            q += " AND eligible != 'no'"
+        q += " ORDER BY mrn, service_date, encounter_key"
+        for r in log.run(conn, q, params):
+            e = dict(r)
+            e["claim_ids"], e["flags"] = json.loads(e["claim_ids"]), json.loads(e["flags"])
+            out.append(e)
     return out
 
 
@@ -95,8 +108,10 @@ def aggregate(encs: list[dict]) -> dict:
     # (reconcile._add_identity_alternatives; each is 'uncertain'). At most one of them happened, so together they
     # contribute the largest of their bounds, not the sum (#12). Every other row is its own group.
     groups: dict[tuple, list[dict]] = {}
+    # An unidentified contact's alternatives share its key before '~' instead (#74).
     for e in encs:
-        groups.setdefault((e["mrn"], e.get("encounter_id")) if e.get("encounter_id") else (e["encounter_key"],), []).append(e)
+        groups.setdefault((e["mrn"], e.get("encounter_id")) if e.get("encounter_id")
+                          else (e["encounter_key"].split("~", 1)[0],), []).append(e)
     for g in groups.values():
         cs = [contribution(e) for e in g]
         s_lo += max(c["sessions"][0] for c in cs); s_hi += max(c["sessions"][1] for c in cs)
@@ -159,39 +174,69 @@ def _source(r: dict) -> str:
     return r["claim_ids"][0].split(":", 1)[0] if r.get("claim_ids") else r["doc_label"]
 
 
+def goal_key(r: dict) -> tuple:
+    """What a revision supersedes (#49, #50): one goal is a metric over a set of counted service types and a period.
+    A later requirement with the same goal key replaces an earlier one; requirements with different keys are
+    different goals, never alternatives of each other."""
+    return (r["metric"], tuple(sorted(r["counted_types"])), r.get("period", "week_mon_sun"))
+
+
+def describe_goal(r: dict) -> str:
+    return (f"{r['metric']} {r['comparator']} {r['threshold']:g} over {sorted(r['counted_types'])} "
+            f"({r.get('period', 'week_mon_sun')})")
+
+
 def requirement_sets_on(reqs: list[dict], day: date) -> tuple[list[list[dict]], list[str]]:
     """The requirement set(s) in effect on `day` (R9).
 
-    - For each metric, the requirements whose effective period started most recently are in effect (a revision
-      supersedes an earlier plan from its effective date; precedence is by effective date, never document date).
-    - Requirements for one metric from ONE document apply together (e.g. >= 2 individual and >= 1 group sessions).
-    - Identical requirement sets restated by several documents count once.
-    - If several documents state DIFFERENT requirement sets for one metric from that latest start date, the record
+    - Supersession is per goal (`goal_key`: metric, counted types, period). For each goal, the requirements whose
+      effective period started most recently are in effect (a revision supersedes an earlier statement of the same
+      goal from its effective date; precedence is by effective date, never document date).
+    - Goals with different keys are independent (#50): a weekly and a monthly goal, or an individual-session and a
+      group-session goal, both apply, whichever documents state them.
+    - Identical requirements restated by several documents count once.
+    - If several documents state DIFFERENT requirements for one goal from that latest start date, the record
       conflicts: every alternative is returned, so callers evaluate each and report UNDETERMINED when they disagree.
+    - A goal that a later revision of the same metric does not restate may have lapsed or may continue; the record
+      does not say which (#49). Both are returned (the sets with and without it), never one picked: agreement gives
+      a verdict, disagreement UNDETERMINED. Reconciliation logs the same as an R9 `goal_not_restated` decision.
     """
     active = plan_in_effect(reqs, day)
     notes: list[str] = []
     by_metric: dict[str, list[dict]] = {}
     for r in active:
         by_metric.setdefault(r["metric"], []).append(r)
-    choices: list[list[dict]] = []
+    choices: list[list[list[dict]]] = []
     for metric, rs in sorted(by_metric.items()):
-        latest = max((r["effective_start"] or "") for r in rs)
-        current = [r for r in rs if (r["effective_start"] or "") == latest]
-        superseded = sorted({r["doc_label"] for r in rs if (r["effective_start"] or "") != latest})
-        if superseded:
-            notes.append(f"{metric}: requirement effective {latest} ({sorted({r['doc_label'] for r in current})}) "
-                         f"supersedes {superseded}")
-        per_doc: dict[str, dict[tuple, dict]] = {}
-        for r in sorted(current, key=lambda r: r["requirement_key"]):
-            per_doc.setdefault(_source(r), {}).setdefault(_req_sig(r), r)
-        distinct: dict[tuple, list[dict]] = {}          # one alternative per distinct document requirement set
-        for reqs_of_doc in per_doc.values():
-            distinct.setdefault(tuple(sorted(reqs_of_doc)), list(reqs_of_doc.values()))
-        if len(distinct) > 1:
-            notes.append(f"{metric}: conflicting requirements in effect on {day} from "
-                         f"{sorted({r['doc_label'] for r in current})}; each alternative evaluated")
-        choices.append(list(distinct.values()))
+        metric_latest = max((r["effective_start"] or "") for r in rs)
+        by_goal: dict[tuple, list[dict]] = {}
+        for r in rs:
+            by_goal.setdefault(goal_key(r), []).append(r)
+        for gk, grs in sorted(by_goal.items(), key=lambda kv: str(kv[0])):
+            latest = max((r["effective_start"] or "") for r in grs)
+            current = [r for r in grs if (r["effective_start"] or "") == latest]
+            superseded = sorted({r["doc_label"] for r in grs if (r["effective_start"] or "") != latest})
+            if superseded:
+                notes.append(f"{metric}: requirement effective {latest} ({sorted({r['doc_label'] for r in current})}) "
+                             f"supersedes {superseded}")
+            per_doc: dict[str, dict[tuple, dict]] = {}
+            for r in sorted(current, key=lambda r: r["requirement_key"]):
+                per_doc.setdefault(_source(r), {}).setdefault(_req_sig(r), r)
+            distinct: dict[tuple, list[dict]] = {}      # one alternative per distinct document requirement set
+            for reqs_of_doc in per_doc.values():
+                distinct.setdefault(tuple(sorted(reqs_of_doc)), list(reqs_of_doc.values()))
+            if len(distinct) > 1:
+                notes.append(f"{metric}: conflicting requirements in effect on {day} from "
+                             f"{sorted({r['doc_label'] for r in current})}; each alternative evaluated")
+            alts = list(distinct.values())
+            if latest < metric_latest:
+                later = sorted({r["doc_label"] for r in rs if (r["effective_start"] or "") > latest})
+                notes.append(f"{metric}: the {sorted({r['doc_label'] for r in current})} goal "
+                             f"{' / '.join(describe_goal(r) for r in alts[0])} (effective {latest}) is not restated by "
+                             f"the later {later} (effective {metric_latest}); it may have lapsed, so it is evaluated "
+                             "both with and without it (R9)")
+                alts.append([])
+            choices.append(alts)
     sets: list[list[dict]] = [[]]
     for alts in choices:
         sets = [s + a for s in sets for a in alts]
@@ -202,13 +247,39 @@ _OPS = {">=": operator.ge, ">": operator.gt, "<=": operator.le, "<": operator.lt
 _METRIC = {"therapy_days": "therapy_days", "patient_present_minutes": "minutes", "sessions": "sessions"}
 
 
+def _identity_disputed(e: dict) -> bool:
+    """A row of an encounter whose service date or type is disputed (reconcile R1/#12: the representative row flags
+    the disagreement, each alternative row is keyed `<key>~<date>-<type>`)."""
+    return "~" in e["encounter_key"] or any(f.startswith(("service type disagreement", "service date disagreement"))
+                                            for f in e["flags"])
+
+
+def counting_rows(encs: list[dict]) -> list[dict]:
+    """Rows as a goal that also counts NON-psychotherapy types sees them (#48). Psychotherapy rows keep their R5
+    eligibility. Any other row counts like R5 without the psychotherapy condition: attended and patient present is
+    'yes', not attended or not present is 'no', anything else (or a disputed date/type) 'uncertain'. Reconciliation
+    computes minutes for psychotherapy only, so such a row's minutes are unknown (0..unbounded)."""
+    out = []
+    for e in encs:
+        if e["service_type"] in THERAPY_TYPES:
+            if e["eligible"] != "no":
+                out.append(e)
+            continue
+        if e["attended"] == "no" or e["patient_present"] == "no":
+            continue
+        ok = e["attended"] == "yes" and e["patient_present"] in ("yes", "partial") and not _identity_disputed(e)
+        out.append({**e, "eligible": "yes" if ok else "uncertain", "minutes_low": None, "minutes_high": None})
+    return out
+
+
 def _lower_bound_only(req: dict) -> str | None:
-    """Why the projected total is only a LOWER bound for this requirement, if it is. The projection counts eligible
-    sessions (R5: psychotherapy, attended, patient present), so it undercounts a goal that also counts other service
-    types, or that counts sessions or days without requiring the patient's presence (#7)."""
+    """Why the projected total is only a LOWER bound for this requirement, if it is. Reconciliation computes
+    patient-present minutes for psychotherapy only, so a minutes goal that also counts other service types is
+    undercounted (sessions and days of those types are counted, #48). The projection counts patient-present
+    contacts, so it also undercounts a goal that counts sessions or days without requiring presence (#7)."""
     other = sorted(set(req.get("counted_types") or ()) - THERAPY_TYPES)
-    if other:
-        return f"counts {other}, which the projection does not count (only psychotherapy)"
+    if other and req["metric"] == "patient_present_minutes":
+        return f"counts minutes of {other}, which reconciliation does not compute (only psychotherapy minutes)"
     if not req.get("requires_patient_present", 1) and req["metric"] in ("sessions", "therapy_days"):
         return "does not require patient presence; only patient-present sessions are counted"
     return None
@@ -227,8 +298,10 @@ def _verdict(comparator: str, threshold: float, lo, hi) -> str:
 
 def evaluate_requirement(req: dict, totals: dict) -> dict:
     metric = _METRIC.get(req["metric"])
-    if metric is None:
-        return {"requirement": req["requirement_key"], "status": "UNDETERMINED", "reason": f"unsupported metric {req['metric']}"}
+    if metric is None:                            # metric and goal always present (#72)
+        return {"requirement": req["requirement_key"], "metric": req["metric"],
+                "goal": f"{req['comparator']} {req['threshold']:g}", "value": bound(0, INF), "status": "UNDETERMINED",
+                "reason": f"unsupported metric {req['metric']}"}
     b = totals[metric]
     if "counted_types" in req and not req["counted_types"]:
         return {"requirement": req["requirement_key"], "metric": req["metric"],
@@ -296,8 +369,11 @@ def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope
                 counted = sorted({t for r in s for t in r["counted_types"]})
                 sub = scope_cls(patients=[mrn], start=ev_lo, end=ev_hi, service_types=counted,
                                 include_excluded=False, include_evidence=False)
-                encs = [e for e in select_encounters(conn, sub, log, include_excluded=False)
+                other = set(counted) - THERAPY_TYPES   # non-psychotherapy rows are eligible='no': select them too
+                encs = [e for e in select_encounters(conn, sub, log, include_excluded=bool(other))
                         if e["service_date"] in covered_set] if counted else []   # [] would mean "no type filter"
+                if other:
+                    encs = counting_rows(encs)
                 totals = aggregate(encs)
                 evals = []
                 for r in s:                       # each requirement is counted over its OWN service types (#6)

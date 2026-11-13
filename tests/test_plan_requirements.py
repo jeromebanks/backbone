@@ -118,9 +118,10 @@ def test_presence_not_required_is_a_lower_bound(tmp_path):
 
 
 def test_non_therapy_counted_types_are_a_lower_bound(tmp_path):
-    # eligibility (R5) only counts psychotherapy, so a goal over medication management cannot be shown NOT_MET
+    # reconciliation computes minutes for psychotherapy only, so a MINUTES goal over medication management cannot be
+    # shown NOT_MET (since #48, a sessions or days goal over it is counted exactly: tests/test_reconcile_followups.py)
     conn, _ = build(tmp_path, with_docs(
-        plan("PLAN", "sessions", 1, counted=["medication_management"]),
+        plan("PLAN", "patient_present_minutes", 15, counted=["medication_management"]),
         session("E1", "2026-02-02", "medication_management", "09:00", "09:20"),
     ))
     r = week(conn)["evaluations"][0]["requirements"][0]
