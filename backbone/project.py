@@ -437,7 +437,12 @@ def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope
 
 
 def plan_change_dates(reqs: list[dict], start: date, end: date) -> list[date]:
-    """Days in (start, end] on which the requirement set in effect differs from the previous day's."""
+    """Days in (start, end] on which the requirement set(s) in effect (R9, `requirement_sets_on`) are non-empty and
+    differ from the previous day's: a revision, a first plan taking effect after `start`, a plan resuming after a gap,
+    or a change in which conflicting alternatives apply. Sets are compared by requirement signature (`_req_sig`:
+    metric, comparator, threshold, counted types, period, patient presence), so an identical restatement is no change.
+    A transition to an empty set (a plan ending with nothing in its place) is NOT returned (#31), and `start` itself
+    is never returned. compare(split="plan_change") splits at the first returned day."""
     def sig(day):
         sets, _ = requirement_sets_on(reqs, day)
         return sorted(tuple(sorted(_req_sig(r) for r in s)) for s in sets)
