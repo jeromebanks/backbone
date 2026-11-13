@@ -21,7 +21,7 @@ import sys
 import time
 from datetime import datetime
 
-from .db import DEFAULT_DB, connect
+from .db import DEFAULT_DB, connect, connect_readonly
 
 
 def _log_run(conn, command: str, t0: float, details: dict):
@@ -62,7 +62,8 @@ def cmd_reconcile(args):
 
 
 def cmd_stats(args):
-    conn = connect(args.db)
+    from .ingest import grounding_fields
+    conn = connect_readonly(args.db)            # read-only: stats never writes the database (#45)
     out = {}
     for t in ["documents", "extractions", "claims", "patients", "encounters", "encounter_intervals",
               "plan_requirements", "assessments", "observations", "decisions", "conflicts"]:
@@ -70,6 +71,18 @@ def cmd_stats(args):
     out["unverified_claims"] = conn.execute("SELECT COUNT(*) FROM claims WHERE verified=0").fetchone()[0]
     out["quarantined_documents"] = {r[0]: r[1] for r in conn.execute(
         "SELECT status, COUNT(*) FROM quarantine GROUP BY status ORDER BY status")}
+    # Value grounding (#36), per value kind: stated in the claim's own quote, elsewhere in the document, or absent.
+    grounding: dict[str, dict[str, int]] = {}
+    for r in conn.execute("SELECT kind, payload, evidence FROM claims WHERE kind != 'document' ORDER BY claim_id"):
+        tail = (json.loads(r["evidence"]) or [{}])[-1]
+        if tail.get("match") != "grounding":
+            continue
+        kinds = {f: k for f, k, _, _ in grounding_fields(r["kind"], json.loads(r["payload"]))}
+        for f, g in tail["grounding"].items():
+            grounding.setdefault(kinds.get(f) or "other", {"quote": 0, "document": 0, "absent": 0})[g] += 1
+    out["grounding"] = dict(sorted(grounding.items()))
+    n, oldest = conn.execute("SELECT COUNT(*), MIN(marked_at) FROM pending_reconcile").fetchone()
+    out["pending_reconcile"] = {"patients": n, "oldest_marked_at": oldest}
     print(json.dumps(out, indent=2))
 
 
@@ -88,7 +101,11 @@ def cmd_answer(args):
 
 def cmd_verify(args):
     from .answer import verify_answers
+    from .answer import OUT_DIR
     rep = verify_answers(db_path=args.db, rewrite=args.rewrite)
+    if not rep:          # nothing checked is not "all verified": a wrong path or a wiped directory must fail (#46)
+        print(f"verify-answers: no saved answers with a plan found in {OUT_DIR}", file=sys.stderr)
+        sys.exit(1)
     for r in rep:
         print(f"{r['id']}: results identical={r['results_identical']} postcheck_ok={r['postcheck_ok']}"
               + ("" if r["postcheck_ok"] else f"  {r['postcheck']}"))
@@ -97,7 +114,6 @@ def cmd_verify(args):
 
 
 def cmd_plan(args):
-    from .db import connect_readonly
     from .query import QueryPlan, execute_plan
     from .summary import summarize
     raw = sys.stdin.read() if args.file == "-" else open(args.file).read()
@@ -117,7 +133,7 @@ def cmd_plan(args):
 
 def cmd_directory(args):
     from .answer import directory
-    print(directory(connect(args.db)))
+    print(directory(connect_readonly(args.db)))
 
 
 def cmd_schema(args):
@@ -128,7 +144,7 @@ def cmd_schema(args):
 def cmd_postcheck(args):
     from .answer import postcheck
     res = json.load(open(args.results))
-    pc = postcheck(connect(args.db), open(args.answer).read(), res)
+    pc = postcheck(connect_readonly(args.db), open(args.answer).read(), res)
     print(json.dumps(pc, indent=2))
     if not pc["ok"]:
         sys.exit(1)
@@ -136,7 +152,7 @@ def cmd_postcheck(args):
 
 def cmd_export(args):
     from .export import export_patient
-    conn = connect(args.db)
+    conn = connect_readonly(args.db)            # writes export files, never the database (#45)
     for p in export_patient(conn, args.patient):
         print(p)
 

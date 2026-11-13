@@ -144,6 +144,75 @@ def _slim(results: dict) -> dict:
 
 _NUM = re.compile(r"(?<![\w-])\d+(?:\.\d+)?(?![\w-])")
 
+# Calendar and clock notation: its digits name a date or a time, not a quantity. Stripped from the answer before its
+# numbers are checked, and from computed strings before their numbers are admitted (#44), so the two sides agree.
+_MONTHS = (r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|"
+           r"Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?(?![A-Za-z])")
+_CALENDAR = [
+    re.compile(r"(?<!\d)\d{4}-\d{1,2}-\d{1,2}(?:[T ]\d{1,2}:\d{2}(?::\d{2})?)?(?!\d)"),      # ISO date / datetime
+    re.compile(r"(?<![\d:])\d{1,2}:\d{2}(?::\d{2})?(?![\d:])"),                             # clock time
+    re.compile(r"(?<![\d/])\d{1,2}/\d{1,2}/\d{2,4}(?![\d/])"),                               # 1/7/2026
+    re.compile(rf"\b\d{{1,2}}(?:\s*[-–]\s*\d{{1,2}})?\s+{_MONTHS}(?:\s+\d{{4}})?(?!\d)"),    # 26 January 2026
+    # Jan 26–30, 2026 · Jan 8, 15 and 27 (a list of days; a number followed by a unit is not a day)
+    re.compile(rf"\b{_MONTHS}\s*\d{{1,2}}(?!\d)(?:\s*[-–]\s*\d{{1,2}}(?!\d))?"
+               rf"(?:(?:,\s*|,?\s+(?:and|&)\s+)\d{{1,2}}(?![\d.,])(?!\s*(?:min|hour|hr|h\b|session|day|week|wk|%)))*"
+               rf"(?:,?\s*\d{{4}})?"),
+    re.compile(rf"\b{_MONTHS}\s+\d{{4}}(?!\d)"),                                               # January 2026
+]
+# Identifiers inside computed strings: keys (MRN|ENC), claim ids, short shas and other hex, and labels or file names
+# such as BH-D103, HG-M042, PHQ-9 or note_88.txt. Their digits are never quantities.
+_IDENTIFIERS = [
+    # A year-less "1/7" is a date in a source quote, but in an answer it may be a ratio ("4/5 sessions"), so it is
+    # removed from computed strings only and stays checked in the answer.
+    re.compile(r"(?<![\d/])\d{1,2}/\d{1,2}(?![\d/])"),
+    re.compile(r"\S*\|\S*"),
+    re.compile(r"\b[0-9a-f]{12}:[a-z_]+:\d+\b"),
+    re.compile(r"\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{8,}\b"),
+    re.compile(r"\[[0-9a-f]{12}\]"),
+    re.compile(r"\b[A-Za-z][A-Za-z0-9]*(?:[-_.][A-Za-z0-9]+)*[-_.][A-Za-z]?\d[\w.-]*"),
+]
+_QUANTITY = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?!\w|\.\d)")
+# Fields whose values identify something (claims, documents, files, keys, rules, line numbers) rather than state a
+# quantity: nothing under them is admitted, whatever its type.
+_ID_FIELDS = {"claim_id", "claim_ids", "file", "sha256", "doc_sha", "requirement", "doc_id", "lines", "line_start",
+              "line_end", "mrn", "encounter_id", "form_id", "subject", "rule"}
+
+
+def _strip_calendar(s: str) -> str:
+    for rx in _CALENDAR:
+        s = rx.sub(" ", s)
+    return s
+
+
+def _known_numbers(results: dict) -> set[float]:
+    """The numbers the computed results state (#44): every JSON number, plus every free-standing number in a
+    human-readable string (calculations, reasons, notes, statements, evidence quotes), outside identifier fields and
+    after removing dates, clock times and identifiers. An unanchored digit scan over the whole envelope admitted the
+    digits of claim-ID hex, keys, file names and dates, so an invented small number usually passed."""
+    out: set[float] = set()
+
+    def walk(o, key):
+        if key in _ID_FIELDS or key.endswith(("_key", "_id", "_ids", "_sha")):
+            return
+        if isinstance(o, dict):
+            for k, v in o.items():
+                walk(v, str(k))
+        elif isinstance(o, list):
+            for v in o:
+                walk(v, key)
+        elif isinstance(o, bool) or o is None:
+            return
+        elif isinstance(o, (int, float)):
+            out.add(float(o))
+        elif isinstance(o, str):
+            s = _strip_calendar(o)
+            for rx in _IDENTIFIERS:
+                s = rx.sub(" ", s)
+            out.update(float(t) for t in _QUANTITY.findall(s))
+
+    walk(json.loads(_computed_blob(results)), "")
+    return out
+
 
 def _computed_blob(results: dict) -> str:
     """The results envelope minus everything that did not come from the abstraction: the question and plan echo
@@ -162,52 +231,78 @@ def _computed_blob(results: dict) -> str:
 
 def postcheck(conn, answer_md: str, results: dict) -> dict:
     blob = _computed_blob(results)
-    known = {float(x) for x in re.findall(r"\d+(?:\.\d+)?", blob)}
+    known = _known_numbers(results)
     text = re.sub(r"\b[A-Z]{2,}-[A-Z]?\d+\b", " ", answer_md)          # drop IDs like BH-D103, HG-E110
+    text = re.sub(r"\[[0-9a-f]{12}\]", " ", text)                       # short shas disambiguating a label (#59)
     text = re.sub(r"\bL\d+(?:[-–]\d+)?\b", " ", text)                    # drop line refs
-    text = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", " ", text)                  # ISO dates
-    text = re.sub(r"\b\d{1,2}:\d{2}\b", " ", text)                      # clock times (checked via quotes)
-    months = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?"
-    text = re.sub(rf"\b\d{{1,2}}(?:\s*[-–]\s*\d{{1,2}})?\s+{months}(?:\s+\d{{4}})?(?!\d)", " ", text)  # 26 January 2026
-    text = re.sub(rf"\b{months}\s+\d{{1,2}}(?!\d)(?:\s*[-–]\s*\d{{1,2}}(?!\d))?(?:,\s*\d{{4}})?", " ", text)  # Jan 26–30, 2026
+    text = _strip_calendar(text)                                          # dates and clock times (checked via quotes)
     unknown = sorted({n for n in _NUM.findall(text) if float(n) not in known}, key=float)
     # Citations: the pattern is built from the corpus's own document labels (any ID scheme or filename stem).
-    labels = sorted({r[0] for r in conn.execute("SELECT doc_label FROM documents")}, key=len, reverse=True)
-    label_re = re.compile(r"(?<![\w-])(" + "|".join(map(re.escape, labels)) + r")(?![\w-])") if labels else None
-    cited = sorted({m.group(1) for m in label_re.finditer(answer_md)}) if label_re else []
-    in_results = {m.group(1) for m in label_re.finditer(blob)} if label_re else set()
-    not_in_results = [c for c in cited if c not in in_results]
+    shas: dict[str, list[str]] = {}
+    for lab, sha in conn.execute("SELECT doc_label, sha256 FROM documents ORDER BY sha256"):
+        shas.setdefault(lab, []).append(sha)
+    labels = sorted(shas, key=len, reverse=True)
+    shared = {lab for lab, s in shas.items() if len(s) > 1}
+    # A label several documents carry is not an identity (#40): results then name each one "LABEL [sha12]", and a
+    # citation must do the same (#59). Group 1 is the label, group 2 the optional short sha.
+    label_re = re.compile(r"(?<![\w-])(" + "|".join(map(re.escape, labels)) + r")(?![\w-])(?:\s*\[([0-9a-f]{12})\])?"
+                          ) if labels else None
+
+    def ref(lab: str, sha: str | None) -> str:
+        return f"{lab} [{sha}]" if sha else lab
+
+    matches = list(label_re.finditer(answer_md)) if label_re else []
+    cited = {(m.group(1), m.group(2)) for m in matches}
+    # What the results name: label mentions in the computed output, and each evidence entry's (doc_id, doc_sha).
+    in_results = {(m.group(1), m.group(2)) for m in label_re.finditer(blob)} if label_re else set()
+    for r in results.get("results", []):
+        for ev in r.get("evidence", []):
+            in_results.add((ev["doc_id"], ev.get("doc_sha")))
+    result_labels = {lab for lab, _ in in_results}
+    ambiguous = sorted({lab for lab, sha in cited if lab in shared and not sha})
+    unknown_sha = sorted({ref(lab, sha) for lab, sha in cited
+                          if sha and not any(s.startswith(sha) for s in shas.get(lab, []))})
+    not_in_results = sorted({ref(lab, sha) for lab, sha in cited if ref(lab, sha) not in unknown_sha
+                             and not ((lab, sha) in in_results if sha else lab in result_labels)})
     # Things that look like document citations "(XYZ-123 L4)" but name no document in the corpus.
     known_ids = set(labels) | set(re.findall(r"[A-Z]{1,}-[A-Z]?\d+", blob))
-    bad_docs = sorted({m for m in re.findall(r"\(([A-Za-z][\w.-]*\d)\s+L\d+", answer_md) if m not in known_ids})
-    # Every line reference in a citation group must fall inside an evidence passage for that document.
-    spans: dict[str, list[tuple[int, int]]] = {}
+    bad_docs = sorted({m for m in re.findall(r"\(([A-Za-z][\w.-]*\d)\s+L\d+", answer_md) if m not in known_ids}
+                      | set(unknown_sha))
+    # Every line reference in a citation group must fall inside an evidence passage for that document. Spans are
+    # keyed by (label, short sha): passages of two same-label documents never back each other's lines (#59).
+    spans: dict[tuple[str, str | None], list[tuple[int, int]]] = {}
     for r in results.get("results", []):
         for ev in r.get("evidence", []):
             for p in ev["passages"]:
                 a, _, b = p["lines"].partition("-")
-                spans.setdefault(ev["doc_id"], []).append((int(a), int(b or a)))
+                spans.setdefault((ev["doc_id"], ev.get("doc_sha")), []).append((int(a), int(b or a)))
+
+    def spans_for(lab: str, sha: str | None) -> list[tuple[int, int]]:
+        if lab in shared:            # only the cited document's own passages; an undisambiguated citation has none
+            return spans.get((lab, sha), []) if sha else []
+        return [s for (d, _), v in spans.items() if d == lab for s in v]
+
     bad_lines = []
-    if label_re:
-        matches = list(label_re.finditer(answer_md))
-        for i, m in enumerate(matches):
-            seg_end = matches[i + 1].start() if i + 1 < len(matches) else len(answer_md)
-            seg = re.split(r"[);\]]", answer_md[m.end():seg_end], maxsplit=1)[0]
-            for a, b in re.findall(r"L(\d+)(?:\s*[-–]\s*L?(\d+))?", seg):
-                lo, hi = int(a), int(b or a)
-                if lo > hi:
-                    bad_lines.append((m.group(1), lo, f"L{lo}-{hi}"))
-                    continue
-                # Every line of a cited range must be inside some evidence passage for that document (passages
-                # may be adjacent; their union must cover the range). Documents with no passages in the results
-                # cannot back any line reference.
-                for ln in range(lo, hi + 1):
-                    if not any(x <= ln <= y for x, y in spans.get(m.group(1), [])):
-                        bad_lines.append((m.group(1), ln, f"L{ln}"))
+    for i, m in enumerate(matches):
+        seg_end = matches[i + 1].start() if i + 1 < len(matches) else len(answer_md)
+        seg = re.split(r"[);\]]", answer_md[m.end():seg_end], maxsplit=1)[0]
+        doc = ref(m.group(1), m.group(2))
+        for a, b in re.findall(r"L(\d+)(?:\s*[-–]\s*L?(\d+))?", seg):
+            lo, hi = int(a), int(b or a)
+            if lo > hi:
+                bad_lines.append((doc, lo, f"L{lo}-{hi}"))
+                continue
+            # Every line of a cited range must be inside some evidence passage for that document (passages
+            # may be adjacent; their union must cover the range). Documents with no passages in the results
+            # cannot back any line reference.
+            for ln in range(lo, hi + 1):
+                if not any(x <= ln <= y for x, y in spans_for(m.group(1), m.group(2))):
+                    bad_lines.append((doc, ln, f"L{ln}"))
     bad_lines = [f"{doc} {ref}" for doc, _, ref in sorted(set(bad_lines))]
     return {"numbers_not_in_results": unknown, "unknown_documents": bad_docs,
             "documents_not_in_results": not_in_results, "line_refs_outside_evidence": bad_lines,
-            "ok": not (unknown or bad_docs or not_in_results or bad_lines)}
+            "ambiguous_citations": ambiguous,
+            "ok": not (unknown or bad_docs or not_in_results or bad_lines or ambiguous)}
 
 
 def _narration_prompt(question: str, results: dict) -> str:
@@ -231,7 +326,11 @@ def answer_question(question: str, *, db_path=None, use_cache: bool = True, qid:
         t0 = time.monotonic()
         row = conn.execute("SELECT result_json FROM answer_cache WHERE cache_key=?", (key,)).fetchone()
         res = json.loads(row["result_json"]) if row else None
-        if res and (res.get("postcheck") or {}).get("ok"):   # an answer that failed its post-check is never served
+        # An answer that fails its post-check is never served. The check is re-run, not read from the row: a row
+        # written under an older, looser post-check (#44, #59) must not be served on the strength of its stored "ok".
+        if res and "results" in res:
+            res["postcheck"] = postcheck(conn, res["answer_markdown"], res["results"])
+        if res and (res.get("postcheck") or {}).get("ok"):
             res["cached"] = True
             res["timings_ms_original"] = res["timings_ms"]
             res["timings_ms"] = {"cache_lookup": round((time.monotonic() - t0) * 1000, 2)}
@@ -308,7 +407,10 @@ def render_markdown(res: dict) -> str:
     lines += ["## Post-check", "", f"- numbers in the answer not found in computed results: {pc['numbers_not_in_results'] or 'none'}",
               f"- cited documents not in the corpus: {pc['unknown_documents'] or 'none'}",
               f"- cited documents not in the computed results: {pc.get('documents_not_in_results') or 'none'}",
-              f"- line references outside the evidence passages: {pc['line_refs_outside_evidence'] or 'none'}", ""]
+              f"- line references outside the evidence passages: {pc['line_refs_outside_evidence'] or 'none'}"]
+    if pc.get("ambiguous_citations"):     # only printed when present, so existing saved Markdown is unchanged
+        lines.append(f"- cited labels shared by several documents, without [sha]: {pc['ambiguous_citations']}")
+    lines += [""]
     ev = {}
     for r in res["results"].get("results", []):
         for e in r.get("evidence", []):

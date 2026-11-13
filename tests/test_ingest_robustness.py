@@ -415,7 +415,9 @@ def test_session_time_not_in_its_own_quote_fails_verification():
     # #15/#36: the quote is exact, but the departure the arithmetic would use is not what it states.
     from backbone.ingest import build_claims
     from backbone.schema import DocumentInfo, Extraction, ServiceEvent
-    text = "Patient: Alex Doe | MRN ZZ-1\nGroup session 10:00-10:30, attended.\nNext group 10:00-11:30 on Friday.\n"
+    # The service date is in the header: a date absent from the whole document fails verification on its own (#52).
+    text = ("Patient: Alex Doe | MRN ZZ-1 | 2026-01-07\nGroup session 10:00-10:30, attended.\n"
+            "Next group 10:00-11:30 on Friday.\n")
     def ex(dep):
         return Extraction(
             document=DocumentInfo(document_id=None, title="t", signed=True, signed_at=None, received_at=None,

@@ -40,18 +40,29 @@ cli.py         argparse entry point (python -m backbone …)
 - **Claim ID**: `<sha256[:12]>:<kind>:<index>`. Kinds: `document`, `relation`, `service_event`, `assessment`,
   `observation`, `plan_requirement`.
 - **Encounter key**: `<MRN>|<ENCOUNTER_ID>`, or `<MRN>|U-<date>-<service_type>-<n>` for contacts without an ID.
-- **Patient**: keyed by normalised MRN (`ingest.attribute`). Without an MRN, the document must match exactly one
-  known patient by name (+ DOB when stated). Otherwise it is **quarantined**: its claims keep `patient_mrn` NULL,
+- **Patient**: keyed by normalised MRN (`ingest.attribute_document`). Without an extracted MRN, the document must
+  match exactly one known patient by name (+ DOB when stated). If the name matches no known patient (or there is no
+  name) and the text prints exactly one MRN, that MRN is used and the basis is recorded in `attribution_notes`
+  (`printed_mrn`, #55), unless it belongs to a known patient recorded under another name (`mrn_mismatch`). Otherwise it is **quarantined**: its claims keep `patient_mrn` NULL,
   it gets a `quarantine` row (`no_patient_identity`, `ambiguous_patient`, `multi_patient` or `mrn_mismatch`), and it
   takes part in no patient's reconciliation. Identity the **text** states outranks the extraction
   (`ingest.text_identity`, no LLM):
   - `multi_patient`: the text names more than one patient. That is more than one distinct `MRN`-labelled value, or an
     MRN table column (`MRN | …` header row) with several values, or a patient-name column (`Patient` / `Name` /
-    `Member` … header cell, exact match) with several names. The extraction holds one patient per document, so no
-    claim is attributed. A patient banner line (`Patient: X | DOB: … | MRN: …`) is not a table header.
+    `Member` … header cell, exact match) with several names. Tables may be pipe-, tab- or whitespace-aligned; an
+    aligned table counts only when every header cell is a known column heading, so an aligned key/value block is
+    not one (#54). Or a free-text attendee line (`Attendees:`, `Patients present:`, `Group members:` …) lists two or
+    more person names not annotated as staff or family (a credential such as `LCSW`, or a role such as `(partner)`).
+    `Participants:` and `Present:` lines are not read as patient lists: family and staff are listed there. The
+    extraction holds one patient per document, so no claim is attributed. A patient banner line
+    (`Patient: X | DOB: … | MRN: …`) is not a table header.
   - An explicit correction on one line (`MRN X corrected/changed/updated to Y`, `Corrected MRN Y (previously MRN
     X)`) counts as one patient, Y. The document is attributed to Y whichever of the two the extractor reported, and
-    the change is recorded in `identifier_changes`. Other documents still carrying X are **not** moved (no merge).
+    the change is recorded in `identifier_changes` (not for a `multi_patient` document). Every other document whose
+    MRN is X then resolves to Y as well (`ingest.resolve_identifier`, #53): chains X→Y→Z are followed; a fork
+    (X→Y and X→Z) or a cycle resolves nothing and quarantines the document as `ambiguous_patient` with the candidates.
+    A moved document gets an `attribution_notes` row (`identifier_change`, naming the stating document and line).
+    The recorded corrections depend only on documents' texts, so the result does not depend on ingest order.
   - `mrn_mismatch`: the extracted MRN is not the one the text prints (compared ignoring case and dashes), or no MRN
     is labelled and the extracted MRN does not appear as a whole token anywhere in the text, or a name-only match
     contradicts the printed MRN.
@@ -62,9 +73,17 @@ cli.py         argparse entry point (python -m backbone …)
   `affected_patients`. `reconcile_patients` then rebuilds that patient from its remaining claims. A patient left
   with no claims and no documents loses its derived rows and its `patients` row. After every ingest,
   `ingest.reattribute` re-runs attribution from the **stored** extraction (latest `extractions` row, never the LLM)
-  for quarantined documents and documents matched by name alone. A patient that arrives later can claim a
-  quarantined document. A second same-name patient makes a name-only match ambiguous and quarantines it. Only actual
-  changes are applied, and they are reported in `stats["reattributed"]`.
+  for quarantined documents, documents matched by name alone, and documents an MRN correction may move (owned by,
+  or extracted with, a corrected MRN, or moved by a correction before), including documents of the same batch. A
+  patient that arrives later can claim a quarantined document. A second same-name patient makes a name-only match
+  ambiguous and quarantines it. Passes repeat to a fixed point (a printed-MRN attribution can create a patient that a
+  name-only document then matches). Only actual changes are applied, and they are reported in
+  `stats["reattributed"]`; the old and new owners are marked pending, and an old owner left with nothing is removed.
+- **Read-only commands** (`directory`, `stats`, `postcheck`, `export`, `plan`, `verify-answers`) open the DB with
+  `db.connect_readonly`: no DDL runs, so the file stays byte-identical (#45). Tables or the week view missing from
+  an older DB are created as empty TEMP objects on that connection only. `stats` also reports value grounding per
+  kind (`grounding: {date|time|minutes|number: {quote, document, absent}}`) and `pending_reconcile`
+  (`patients`, `oldest_marked_at`) (#56).
 - **Pending reconciles** (`pending_reconcile`): every patient whose evidence changes is marked in the **same
   transaction** as the claims. Triggers on `patients` clear the mark when `reconcile.persist()` stamps `reconciled_at`
   or the patient row is deleted, and `cli` also clears it after a successful reconcile. A crash between ingest and

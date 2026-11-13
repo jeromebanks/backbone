@@ -1,6 +1,6 @@
 """SQLite persistence. Two layers:
 
-evidence layer   documents, extractions, claims, quarantine, identifier_changes (produced by ingest/extract)
+evidence layer   documents, extractions, claims, quarantine, identifier_changes, attribution_notes (ingest/extract)
 bookkeeping      pending_reconcile (patients whose evidence changed and are not yet reconciled)
 clinical layer   patients, encounters, encounter_intervals,  (derived; rebuilt per patient by reconcile.py)
                  plan_requirements, assessments, observations, decisions, conflicts
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS documents (
     ingested_at   TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_documents_patient ON documents(patient_mrn);
+CREATE INDEX IF NOT EXISTS ix_documents_label ON documents(doc_label);   -- shared-label lookups (#40, #57)
 
 CREATE TABLE IF NOT EXISTS extractions (
     sha256            TEXT NOT NULL REFERENCES documents(sha256),
@@ -71,8 +72,9 @@ CREATE TABLE IF NOT EXISTS quarantine (
     quarantined_at TEXT NOT NULL
 );
 
--- Explicit MRN corrections stated in a document's text ("MRN X corrected to Y"). Evidence, not a merge: the document
--- is attributed to the corrected MRN; other documents still carrying the old MRN are not moved.
+-- Explicit MRN corrections stated in a document's text ("MRN X corrected to Y"). The stating document is attributed to
+-- Y, and attribution resolves every other document carrying X to Y as well (chains followed; a fork or cycle resolves
+-- nothing and quarantines the document as ambiguous_patient) (#53). Not recorded for multi_patient documents.
 CREATE TABLE IF NOT EXISTS identifier_changes (
     sha256   TEXT NOT NULL REFERENCES documents(sha256),
     old_mrn  TEXT NOT NULL,
@@ -80,6 +82,16 @@ CREATE TABLE IF NOT EXISTS identifier_changes (
     quote    TEXT NOT NULL,
     line     INTEGER,
     PRIMARY KEY (sha256, old_mrn, new_mrn)
+);
+
+-- Why a document was attributed the way it was, when the basis is not simply the MRN the extraction reported
+-- (printed_mrn: the text's single printed MRN, the extraction had none (#55); identifier_change: another document's
+-- explicit MRN correction (#53)). Evidence-layer bookkeeping, rewritten whenever the document is (re-)attributed.
+CREATE TABLE IF NOT EXISTS attribution_notes (
+    sha256  TEXT PRIMARY KEY REFERENCES documents(sha256),
+    mrn     TEXT NOT NULL,
+    basis   TEXT NOT NULL,                    -- printed_mrn | identifier_change
+    reason  TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS patients (
@@ -190,6 +202,7 @@ CREATE TABLE IF NOT EXISTS decisions (
     ruleset_version TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_decisions_subject ON decisions(mrn, subject_key);
+CREATE INDEX IF NOT EXISTS ix_decisions_rule ON decisions(rule, mrn);      -- R0 rejection lookups (#39, #57)
 
 CREATE TABLE IF NOT EXISTS conflicts (
     conflict_id  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -234,8 +247,32 @@ def connect(path: Path | str | None = None) -> sqlite3.Connection:
     return conn
 
 
+_SCHEMA: list[tuple[str, str, str]] | None = None
+
+
+def _schema() -> list[tuple[str, str, str]]:
+    """(type, name, sql) of every table and view the DDL defines, read from an in-memory copy (computed once)."""
+    global _SCHEMA
+    if _SCHEMA is None:
+        mem = sqlite3.connect(":memory:")
+        mem.executescript(DDL)
+        _SCHEMA = [tuple(r) for r in mem.execute(
+            "SELECT type, name, sql FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'")]
+        mem.close()
+    return _SCHEMA
+
+
 def connect_readonly(path: Path | str | None = None) -> sqlite3.Connection:
+    """Open the database without writing to it: no DDL touches the file (#45), so read-only commands leave it
+    byte-identical. A database from an older version may lack newer tables or the week view; those are created as
+    empty TEMP objects on this connection only (in memory), so readers see the current schema."""
     path = Path(path or DEFAULT_DB)
+    if not path.exists():
+        raise FileNotFoundError(f"database not found: {path}")
     conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
+    have = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type IN ('table','view')")}
+    for typ, name, sql in _schema():
+        if name not in have:
+            conn.execute(sql.replace(f"CREATE {typ.upper()} ", f"CREATE TEMP {typ.upper()} ", 1))
     return conn

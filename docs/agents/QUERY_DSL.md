@@ -46,7 +46,8 @@ Rules for operators:
 - Same-label documents (#40): `doc_id` stays the label. When a label is carried by more than one document in the
   corpus, evidence entries and timeline document facts gain `doc_sha` (sha256[:12]), and label lists (`records`,
   `recorded_in`, `copies_not_counted`, `documents`) name the document `LABEL [sha12]`. Unique labels are
-  unchanged. The post-check does not use `doc_sha` yet.
+  unchanged. The post-check keys evidence by `(doc_id, doc_sha)` and requires such a document to be cited as
+  `LABEL [sha12]` (#59).
 
 ## Adding an operator
 
@@ -68,16 +69,25 @@ Rules for operators:
 - `postcheck` checks these things against the results **minus the echoed `question`, `plan`, each step's
   `params` and SQL text**, so a number or document the asker typed cannot back itself. A parameter value counts only
   where the operator also states it in its computed output:
-  - Every number in the narrative (excluding IDs, line refs, ISO dates, clock times and month-name dates) must
-    appear in the results (totals, groups, facts, calculations, exclusions, decisions, evidence quotes, notes).
-  - Cited labels are matched against **the corpus's own document labels**. A cited document that does not appear
-    in the results (`documents_not_in_results`) fails the check.
+  - Every number in the narrative (excluding IDs, line refs, short shas, and calendar notation: ISO dates and
+    datetimes, clock times, `1/7`, month-name dates including day lists such as `Jan 8, 15 and 27`, `January 2026`)
+    must be a number the results **state** (`_known_numbers`, #44): any JSON number, or a free-standing number in a
+    human-readable string (calculations, reasons, notes, statements, evidence quotes). Identifier fields (`claim_id`,
+    `doc_id`, `file`, `lines`, `rule`, `requirement`, `*_key`, `*_id`, `*_sha` …) contribute nothing, and inside
+    strings the same calendar notation plus keys (`MRN|…`), claim IDs, hex and label-like tokens (`BH-D103`,
+    `PHQ-9`, `note_88.txt`) are removed first. Before #44 an unanchored digit scan admitted the digits of hex, keys
+    and dates (on DEV-01, 71 of the integers 0–200; now 20).
+  - Cited labels are matched against **the corpus's own document labels**, optionally followed by `[sha12]`. A
+    cited document that does not appear in the results (`documents_not_in_results`) fails the check, as does a
+    `[sha12]` that no document with that label has (`unknown_documents`), and a label several documents share cited
+    without `[sha12]` (`ambiguous_citations`, #59).
   - Every line of every `L<a>` or `L<a>–<b>` in a citation group must fall inside an evidence passage for that
-    document. Adjacent passages may together cover a range; a reversed range fails.
+    document. Adjacent passages may together cover a range; a reversed range fails. Passages are keyed by
+    `(doc_id, doc_sha)`, so two same-label documents never back each other's lines (#59).
 - The post-check is a gate in `answer_question`. A failing narration is regenerated once, on the same results, with
   the failures and the previous answer in the prompt. If it still fails, the answer is returned with
-  `postcheck.ok = false`, a warning banner in its Markdown, and is **not** cached. A cached answer that failed its
-  post-check is treated as a miss. `postcheck_attempts` and `postcheck_first_attempt` record what happened.
+  `postcheck.ok = false`, a warning banner in its Markdown, and is **not** cached. On a cache hit the post-check is
+  **re-run** (not read from the row), so an answer cached under an older, looser check is a miss if it now fails. `postcheck_attempts` and `postcheck_first_attempt` record what happened.
 - Cache key: `sha256(question + fingerprint)`. The fingerprint hashes the extractor, ruleset, query and prompt
   versions plus the abstraction's content: documents (minus text and timestamps), committed extraction identities
   (sha256, extractor version, model), claims, and every derived clinical table, excluding rowids and timestamps.
@@ -88,7 +98,7 @@ Rules for operators:
   added there.
 - `verify_answers()` / `python -m backbone verify-answers` re-executes every saved plan, requires identical results
   JSON, and re-runs the post-check. It is read-only (read-only DB connection, no files written) and exits 1 if any
-  result differs or any post-check fails. `--rewrite` (`rewrite=True`) refreshes each saved answer's post-check
+  result differs or any post-check fails, or when it finds no saved answer with a plan (#46). `--rewrite` (`rewrite=True`) refreshes each saved answer's post-check
   field and Markdown.
 - Output file names come from question IDs (`answer_file`) and MRNs (`export`). `backbone/paths.safe_output_path`
   accepts only `[A-Za-z0-9][A-Za-z0-9._-]*` without `..`, and requires the resolved path to stay inside the output

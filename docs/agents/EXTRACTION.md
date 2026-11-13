@@ -36,7 +36,7 @@ typos are forgiven but a changed number is not. Spans go into `claims.evidence` 
 own and every quote was found. A blank quote is a `missing` span, not something to skip. A service event's
 nontherapeutic-interval quotes are verified too, but they cannot stand in for the event's own `quotes`. The document
 claim carries no quotes and is exempt. Unverified claims are dropped by R0. In this corpus 254 claims
-were extracted, with 0 fuzzy matches and 0 unverified.
+were extracted, with 0 fuzzy matches and 0 unverified quotes (1 claim is unverified for an absent date; see below).
 
 ## Value grounding (`evidence.ground_values`, `ingest.grounding_fields`) — a flag, not a filter (#36)
 
@@ -47,14 +47,18 @@ normalising (`9:00` = `09:00` = `9:00 am`, en dashes, `50 min` = `50 minutes`, `
 `2026-01-07`, number words). A nontherapeutic interval may be grounded by its own quote. The result is the **last**
 `claims.evidence` entry: `{"quote": null, "line_start": null, "line_end": null, "match": "grounding",
 "grounding": {field: "quote" | "document" | "absent"}}` (`document` = stated elsewhere in the text, e.g. a header
-date). It has no line span, so operators and exports never cite it. It does **not** change `verified`.
+date). It has no line span, so operators and exports never cite it. It changes `verified` in two cases only: a
+service event whose clock times or stated minutes are not in its own quotes (#15/#36), and any claim with a **date
+that is `absent` from the whole document** (#52: an inferred date must not become dated evidence, and observations
+have no undated form). The latter is named on the entry as `"unverified_absent": [field, …]`, and R0 drops the claim.
 
 Why a flag: measured on the corpus (223 non-document claims), 165 have a value not in their own quote, almost all
 dates taken from the header (165 `document`). Times: 116 `quote`, 1 `document`; stated minutes: 11/11 `quote`;
 scores/thresholds: 4 `quote`, 2 `document`. Only **one** value is `absent` from the whole document (BH-D015, an
 observation dated the day before the note, inferred from "a poor night of sleep"). Dropping on ungrounded values would
-have removed real evidence and moved golden results. Making `absent` (or an ungrounded time/minute) R0-fatal is a
-possible later tightening.
+have removed real evidence and moved golden results. An `absent` date is now R0-fatal (#52); on the corpus this
+rejects exactly that BH-D015 observation (one `observations` row fewer, one R0 decision more; golden values
+unchanged). `python -m backbone stats` reports these counts per kind.
 
 ## Cache
 
