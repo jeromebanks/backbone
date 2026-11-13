@@ -156,6 +156,40 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
       - **Why:** computing them would change the corpus's non-therapy encounter rows.
       - **Later:** compute them, with a ruleset bump.
 
+30. **An R0 reason names its cause from the evidence spans, never the unverified value (#76).** A session time or
+    minute total missing from the claim's own quotes is named by field, with "only elsewhere in the document" or
+    "nowhere in the document" from the grounding entry's per-field status.
+    - **Why:** the quote was found, so "quote not found" was false. The value is left out for #68's reason: R0
+      reasons reach results, and a number there can back an answer in the post-check.
+    - **Rejected:** recording the failing fields on the grounding entry in ingest. The per-field status is already
+      there, and reading it also gives the right reason for claims persisted before this change, without re-ingest.
+31. **R1 matches on every account of an encounter's times, corrected ones included (#77).** It is the union of the
+    original times and those the time corrections give, as #61 does for service types.
+    - **Why:** matching only the uncorrected times missed a record of the corrected session. Dropping the superseded
+      times instead would make a resend of the uncorrected record a second session.
+    - Every correction of the encounter is used, not only applied ones (as #61): R1 runs before tiers are known. It
+      can only widen a match.
+32. **A record that may be one of several contacts never becomes a definite session (#78).**
+    - Overlapping several psychotherapy contacts of other types: it joins each as an account with the type disputed
+      (#74's alternatives), so every reading ("it is A", "it is B") is within the bounds, per-type goals too.
+    - Several same-type candidates: it stays its own `U-` contact, but `uncertain`, because without times it may be a
+      further session.
+    - **Rejected:** a single `uncertain` `U-` contact for the overlap case. A and B would stay definite of their own
+      types, so a goal over A's type would not see the reading in which A is the record's type. It also allows a third
+      session that the overlap rules out.
+    - **Trade-off:** as in decision 21, both contacts become `uncertain`, so the low bound of a range holding them is
+      lower than the truth.
+33. **Assessment scores and instruments are reconciled, not taken from the first record (#80).** Silence is not
+    disagreement. Different primary scores give no definite score (NULL) plus a conflict with every value. A copy is
+    named, not weighed. One form ID under two instruments is an instrument dispute.
+    - **Rejected:** `[low, high]` score columns. They need a schema migration and a projection change, and no
+      operator does arithmetic on scores.
+    - **Held back:** keeping each distinct statement of one observation quote. It changes two corpus observation rows
+      (BH-D101 and BH-D104, 2026-01-19), where one sentence carries a clinician observation and a patient report and
+      the patient report is dropped today. It awaits sign-off.
+34. **Modality is reconciled like the other encounter fields (#81).** The first tier that states one decides it;
+    disagreement in that tier is `disputed` plus a conflict.
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K

@@ -5,7 +5,9 @@ to `decisions` (rule id, outcome, reason, claim ids) and every unresolved disagr
 reviewer can see why a session counted or not and which records contributed.
 
 Rules (RULESET_VERSION in __init__):
-  R0  claims whose quotes cannot be located in the source text are excluded.
+  R0  claims ingest could not verify are excluded: no quote of their own, a quote not located in the source text
+      (a near match must keep its numbers and identifiers), a session time or minute total not stated in the
+      claim's own quotes, or a date stated nowhere in the document. The reason names the cause.
   R1  encounter identity: group by encounter ID; otherwise match on same date + service type (and overlapping
       times if both known, arrival–departure included; corrected service types included); a psychotherapy record
       overlapping in time a psychotherapy contact of another type joins it with the type disputed; otherwise keep
@@ -114,27 +116,72 @@ def _classify(c: Claim) -> None:
         c.tier = 2
 
 
-def _group_events(events: list[Claim], res: Result, corrections: dict[str, list[Claim]]) -> dict[str, list[Claim]]:
+def _group_events(events: list[Claim], res: Result, corrections: dict[str, list[Claim]],
+                  ambiguous: dict[str, list[str]] | None = None) -> dict[str, list[Claim]]:
+    """R1 encounter identity. `ambiguous` (filled in when given) maps an unidentified contact that may be one of
+    several candidate encounters to those candidates (#78)."""
+    ambiguous = {} if ambiguous is None else ambiguous
     groups: dict[str, list[Claim]] = defaultdict(list)
     meta: dict[str, tuple[set, list, list]] = {}  # key -> ({(date, type)}, stated times, actual times)
     corrected: dict[str, set] = defaultdict(set)  # key -> (date, type) pairs reached only through a correction
     mrn = res.mrn
+    # key -> time corrections (old, new, claim, field) of the encounter, in comparable form (#77)
+    time_edges: dict[str, list[tuple]] = defaultdict(list)
+    for key, rs in corrections.items():
+        for r in sorted(rs, key=lambda r: r.claim_id):
+            fname = r.payload.get("field")
+            if fname in ("arrival", "departure", "contact_interval"):
+                old, new = _corr_value(fname, r.payload.get("old_value")), _corr_value(fname, r.payload.get("new_value"))
+                if old is not None and new is not None and old != new:
+                    time_edges[key].append((old, new, r, fname))
 
-    def ivs(c: Claim):
-        """Every time the record states for the contact: contact intervals, schedule, and actual arrival–departure
-        when both ends are known (#11: two ID-less sessions known only by arrival/departure must not merge)."""
+    def accounts(c: Claim, key: str | None) -> list[dict]:
+        """The record's time accounts (#77): its own times, plus each combination of the values that corrections of
+        the encounter turn them into (as R3 would; the correcting document's own record excepted). An uncorrected
+        field keeps its value; a corrected one is never crossed with its original, so no account mixes the two."""
         p = c.payload
-        out = [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
-        if p.get("scheduled"):
-            out.append((to_min(p["scheduled"]["start"]), to_min(p["scheduled"]["end"])))
-        out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
+        mine = [e for e in time_edges.get(key, ()) if e[2].sha256 != c.sha256]
+        if not mine:
+            return [p]
+        per = []
+        for fname in ("arrival", "departure", "contact_interval"):
+            f = FIELD_MAP[fname]
+            vals = (p.get(f) or []) if fname == "contact_interval" else [p.get(f)]
+            fe = [e for e in mine if e[3] == fname]
+            opts = []
+            for v in vals:
+                k0 = _corr_value(fname, v)
+                found = _resolve(k0, [e[:3] for e in fe]) if k0 is not None and fe else {}
+                opts.append([_corr_display(fname, t) for t in sorted(found, key=str)] if found and found != {k0: []}
+                            else [v])
+            per.append((f, fname, [list(x) for x in itertools.product(*opts)]))
+        out = [p]
+        for combo in itertools.product(*(alts for _, _, alts in per)):
+            q = dict(p)
+            for (f, fname, _), vals in zip(per, combo):
+                q[f] = vals if fname == "contact_interval" else vals[0]
+            if q != p:
+                out.append(q)
+        return out
+
+    def ivs(c: Claim, key: str | None = None):
+        """Every time the record states for the contact: contact intervals, schedule, and actual arrival–departure
+        when both ends are known (#11: two ID-less sessions known only by arrival/departure must not merge), over
+        every account of its times (#77)."""
+        out = []
+        for p in accounts(c, key):
+            out += [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
+            if p.get("scheduled"):
+                out.append((to_min(p["scheduled"]["start"]), to_min(p["scheduled"]["end"])))
+            out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
         return normalize(out)
 
-    def actual(c: Claim):
+    def actual(c: Claim, key: str | None = None):
         """Times the patient was actually in contact: contact intervals and arrival–departure (not the schedule)."""
-        p = c.payload
-        out = [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
-        out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
+        out = []
+        for p in accounts(c, key):
+            out += [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
+            out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
         return normalize(out)
 
     def type_edges(key: str) -> list[tuple]:
@@ -167,8 +214,8 @@ def _group_events(events: list[Claim], res: Result, corrections: dict[str, list[
                 for t2 in _resolve(k0, mine):
                     if (d, t2) not in pairs:
                         corrected[key].add((d, t2))
-            iv = normalize(iv + ivs(c))                       # times of every record of the encounter
-            act = normalize(act + actual(c))
+            iv = normalize(iv + ivs(c, key))                  # times of every record of the encounter, every
+            act = normalize(act + actual(c, key))             # account of them (corrected ones too, #77)
         corrected[key] -= pairs
         meta[key] = (pairs | corrected[key], iv, act)
     for c in sorted(unided, key=lambda c: c.claim_id):
@@ -184,27 +231,38 @@ def _group_events(events: list[Claim], res: Result, corrections: dict[str, list[
             cands = [k for k, (mp, _, mact) in meta.items()
                      if mact and overlaps(act, mact) and any(md == d and mt in THERAPY_TYPES for md, mt in mp)]
             disputed = True
-        if len(cands) == 1:
-            groups[cands[0]].append(c)
-            mp, miv, mact = meta[cands[0]]
-            if disputed:
+        if len(cands) == 1 or (disputed and cands):
+            # #78: overlapping SEVERAL contacts of other types, the record is one of them, never a further session
+            # (the patient cannot attend two at once), and the record does not say which. So it joins each of them
+            # as an account with its type disputed: every reading (it is A, or it is B) is within the bounds.
+            for k in sorted(cands):
+                groups[k].append(c)
+                mp, miv, mact = meta[k]
                 others = sorted({mt for md, mt in mp if md == d})
-            meta[cands[0]] = (mp | {(d, t)}, normalize(miv + iv), normalize(mact + act))
-            via = " (the service type a correction gives the encounter)" if (d, t) in corrected[cands[0]] else ""
-            res.decide(cands[0], "R1", "matched_without_id",
-                       f"{c.doc_label} names no encounter ID; matched on date {d} + service type {t}{via}"
-                       if not disputed else
-                       f"{c.doc_label} names no encounter ID; matched on date {d} + overlapping contact times "
-                       f"{fmt_set(act)}: "
-                       f"it states {t} where the contact's records state {others}, so the service type is disputed",
-                       [c.claim_id])
+                meta[k] = (mp | {(d, t)}, normalize(miv + ivs(c, k)), normalize(mact + actual(c, k)))
+                via = " (the service type a correction gives the encounter)" if (d, t) in corrected[k] else ""
+                alsos = [x for x in sorted(cands) if x != k]
+                res.decide(k, "R1", "matched_without_id",
+                           f"{c.doc_label} names no encounter ID; matched on date {d} + service type {t}{via}"
+                           if not disputed else
+                           f"{c.doc_label} names no encounter ID; matched on date {d} + overlapping contact times "
+                           f"{fmt_set(act)}: "
+                           f"it states {t} where the contact's records state {others}, so the service type is disputed"
+                           + (f"; it also overlaps {', '.join(alsos)} and may be that contact instead, so it is an "
+                              "account of each" if alsos else ""),
+                           [c.claim_id])
             continue
         n = sum(1 for k in meta if k.startswith(f"{mrn}|U-{d}-{t}")) + 1
         key = f"{mrn}|U-{d}-{t}-{n}"
         groups[key].append(c)
         meta[key] = ({(d, t)}, iv, act)
+        if cands:
+            # Several same-type candidates (#78): it may be one of them, or (without overlapping times) a further
+            # contact. It is kept as its own contact that counts within bounds only, never as a definite session.
+            ambiguous[key] = sorted(cands)
         why = "ambiguous: several candidates" if cands else "no matching encounter"
-        res.decide(key, "R1", "unidentified_contact", f"{c.doc_label}: {why} ({d}, {t}); kept as a separate contact",
+        res.decide(key, "R1", "unidentified_contact", f"{c.doc_label}: {why} ({d}, {t}); kept as a separate contact"
+                   + (f" that may be {' or '.join(sorted(cands))}, so it counts within bounds only" if cands else ""),
                    [c.claim_id])
     return groups
 
@@ -448,7 +506,7 @@ def _vote(values: list[str]) -> tuple[str, bool]:
 
 
 def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim], retransmitted: dict[str, list],
-                         res: Result) -> tuple[dict, list[dict]]:
+                         res: Result, ambiguous_with: list[str] = ()) -> tuple[dict, list[dict]]:
     flags: list[str] = []
     group_eid = key.split("|", 1)[1]           # R1 already placed ID-less records: E1, or their own U- contact
     for c in group:
@@ -488,8 +546,20 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
                 {"value": x, "claim_ids": [c.claim_id for c in pool if any(
                     (v["service_type"] if fld == "service_type" else c.payload[fld]) == x for v in _variants(c))]}
                 for x in counts]})
-    modality = next((c.payload["modality"] for c in t1 if c.payload.get("modality") not in (None, "unknown")),
-                    next((c.payload["modality"] for c in usable if c.payload.get("modality") not in (None, "unknown")), "unknown"))
+    # modality (#81): the first tier that states one decides it ("unknown" is silence, not an account); records of
+    # that tier that disagree give 'disputed' and a conflict, never the first record's value.
+    modality = "unknown"
+    for tier in (t1, t2):
+        mods = sorted({c.payload["modality"] for c in tier if c.payload.get("modality") not in (None, "unknown")})
+        if len(mods) == 1:
+            modality = mods[0]
+        elif mods:
+            modality = "disputed"
+            flags.append(f"modality disagreement: {mods}")
+            res.conflicts.append({"subject_key": key, "field": "modality", "resolution": "disputed", "candidates": [
+                {"value": m, "claim_ids": [c.claim_id for c in tier if c.payload.get("modality") == m]} for m in mods]})
+        if mods:
+            break
     eid = _norm_id(next((c.payload.get("encounter_id") for c in group if c.payload.get("encounter_id")), None))
 
     # attendance (R4/R5)
@@ -545,6 +615,10 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         eligible = "yes"
     else:
         eligible, reason = "uncertain", f"attendance {attended}, presence {present}"
+    if ambiguous_with and eligible == "yes":
+        # #78: R1 could not tell which of several encounters this contact is, or whether it is a further one
+        eligible, reason = "uncertain", (f"it may be the same contact as {' or '.join(ambiguous_with)} (R1: several "
+                                         "candidates); counted only within bounds")
     alternatives: list[tuple[str, str]] = []
     if is_therapy and eligible != "no" and len(accounts) > 1:
         disputed = " and ".join(f for f, n in (("service type", len(types)), ("service date", len(dates))) if n > 1)
@@ -751,6 +825,7 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         "minutes_low": m_low, "minutes_high": m_high, "minutes_status": status, "calculation": calc,
         "claim_ids": sorted(ids + _cited_corrections(group, applied)), "flags": flags, "ruleset_version": RULESET_VERSION,
         "_present_sets": [list(iv) for iv in cands] if eligible != "no" else [],
+        "_present_src": [{x.claim_id for x in cs} for cs in cands.values()] if eligible != "no" else [],
         "_superseded": [], "_identity": key, "_alternatives": alternatives,
     }
     # remember pre-correction presence for the overlap rationale
@@ -807,9 +882,10 @@ def _overlap_checks(encs: list[dict], res: Result) -> None:
             for b in es[i + 1:]:
                 if a["_identity"] == b["_identity"]:      # alternative rows of one encounter (#12), not two contacts
                     continue
-                for sa in a["_present_sets"]:
-                    for sb in b["_present_sets"]:
-                        if overlaps(sa, sb):
+                for sa, ca in zip(a["_present_sets"], a.get("_present_src") or itertools.repeat(set())):
+                    for sb, cb in zip(b["_present_sets"], b.get("_present_src") or itertools.repeat(set())):
+                        # one record that R1 made an account of both encounters (#78) is not two contacts at once
+                        if overlaps(sa, sb) and not (ca & cb):
                             msg = f"patient-present intervals overlap: {a['encounter_key']} {fmt_set(sa)} vs {b['encounter_key']} {fmt_set(sb)}"
                             a["flags"].append(msg); b["flags"].append(msg)
                             res.decide(a["encounter_key"], "R7", "overlap", msg, [])
@@ -929,23 +1005,59 @@ def _assessments(acl: list[Claim], copy_docs: dict[str, list], res: Result) -> N
             copies = [c for c in bcs if c.payload.get("is_copy_of_earlier") or _covered(
                 copy_docs.get(c.sha256, ()), _norm_id(c.payload.get("form_id")), c.payload.get("completed_date"))]
             prim = [c for c in bcs if c not in copies] or copies
-            scores = {c.payload.get("total_score") for c in bcs}
+            # #80: the score is reconciled over the primary records, not taken from the first one. A record that
+            # states no total is silent. One stated value is the score; different values are a dispute with no
+            # definite score (the conflict carries every value). A copy carries no weight of its own (R3), so a copy
+            # that differs is named in the R8 decision instead of changing the score.
+            scores = sorted({c.payload.get("total_score") for c in prim} - {None})
             key = f"{res.mrn}|{inst}|{d}|{form or '-'}"
             status = "disputed" if len(scores) > 1 else "distinct"
             items = sorted({i for c in bcs for i in c.payload.get("item_scores") or []})
             res.assessments.append({
-                "assessment_key": key, "mrn": res.mrn, "instrument": prim[0].payload["instrument"],
-                "total_score": prim[0].payload.get("total_score"), "item_scores": items, "completed_date": d,
+                "assessment_key": key, "mrn": res.mrn,
+                # the group key is the normalised name, so records differ at most in spelling: one, independent of order
+                "instrument": sorted({c.payload["instrument"] for c in prim})[0],
+                "total_score": scores[0] if len(scores) == 1 else None, "item_scores": items, "completed_date": d,
                 "form_id": form, "status": status, "claim_ids": sorted(c.claim_id for c in prim),
                 "copy_claim_ids": sorted(c.claim_id for c in copies if c not in prim)})
             if copies and prim is not copies:
+                differ = sorted({c.payload.get("total_score") for c in copies} - {None} - set(scores))
                 res.decide(key, "R8", "copy_not_distinct",
                            f"{', '.join(sorted({c.doc_label for c in copies}))} restate(s) the {inst} completed {d}"
                            + (f" (form {form})" if form else "") + f" recorded in {', '.join(sorted({c.doc_label for c in prim}))}; "
-                           "not counted as a separate assessment", [c.claim_id for c in bcs])
+                           "not counted as a separate assessment"
+                           + (f"; the copy states total score {', '.join(f'{s:g}' for s in differ)}, which does not "
+                              "change the primary record's score" if differ else ""), [c.claim_id for c in bcs])
             if status == "disputed":
                 res.conflicts.append({"subject_key": key, "field": "total_score", "resolution": "disputed",
-                                      "candidates": [{"value": s, "claim_ids": [c.claim_id for c in bcs if c.payload.get('total_score') == s]} for s in scores]})
+                                      "candidates": [{"value": s, "claim_ids": sorted(
+                                          c.claim_id for c in prim if c.payload.get("total_score") == s)}
+                                          for s in scores]})
+                res.decide(key, "R8", "score_disputed",
+                           f"records of the {inst} completed {d}" + (f" (form {form})" if form else "")
+                           + f" state different total scores ({' vs '.join(f'{s:g}' for s in scores)}) and none "
+                           "corrects or copies another; no score is picked", [c.claim_id for c in prim])
+    # #80: one form ID under two instruments is one form whose instrument the record disputes. Each instrument's
+    # row is kept, marked disputed, with an instrument conflict (two instruments on one day without a shared form
+    # ID are ordinary practice and stay distinct).
+    by_form: dict[str, list[dict]] = defaultdict(list)
+    for a in res.assessments:
+        if a["form_id"]:
+            by_form[_norm_id(a["form_id"])].append(a)
+    for form, rows in sorted(by_form.items()):
+        insts = sorted({a["assessment_key"].split("|")[1] for a in rows})
+        if len(insts) < 2:
+            continue
+        cands = [{"value": sorted({r["instrument"] for r in rows if r["assessment_key"].split("|")[1] == i})[0],
+                  "claim_ids": sorted(x for r in rows if r["assessment_key"].split("|")[1] == i for x in r["claim_ids"])}
+                 for i in insts]
+        for a in sorted(rows, key=lambda r: r["assessment_key"]):
+            a["status"] = "disputed"
+            res.conflicts.append({"subject_key": a["assessment_key"], "field": "instrument", "resolution": "disputed",
+                                  "candidates": cands})
+            res.decide(a["assessment_key"], "R8", "instrument_disputed",
+                       f"form {form} is recorded as {' and as '.join(c['value'] for c in cands)}; each reading is "
+                       "kept, neither is picked", [x for c in cands for x in c["claim_ids"]])
 
 
 def _observations(ocl: list[Claim], res: Result) -> None:
@@ -954,28 +1066,67 @@ def _observations(ocl: list[Claim], res: Result) -> None:
         q = " ".join((c.payload.get("quote") or "").lower().split())
         groups[(c.payload["date"], c.payload["domain"], c.doc_label, q)].append(c)
     for (d, dom, label, q), cs in sorted(groups.items()):
-        c0 = cs[0]
-        key = f"{res.mrn}|obs|" + hashlib.sha1(f"{d}{dom}{label}{q}".encode()).hexdigest()[:12]
-        res.observations.append({"observation_key": key, "mrn": res.mrn, "obs_date": d, "domain": dom,
-                                 "source": c0.payload["source"], "statement": c0.payload["statement"],
-                                 "claim_ids": sorted(c.claim_id for c in cs)})
+        # #80: one quote can carry several statements (a clinician observation and a patient report in one
+        # sentence). Each distinct (source, statement) is kept, never the first record's alone; an identical
+        # restatement is still one row. The key stays the quote's when it carries one statement.
+        accts: dict[tuple, list[Claim]] = defaultdict(list)
+        for c in cs:
+            accts[(c.payload["source"], " ".join(c.payload["statement"].split()))].append(c)
+        for (src, st), acs in sorted(accts.items()):
+            extra = "" if len(accts) == 1 else f"{src}{st.lower()}"
+            key = f"{res.mrn}|obs|" + hashlib.sha1(f"{d}{dom}{label}{q}{extra}".encode()).hexdigest()[:12]
+            res.observations.append({"observation_key": key, "mrn": res.mrn, "obs_date": d, "domain": dom,
+                                     "source": src, "statement": sorted({c.payload["statement"] for c in acs})[0],
+                                     "claim_ids": sorted(c.claim_id for c in acs)})
 
 
 # --------------------------------------------------------------------------------------------- entry points
 
+def _field_label(path: str) -> str:
+    """A grounding field path in words: `patient_contact_intervals[0].start` -> "contact interval 1 start"."""
+    m = re.fullmatch(r"(\w+)\[(\d+)\]\.(\w+)", path)
+    if m:
+        what = {"patient_contact_intervals": "contact interval",
+                "nontherapeutic_intervals": "non-therapeutic interval"}.get(m.group(1), m.group(1).replace("_", " "))
+        return f"{what} {int(m.group(2)) + 1} {m.group(3)}"
+    return {"patient_arrival": "arrival", "patient_departure": "departure", "stated_minutes": "minute total",
+            "scheduled.start": "scheduled start", "scheduled.end": "scheduled end"}.get(path, path.replace("_", " "))
+
+
+def _and(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
 def _rejection_reason(c: Claim) -> str:
-    """Why ingest left a claim unverified, from its evidence (#68). A date that is stated nowhere in the document
-    (#52) is named as such: its quote WAS found, so "quote not found" would be false. A located quote failure keeps
-    the generic text. The inferred value itself is not repeated: it must not reach results as if it were a date
-    of the record."""
-    grounding = next((s for s in reversed(c.evidence or []) if s.get("match") == "grounding"), {})
-    absent = grounding.get("unverified_absent") or []
+    """Why ingest left a claim unverified, read from its evidence spans (#68, #76). Every cause found is named:
+    - no non-blank quote of its own (#14), or a blank quote beside others;
+    - a quote not located in the text, which includes a near match whose numbers or identifiers differ (#15);
+    - a date stated nowhere in the document (#52, the grounding entry's `unverified_absent`);
+    - a service event's clock time or minute total not stated in its own quotes (#36), read from the grounding
+      entry's per-field status: stated elsewhere in the document, or nowhere. The service date is not one of them
+      (a header-only date is a flag, not a rejection).
+    The unverified value itself is never repeated: it must not reach results as if the record stated it."""
+    spans = c.evidence or []
+    grounding = next((s for s in reversed(spans) if s.get("match") == "grounding"), {})
+    p = c.payload or {}
+    own = [q for q in (p.get("quotes") if c.kind == "service_event" else [p.get("quote")]) or [] if (q or "").strip()]
     why = []
-    if any(s.get("match") == "missing" for s in c.evidence or []) or not absent:
+    if not own:
+        why.append("it has no quote of its own")
+    elif any(s.get("match") == "missing" and not (s.get("quote") or "").strip() for s in spans):
+        why.append("one of its quotes is blank")
+    if any(s.get("match") == "missing" and (s.get("quote") or "").strip() for s in spans):
         why.append("quote not found in source text")
     why += [f"the {f.replace('_', ' ')} is not stated anywhere in the document (the extracted value was inferred)"
-            for f in absent]
-    return "; ".join(why)
+            for f in grounding.get("unverified_absent") or []]
+    if c.kind == "service_event":
+        status = grounding.get("grounding") or {}
+        for st, tail in (("document", "not stated in the record's own quotes (only elsewhere in the document)"),
+                         ("absent", "not stated anywhere in the document")):
+            names = [_field_label(f) for f, s in status.items() if s == st and f != "service_date"]
+            if names:
+                why.append(f"the {_and(names)} {'is' if len(names) == 1 else 'are'} {tail}")
+    return "; ".join(why) or "it failed verification at ingest (no reason recorded)"
 
 
 def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
@@ -1012,10 +1163,12 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
                             events, "encounter_id", "service_date")
     copy_docs = _scopes([r for r in rel if r.payload["type"] == "copies_measurement"], "form_id",
                         acl, "form_id", "completed_date")
-    groups = _group_events(events, res, corrections)
+    ambiguous: dict[str, list[str]] = {}
+    groups = _group_events(events, res, corrections, ambiguous)
     encs = []
     for key in sorted(groups):
-        enc, rows = _reconcile_encounter(key, groups[key], corrections.get(key, []), retransmitted, res)
+        enc, rows = _reconcile_encounter(key, groups[key], corrections.get(key, []), retransmitted, res,
+                                         ambiguous.get(key, ()))
         encs.append(enc)
         res.intervals.extend(rows)
     for key in sorted(set(corrections) - set(groups)):

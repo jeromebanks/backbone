@@ -14,10 +14,18 @@ ids, so the export and operators show why the document belongs to the patient. A
 ## Pipeline inside `reconcile_patient`
 
 1. Attach each claim's document metadata (`signed`, `finality`, `signed_at`).
-2. **R0:** drop unverified claims, with a decision. The reason reads the claim's grounding entry: a date that its
-   document states nowhere (`unverified_absent`, #52) gives "the date is not stated anywhere in the document (the
-   extracted value was inferred)", without repeating the inferred value; a quote that was not located keeps "quote
-   not found in source text" (#68).
+2. **R0:** drop unverified claims, with a decision. The reason reads the claim's evidence spans and names every
+   cause found, never repeating the unverified value (#68, #76):
+   - no non-blank quote of its own (#14): "it has no quote of its own"; a blank quote beside others: "one of its
+     quotes is blank";
+   - a quote not located (#15 included: a near match must keep its numbers and identifiers): "quote not found in
+     source text";
+   - a date its document states nowhere (`unverified_absent`, #52): "the date is not stated anywhere in the document
+     (the extracted value was inferred)";
+   - a service event's clock time or minute total not in its own quotes (#36), from the grounding entry's per-field
+     status: "the departure is not stated in the record's own quotes (only elsewhere in the document)" or "... is not
+     stated anywhere in the document". The service date is not one of these (a header-only date is a flag).
+   - With none of these recorded, "it failed verification at ingest (no reason recorded)".
 3. Index relations: field corrections by encounter, plus the scope of each retransmission and copy relation
    (`_scopes`). A copy relation covers only the records it names (#22). A retransmission naming an encounter covers
    that encounter's records; an ID-less event counts as the encounter R1 placed it in. A measurement copy naming a
@@ -31,10 +39,18 @@ ids, so the export and operators show why the document belongs to the patient. A
    R3). If there is no such candidate, an ID-less psychotherapy record joins exactly one psychotherapy contact (ID'd
    or not) of another type on that date when their actual contact times overlap, and the type becomes disputed
    (#74). Actual contact times are contact intervals or arrival–departure; a schedule alone never merges. The patient
-   cannot attend two sessions at once. Otherwise
-   they form a separate `U-` contact (an "unidentified contact" decision). The intervals are every time a record
+   cannot attend two sessions at once. If it overlaps several such contacts, it joins **each** of them as an account
+   with the type disputed (#78): it is one of them, never a further session, and the record does not say which.
+   R7 does not compare that one record's account in one encounter with itself in the other. Otherwise
+   they form a separate `U-` contact (an "unidentified contact" decision). A `U-` contact made because several
+   same-type encounters were candidates ("ambiguous") counts within bounds only: an R5 `yes` becomes `uncertain`
+   (#78). The intervals are every time a record
    states (contact intervals, schedule, arrival–departure when both ends are known), unioned over the group's
-   records, so two ID-less sessions known only by disjoint arrival/departure times stay two contacts (#11).
+   records, so two ID-less sessions known only by disjoint arrival/departure times stay two contacts (#11). Every
+   account of an encounter's times counts (#77): a record's own times, plus each combination of the values that the
+   encounter's arrival, departure and contact-interval corrections turn them into (resolved as in R3, the correcting
+   document's own record excepted, a corrected field never crossed with its original). So an ID-less record that
+   overlaps only the corrected times matches, and one that overlaps only the superseded times still matches too.
 5. For each group, `_reconcile_encounter`:
    - `_classify` (R2/R3 evidence tiers): `draft_template`, `billing`, `retransmitted_copy` and documents with
      finality `draft` are excluded with a reason. `clinical_note`, `attendance_record`, `attendance_correction` and
@@ -68,6 +84,8 @@ ids, so the export and operators show why the document belongs to the patient. A
      not compare them with each other. The representative row is the first psychotherapy account, or the first
      account if there is none (never a majority pick). A non-psychotherapy account gets a row too, with
      `eligible = 'no'` and no minutes. Only a goal that counts its type sees that row (#48).
+   - Modality (#81): the first tier that states one decides it; `unknown` is silence. Records of that tier that
+     disagree give `disputed`, a `modality` conflict and a flag, never the first record's value.
    - Attendance (R4): the first tier with a known yes/no decides. Yes and no in the same tier gives `disputed`.
    - Presence: tier-1 `patient_present` votes; not attended implies not present.
    - Eligibility (R5): `yes` if psychotherapy (`THERAPY_TYPES`), attended and present. `no` with a reason. Otherwise
@@ -111,8 +129,17 @@ ids, so the export and operators show why the document belongs to the patient. A
    counted and logged (effectivity is by date).
 9. **R8** `_assessments`: grouped by (instrument, completed date), split by distinct form IDs. Copies
    (`is_copy_of_earlier`, or a document with a `copies_measurement` relation) are listed in `copy_claim_ids`, not
-   as new assessments. Different scores give a `disputed` status plus a conflict.
-10. `_observations`: deduplicated by (date, domain, document label, normalised quote).
+   as new assessments. The score is reconciled over the primary records (#80): a record that states no total is
+   silent; one stated value is the score; different values give `disputed`, `total_score` NULL (no definite score),
+   a `total_score` conflict carrying every value and an R8 `score_disputed` decision. A copy carries no weight, so a
+   copy that states another score is named in the `copy_not_distinct` reason and does not change the score. The
+   instrument spelling is the sorted first of the primaries' (the group key is the normalised name). One form ID
+   under two instruments makes each instrument's row `disputed`, with an `instrument` conflict and an R8
+   `instrument_disputed` decision. Two instruments on one day without a shared form ID stay distinct.
+10. `_observations`: deduplicated by (date, domain, document label, normalised quote). Known gap (#80, held back):
+    when one quote carries two statements (a clinician observation and a patient report), the row keeps the first
+    claim's source and statement only. The fix changes two corpus rows (BH-D101 and BH-D104, 2026-01-19) and awaits
+    sign-off; `tests/test_reconcile_final.py` holds it as a strict xfail.
 
 ## Plan semantics (in `project.py`, because they are evaluated at query time)
 
