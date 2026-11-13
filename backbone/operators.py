@@ -11,7 +11,8 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from .project import (INF, SqlLog, aggregate, consecutive_runs, contribution, group_key, patients_in_scope,
-                      plan_change_dates, plan_requirements, select_encounters, weekly_compliance)
+                      plan_change_dates, plan_requirements, select_encounters, session_group_key,
+                      weekly_compliance)
 from .query import COMPLIANCE_SERVICE_TYPES_REJECTED, CareStep, ComplianceStep, CompareStep, Scope, TimelineStep
 
 
@@ -262,16 +263,27 @@ def _ids(encs: list[dict], n: int = 60) -> str:
 
 
 def _minutes_expr(encs: list[dict], n: int = 60) -> str:
-    if len(encs) > n:
-        return f"sum over {len(encs)} encounters (first {n}: " + _minutes_expr(encs[:n]) + " …)"
-    parts = []
-    for e in encs:
-        if e["eligible"] == "no":
-            continue
+    """The minutes sum as `project.aggregate` computes it. Rows that are alternative accounts of one session
+    (`project.session_group_key`) count once, as the largest of their contributions, so they render as
+    `max(a, b)` (#73). Rows that do not count (`eligible='no'`) are left out. A long sum shows its first `n` rows plus
+    any later alternatives of them, so no `max(...)` is cut in two."""
+    rows = [e for e in encs if e["eligible"] != "no"]
+    if len(encs) <= n:
+        return _sum_expr(rows)
+    head = [e for e in encs[:n] if e["eligible"] != "no"]
+    keys = {session_group_key(e) for e in head}
+    alts = [e for e in encs[n:] if e["eligible"] != "no" and session_group_key(e) in keys]
+    more = f" and {len(alts)} identity alternative{'s' if len(alts) > 1 else ''} of them" if alts else ""
+    return f"sum over {len(encs)} encounters (first {n}{more}: " + _sum_expr(head + alts) + " …)"
+
+
+def _sum_expr(rows: list[dict]) -> str:
+    sessions: dict[tuple, list[str]] = {}            # first-appearance order, so a row's position is kept
+    for e in rows:
         lo, hi = _counted(e)             # the row's contribution, as the totals count it (#65)
         v = f"{lo:g}" if lo == hi else f"[{lo:g}–{'?' if hi == INF else f'{hi:g}'}]"
-        parts.append(f"{v} ({_short(e['encounter_key'])})")
-    return " + ".join(parts) or "0"
+        sessions.setdefault(session_group_key(e), []).append(f"{v} ({_short(e['encounter_key'])})")
+    return " + ".join(p[0] if len(p) == 1 else f"max({', '.join(p)})" for p in sessions.values()) or "0"
 
 
 def _fmt_bound(b: dict) -> str:
@@ -360,14 +372,22 @@ def compliance(conn, step: ComplianceStep, *, cache: dict | None = None) -> dict
     # minute expressions per week for traceability (rows come from the projection; no re-query)
     for w in weeks_all:
         for ev in w["evaluations"]:
-            ev["minutes_calculation"] = _minutes_expr(ev.pop("_rows"))
+            ev["minutes_calculation"] = _minutes_expr(ev.pop("_rows"))   # psychotherapy rows only (#79)
+    # non-psychotherapy rows that a goal counting their type counts (or may count), as the projection lists them
+    counted_elsewhere = {c["encounter"] for w in weeks_all for ev in w["evaluations"] for r in ev["requirements"]
+                         for c in r.get("counted_non_psychotherapy", ())}
     weeks_shown = _cap(weeks_all, notes, "weeks", "totals")
     enc_keys = sorted({k for w in weeks_shown for ev in w["evaluations"] for k in ev["encounters"]})
     for w in weeks_shown:
         for ev in w["evaluations"]:
             ev["encounters"] = [_short(k) for k in ev["encounters"]]
-    # encounters in the period that do NOT count toward any goal, with reasons (drafts, charges, no-shows, ...)
-    not_counted = _cap([e for e in select_encounters(conn, sc, log, include_excluded=True) if e["eligible"] == "no"],
+            for r in ev["requirements"]:
+                for c in r.get("counted_non_psychotherapy", ()):
+                    c["encounter"] = _short(c["encounter"])
+    # encounters in the period that do NOT count toward any goal, with reasons (drafts, charges, no-shows, ...); a
+    # non-psychotherapy row that some goal counts is listed under that requirement instead (#79)
+    not_counted = _cap([e for e in select_encounters(conn, sc, log, include_excluded=True)
+                        if e["eligible"] == "no" and e["encounter_key"] not in counted_elsewhere],
                        notes, "exclusions")
     exclusions = [{"encounter": _short(e["encounter_key"]), "date": e["service_date"], "week_start": e["week_start"],
                    "service_type": e["service_type"], "reason": e["exclusion_reason"],

@@ -99,19 +99,24 @@ def contribution(e: dict) -> dict:
     return {"sessions": (0, 0), "minutes": (0, 0)}
 
 
+def session_group_key(e: dict) -> tuple:
+    """The session an encounter row is an account of. Rows sharing (mrn, encounter_id) are alternative accounts of
+    ONE encounter whose date or type is disputed (reconcile._add_identity_alternatives; each is 'uncertain'); an
+    unidentified contact's alternatives share its key before '~' instead (#74). Every other row is its own session.
+    `aggregate` counts each key at most once; operators group minute expressions by it (#73)."""
+    return (e["mrn"], e["encounter_id"]) if e.get("encounter_id") else (e["encounter_key"].split("~", 1)[0],)
+
+
 def aggregate(encs: list[dict]) -> dict:
     """Totals with bounds over a set of encounters."""
     s_lo = s_hi = m_lo = m_hi = 0.0
     days_lo, days_hi = set(), set()
     uncertain = []
-    # Rows sharing (mrn, encounter_id) are alternative accounts of ONE encounter whose date or type is disputed
-    # (reconcile._add_identity_alternatives; each is 'uncertain'). At most one of them happened, so together they
-    # contribute the largest of their bounds, not the sum (#12). Every other row is its own group.
+    # Alternative accounts of one session (`session_group_key`): at most one of them happened, so together they
+    # contribute the largest of their bounds, not the sum (#12).
     groups: dict[tuple, list[dict]] = {}
-    # An unidentified contact's alternatives share its key before '~' instead (#74).
     for e in encs:
-        groups.setdefault((e["mrn"], e.get("encounter_id")) if e.get("encounter_id")
-                          else (e["encounter_key"].split("~", 1)[0],), []).append(e)
+        groups.setdefault(session_group_key(e), []).append(e)
     for g in groups.values():
         cs = [contribution(e) for e in g]
         s_lo += max(c["sessions"][0] for c in cs); s_hi += max(c["sessions"][1] for c in cs)
@@ -258,7 +263,8 @@ def counting_rows(encs: list[dict]) -> list[dict]:
     """Rows as a goal that also counts NON-psychotherapy types sees them (#48). Psychotherapy rows keep their R5
     eligibility. Any other row counts like R5 without the psychotherapy condition: attended and patient present is
     'yes', not attended or not present is 'no', anything else (or a disputed date/type) 'uncertain'. Reconciliation
-    computes minutes for psychotherapy only, so such a row's minutes are unknown (0..unbounded)."""
+    computes minutes for psychotherapy only, so such a row's minutes are unknown (0..unbounded).
+    Each such row carries `count_reason`, why a goal that counts its type counts it (#79)."""
     out = []
     for e in encs:
         if e["service_type"] in THERAPY_TYPES:
@@ -267,8 +273,16 @@ def counting_rows(encs: list[dict]) -> list[dict]:
             continue
         if e["attended"] == "no" or e["patient_present"] == "no":
             continue
-        ok = e["attended"] == "yes" and e["patient_present"] in ("yes", "partial") and not _identity_disputed(e)
-        out.append({**e, "eligible": "yes" if ok else "uncertain", "minutes_low": None, "minutes_high": None})
+        disputed = _identity_disputed(e)
+        ok = e["attended"] == "yes" and e["patient_present"] in ("yes", "partial") and not disputed
+        t = e["service_type"]
+        why = (f"attended {t} visit with the patient present: counts for a goal that counts {t}" if ok else
+               f"{t} contact whose service date or type is disputed: may count for a goal that counts {t}" if disputed
+               else f"{t} contact whose attendance or patient presence is not established: may count for a goal "
+                    f"that counts {t}")
+        # no issue number in the text: the post-check would accept it as a stated number
+        out.append({**e, "eligible": "yes" if ok else "uncertain", "minutes_low": None, "minutes_high": None,
+                    "count_reason": why + " (not a psychotherapy service, so reconciliation computes no minutes for it)"})
     return out
 
 
@@ -383,11 +397,25 @@ def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope
                     else:
                         own_totals = aggregate([e for e in encs if e["service_type"] in own])
                         evals.append({**_evaluate_weekly(r, own_totals), "counted_service_types": own})
+                    if set(own) - THERAPY_TYPES:  # the non-psychotherapy rows this goal counts, and why (#79)
+                        evals[-1]["counted_non_psychotherapy"] = [
+                            {"encounter": e["encounter_key"], "date": e["service_date"],
+                             "service_type": e["service_type"], "counts": e["eligible"], "reason": e["count_reason"]}
+                            for e in encs if e["service_type"] in own and e["service_type"] not in THERAPY_TYPES]
                 st = ("NOT_MET" if any(e["status"] == "NOT_MET" for e in evals)
                       else "MET" if all(e["status"] == "MET" for e in evals) else "UNDETERMINED")
+                # Shown minutes are psychotherapy minutes (#79): reconciliation computes none for other types, whose
+                # rows would otherwise make the shown total unbounded. Requirements above use their own totals.
+                therapy_rows = [e for e in encs if e["service_type"] in THERAPY_TYPES]
+                shown = totals
+                if other:
+                    psy = aggregate(therapy_rows)
+                    shown = {**totals, "minutes": psy["minutes"], "hours": psy["hours"]}
                 ev = {"plan_days": f"{ev_lo}..{ev_hi}", "plan_documents": sorted({r['doc_label'] for r in s}),
-                      "counted_service_types": counted, "totals": totals, "requirements": evals,
-                      "status": st, "encounters": [e["encounter_key"] for e in encs], "_rows": encs}
+                      "counted_service_types": counted, "totals": shown, "requirements": evals,
+                      "status": st, "encounters": [e["encounter_key"] for e in encs], "_rows": therapy_rows}
+                if other:
+                    ev["minutes_service_types"] = sorted(set(counted) & THERAPY_TYPES)
                 if len(sets) > 1:
                     ev["requirement_set_in_effect"] = f"{min(sdays)}..{max(sdays)}"
                 evaluations.append(ev)
