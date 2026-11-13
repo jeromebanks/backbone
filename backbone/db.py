@@ -1,6 +1,7 @@
 """SQLite persistence. Two layers:
 
-evidence layer   documents, extractions, claims, quarantine (append-only; produced by ingest/extract)
+evidence layer   documents, extractions, claims, quarantine, identifier_changes (produced by ingest/extract)
+bookkeeping      pending_reconcile (patients whose evidence changed and are not yet reconciled)
 clinical layer   patients, encounters, encounter_intervals,  (derived; rebuilt per patient by reconcile.py)
                  plan_requirements, assessments, observations, decisions, conflicts
 projection       v_encounter_week, v_patient_week            (SQL views over the clinical layer)
@@ -59,14 +60,26 @@ CREATE INDEX IF NOT EXISTS ix_claims_subject ON claims(subject_key);
 CREATE INDEX IF NOT EXISTS ix_claims_doc ON claims(sha256);
 
 -- Documents ingest could not attribute to exactly one patient. Their claims are kept with patient_mrn NULL, so they
--- are evidence but take part in no patient's reconciliation. Cleared when a re-extraction attributes the document.
+-- are evidence but take part in no patient's reconciliation. Every ingest re-runs attribution for quarantined and
+-- name-matched documents from their stored extraction, so a row is cleared once the document can be attributed.
 CREATE TABLE IF NOT EXISTS quarantine (
     sha256         TEXT PRIMARY KEY REFERENCES documents(sha256),
     doc_label      TEXT NOT NULL,
-    status         TEXT NOT NULL,             -- no_patient_identity | ambiguous_patient | multi_patient
+    status         TEXT NOT NULL,             -- no_patient_identity | ambiguous_patient | multi_patient | mrn_mismatch
     reason         TEXT NOT NULL,
     candidates     TEXT NOT NULL,             -- JSON list of candidate MRNs (empty when none)
     quarantined_at TEXT NOT NULL
+);
+
+-- Explicit MRN corrections stated in a document's text ("MRN X corrected to Y"). Evidence, not a merge: the document
+-- is attributed to the corrected MRN; other documents still carrying the old MRN are not moved.
+CREATE TABLE IF NOT EXISTS identifier_changes (
+    sha256   TEXT NOT NULL REFERENCES documents(sha256),
+    old_mrn  TEXT NOT NULL,
+    new_mrn  TEXT NOT NULL,
+    quote    TEXT NOT NULL,
+    line     INTEGER,
+    PRIMARY KEY (sha256, old_mrn, new_mrn)
 );
 
 CREATE TABLE IF NOT EXISTS patients (
@@ -76,6 +89,19 @@ CREATE TABLE IF NOT EXISTS patients (
     reconciled_at TEXT,
     ruleset_version TEXT
 );
+
+-- Patients whose evidence changed and who still need reconciling. Written in the same transaction as the claims, so
+-- a crash before reconciliation cannot leave the clinical layer silently stale: the next ingest or reconcile picks
+-- them up. No FK to patients (a former owner may be deleted). Cleared by the triggers below, atomically with
+-- reconcile.persist() (which stamps reconciled_at) or with the removal of an orphaned patient.
+CREATE TABLE IF NOT EXISTS pending_reconcile (
+    mrn       TEXT PRIMARY KEY,
+    marked_at TEXT NOT NULL
+);
+CREATE TRIGGER IF NOT EXISTS trg_pending_cleared_on_reconcile AFTER UPDATE OF reconciled_at ON patients
+BEGIN DELETE FROM pending_reconcile WHERE mrn = NEW.mrn; END;
+CREATE TRIGGER IF NOT EXISTS trg_pending_cleared_on_patient_delete AFTER DELETE ON patients
+BEGIN DELETE FROM pending_reconcile WHERE mrn = OLD.mrn; END;
 
 CREATE TABLE IF NOT EXISTS encounters (
     encounter_key    TEXT PRIMARY KEY,         -- mrn|encounter_id (or mrn|U-date-type-n when unidentified)

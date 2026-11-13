@@ -42,13 +42,34 @@ cli.py         argparse entry point (python -m backbone …)
 - **Encounter key**: `<MRN>|<ENCOUNTER_ID>`, or `<MRN>|U-<date>-<service_type>-<n>` for contacts without an ID.
 - **Patient**: keyed by normalised MRN (`ingest.attribute`). Without an MRN, the document must match exactly one
   known patient by name (+ DOB when stated). Otherwise it is **quarantined**: its claims keep `patient_mrn` NULL,
-  it gets a `quarantine` row (`no_patient_identity`, `ambiguous_patient` or `multi_patient`), and it takes part
-  in no patient's reconciliation. `multi_patient` means the text labels more than one distinct MRN value
-  (a roster): the extraction holds one patient per document, so no claim is attributed. Ingest reports
-  quarantines in `stats["quarantined"]`, and `python -m backbone stats` counts them. There is no `UNRESOLVED` pool.
+  it gets a `quarantine` row (`no_patient_identity`, `ambiguous_patient`, `multi_patient` or `mrn_mismatch`), and it
+  takes part in no patient's reconciliation. Identity the **text** states outranks the extraction
+  (`ingest.text_identity`, no LLM):
+  - `multi_patient`: the text names more than one patient. That is more than one distinct `MRN`-labelled value, or an
+    MRN table column (`MRN | …` header row) with several values, or a patient-name column (`Patient` / `Name` /
+    `Member` … header cell, exact match) with several names. The extraction holds one patient per document, so no
+    claim is attributed. A patient banner line (`Patient: X | DOB: … | MRN: …`) is not a table header.
+  - An explicit correction on one line (`MRN X corrected/changed/updated to Y`, `Corrected MRN Y (previously MRN
+    X)`) counts as one patient, Y. The document is attributed to Y whichever of the two the extractor reported, and
+    the change is recorded in `identifier_changes`. Other documents still carrying X are **not** moved (no merge).
+  - `mrn_mismatch`: the extracted MRN is not the one the text prints (compared ignoring case and dashes), or no MRN
+    is labelled and the extracted MRN does not appear as a whole token anywhere in the text, or a name-only match
+    contradicts the printed MRN.
+
+  Ingest reports quarantines in `stats["quarantined"]`, and `python -m backbone stats` counts them. There is no
+  `UNRESOLVED` pool.
 - **Re-attribution**: when a re-extraction moves (or quarantines) a document, its former owner is also returned in
   `affected_patients`. `reconcile_patients` then rebuilds that patient from its remaining claims. A patient left
-  with no claims and no documents loses its derived rows and its `patients` row.
+  with no claims and no documents loses its derived rows and its `patients` row. After every ingest,
+  `ingest.reattribute` re-runs attribution from the **stored** extraction (latest `extractions` row, never the LLM)
+  for quarantined documents and documents matched by name alone. A patient that arrives later can claim a
+  quarantined document. A second same-name patient makes a name-only match ambiguous and quarantines it. Only actual
+  changes are applied, and they are reported in `stats["reattributed"]`.
+- **Pending reconciles** (`pending_reconcile`): every patient whose evidence changes is marked in the **same
+  transaction** as the claims. Triggers on `patients` clear the mark when `reconcile.persist()` stamps `reconciled_at`
+  or the patient row is deleted, and `cli` also clears it after a successful reconcile. A crash between ingest and
+  reconcile therefore cannot leave the abstraction stale. The next `ingest` returns those patients in
+  `affected_patients` (and in `pending_from_earlier_runs`), and `reconcile` without `--patient` includes them.
 
 ## The results envelope (every operator)
 
@@ -72,9 +93,11 @@ cli.py         argparse entry point (python -m backbone …)
 
 1. `ingest` hashes the file. If the hash is known, it only records the new path.
 2. A new hash is extracted, using the cache when possible.
-3. `build_claims` verifies quotes and writes claims.
-4. The document's MRN is added to the affected patients.
-5. `reconcile_patients(affected)` deletes and rebuilds only those patients' clinical rows (~4 ms per patient).
+3. `build_claims` verifies quotes, records value grounding (see EXTRACTION.md) and writes claims.
+4. The document is attributed (or quarantined). Its MRN and any former owner are marked pending, in the claims'
+   transaction. `reattribute` then revisits quarantined and name-matched documents.
+5. `reconcile_patients(affected)` deletes and rebuilds only those patients' clinical rows (~4 ms per patient), which
+   clears their pending marks.
 6. Saved answers are invalidated automatically, because the fingerprint includes every document's sha256.
 
 ## Data flow for a question

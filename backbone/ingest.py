@@ -1,8 +1,10 @@
 """Ingest documents: hash -> dedupe -> extract (cached) -> attribute to a patient -> verified claims.
 
-Returns the set of patient MRNs whose evidence changed (new owners and former owners of re-extracted documents), so
-only those patients are re-reconciled. A document that cannot be attributed to exactly one patient is quarantined:
-its claims are stored with no patient and take part in no patient's reconciliation.
+Returns the set of patient MRNs whose evidence changed (new owners and former owners of re-extracted or re-attributed
+documents), so only those patients are re-reconciled. They are also recorded in `pending_reconcile` in the claims'
+transaction, so a crash before reconciliation is repaired by the next run. A document that cannot be attributed to
+exactly one patient, or whose extracted MRN contradicts its text, is quarantined: its claims are stored with no patient
+and take part in no patient's reconciliation until a later ingest can attribute it from the stored extraction.
 """
 from __future__ import annotations
 
@@ -13,18 +15,36 @@ import re
 import sqlite3
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
 from . import EXTRACTOR_VERSION
-from .evidence import DocumentIndex
+from .evidence import DocumentIndex, ground_values, times_in
 from .extract import extract_document
 from .llm import DEFAULT_MODEL
 from .schema import Extraction
 
 HEADER_ID = re.compile(r"^\s*Document ID:\s*(\S+)", re.MULTILINE)
+_DASHES = str.maketrans({"–": "-", "—": "-", "−": "-", "‐": "-", "‑": "-"})
+_VAL = r"[A-Za-z0-9-]*[0-9][A-Za-z0-9-]*"
 # A labelled MRN value ("MRN HG-1", "MRN: hg-1", "MRN #HG-1"); the value must contain a digit so prose isn't matched.
-MRN_LABEL = re.compile(r"\bMRN\b[ \t:#]*([A-Za-z0-9-]*[0-9][A-Za-z0-9-]*)")
+MRN_LABEL = re.compile(r"\bMRN\b[ \t:#]*(" + _VAL + ")")
+# Explicit MRN corrections on one line: "MRN X corrected/changed/updated to [MRN] Y" and "Corrected MRN Y (previously
+# MRN X)". Anything looser stays a second MRN, so the document is quarantined rather than guessed at.
+_CORRECTED_TO = re.compile(r"\bMRN\b[ \t:#]*(?P<old>" + _VAL + r")[^\n]{0,40}?\b(?:corrected|changed|updated|amended|"
+                           r"revised|replaced)\s+(?:to|with|by)\b[ \t:#]*(?:MRN\b[ \t:#]*)?(?P<new>" + _VAL + ")", re.I)
+_CORRECTED_FROM = re.compile(r"\b(?:corrected|updated|amended|revised|new|current)\s+MRN\b[ \t:#]*(?P<new>" + _VAL +
+                             r")[^\n]{0,40}?\b(?:previously|formerly|replaces|replacing|was|old|prior)\b[^\n]{0,20}?"
+                             r"\bMRN\b[ \t:#]*(?P<old>" + _VAL + ")", re.I)
+_ISO_DATE = re.compile(r"\d{4}-\d{1,2}-\d{1,2}")
+# Table header cells (exact, case-insensitive) naming a per-row patient identity. A patient banner line such as
+# "Patient: A | DOB: … | MRN: …" has no such cell, and "Patient arrived" is not one either.
+_MRN_HEADERS = {"mrn", "mrn #", "mrn#", "mrn no", "mrn no.", "patient mrn", "medical record number", "medical record no.",
+                "medical record #"}
+_NAME_HEADERS = {"patient", "patient name", "name", "member", "member name", "client", "client name", "participant",
+                 "participant name", "attendee"}
+_ID_TOKEN = re.compile(r"[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*")
 
 
 def sha256_bytes(b: bytes) -> str:
@@ -37,24 +57,108 @@ def norm_mrn(mrn: str | None) -> str | None:
     return re.sub(r"\s+", "", mrn).upper()
 
 
+def _canon(mrn: str) -> str:
+    """Comparison key for identifiers: case, dashes and spacing do not distinguish two MRNs."""
+    return re.sub(r"[^A-Z0-9]", "", mrn.translate(_DASHES).upper())
+
+
 def mrns_in_text(text: str) -> set[str]:
     """Distinct normalised MRN values labelled in the raw document text (deterministic multi-patient guard)."""
-    return {norm_mrn(m.strip("-")) for m in MRN_LABEL.findall(text) if m.strip("-")}
+    return {norm_mrn(m.strip("-")) for m in MRN_LABEL.findall(text.translate(_DASHES)) if m.strip("-")}
+
+
+@dataclass
+class TextIdentity:
+    """Patient identifiers the document text itself states (no LLM involved)."""
+    labelled: set[str]                                   # values after an "MRN" label
+    table_mrns: set[str]                                 # values in an MRN column of a table
+    corrections: list[tuple[str, str, str, int]]         # (old, new, quote, line) explicit MRN corrections
+    roster_names: set[str] = field(default_factory=set)  # distinct names in a patient-name column, when >= 2
+
+    @property
+    def mrns(self) -> set[str]:
+        """The distinct patients the text names by MRN; an MRN corrected to another is the same patient."""
+        old = {o for o, *_ in self.corrections}
+        return (self.labelled | self.table_mrns | {n for _, n, *_ in self.corrections}) - old
+
+
+def _cells(line: str) -> tuple[str | None, list[str]]:
+    for sep in ("|", "\t"):
+        if sep in line:
+            cells = [c.strip() for c in line.strip().strip("|").split(sep)]
+            if len(cells) >= 2:
+                return sep, cells
+    return None, []
+
+
+def _table_identities(lines: list[str]) -> tuple[set[str], set[str]]:
+    """MRNs and names listed under an MRN / patient-name column header, one table row per line."""
+    mrns: set[str] = set()
+    names: set[str] = set()
+    for i, line in enumerate(lines):
+        sep, head = _cells(line)
+        keys = [" ".join(c.lower().split()).rstrip(":") for c in head]
+        col_m = [j for j, k in enumerate(keys) if k in _MRN_HEADERS]
+        col_n = [j for j, k in enumerate(keys) if k in _NAME_HEADERS]
+        if not (col_m or col_n):
+            continue
+        for row in lines[i + 1:]:
+            s, cells = _cells(row)
+            if s != sep or len(cells) != len(head):
+                break
+            if all(re.fullmatch(r":?-{2,}:?", c) for c in cells if c):
+                continue                                         # markdown separator row
+            mrns |= {norm_mrn(cells[j]) for j in col_m if re.search(r"\d", cells[j])}
+            names |= {" ".join(cells[j].lower().split()) for j in col_n if cells[j] and cells[j] not in "-—"}
+    return mrns, names
+
+
+def text_identity(text: str) -> TextIdentity:
+    t = text.translate(_DASHES)
+    corrections = []
+    for rx in (_CORRECTED_TO, _CORRECTED_FROM):
+        for m in rx.finditer(t):
+            old, new = norm_mrn(m["old"].strip("-")), norm_mrn(m["new"].strip("-"))
+            if old and new and _canon(old) != _canon(new) and not (_ISO_DATE.fullmatch(old) or _ISO_DATE.fullmatch(new)):
+                corrections.append((old, new, m.group(0), t.count("\n", 0, m.start()) + 1))
+    table_mrns, names = _table_identities(t.splitlines())
+    return TextIdentity(mrns_in_text(t), table_mrns, sorted(set(corrections)), names if len(names) > 1 else set())
+
+
+def _mismatch(reason: str, candidates) -> tuple[None, dict]:
+    return None, {"status": "mrn_mismatch", "candidates": sorted(set(candidates)), "reason": reason}
 
 
 def attribute(conn: sqlite3.Connection, text: str, ex: Extraction) -> tuple[str | None, dict | None]:
     """Decide which patient a document belongs to: (mrn, None), or (None, quarantine record).
 
     Never invents an identity merge: without an MRN the document must match exactly one known patient by name (and DOB
-    when stated). The extraction holds one patient per document, so text naming several MRNs is not attributed at all.
+    when stated). The extraction holds one patient per document, so text naming several patients (labelled MRNs, an MRN
+    or patient-name table column) is not attributed at all. The text outranks the extractor on identifiers: an extracted
+    MRN must be the one the text prints (or, when none is labelled, appear in the text verbatim), and an explicit
+    "MRN X corrected to Y" in the text attributes the document to Y.
     """
-    labelled = sorted(mrns_in_text(text))
-    if len(labelled) > 1:
-        return None, {"status": "multi_patient", "candidates": labelled,
-                      "reason": f"document text labels {len(labelled)} distinct MRNs; extraction holds one patient "
+    ident = text_identity(text)
+    printed = sorted(ident.mrns)
+    if len(printed) > 1:
+        return None, {"status": "multi_patient", "candidates": printed,
+                      "reason": f"document text names {len(printed)} distinct MRNs; extraction holds one patient "
                                 "per document, so its claims cannot be attributed"}
+    if ident.roster_names:
+        return None, {"status": "multi_patient", "candidates": [],
+                      "reason": f"a patient-name table column lists {len(ident.roster_names)} distinct names; "
+                                "extraction holds one patient per document, so its claims cannot be attributed"}
+    corrected = {_canon(o): n for o, n, *_ in ident.corrections}
     mrn = norm_mrn(ex.document.patient_mrn)
     if mrn:
+        mrn = corrected.get(_canon(mrn), mrn)
+        if printed:
+            if _canon(mrn) != _canon(printed[0]):
+                return _mismatch(f"extracted MRN {mrn} differs from the MRN printed in the text ({printed[0]})",
+                                 [printed[0], mrn])
+            return printed[0], None
+        if _canon(mrn) not in {_canon(t) for t in _ID_TOKEN.findall(text.translate(_DASHES))}:
+            return _mismatch(f"extracted MRN {mrn} does not appear in the document text", [mrn])
         return mrn, None
     name, dob = ex.document.patient_name, ex.document.patient_dob
     if not name:
@@ -63,6 +167,9 @@ def attribute(conn: sqlite3.Connection, text: str, ex: Extraction) -> tuple[str 
         "SELECT mrn FROM patients WHERE name=? AND (dob=? OR ? IS NULL)", (name, dob, dob)))
     key = "name + DOB" if dob else "name (no DOB)"
     if len(hits) == 1:
+        if printed and _canon(hits[0]) != _canon(printed[0]):
+            return _mismatch(f"no extracted MRN; {key} matches {hits[0]}, but the text prints MRN {printed[0]}",
+                             [hits[0], printed[0]])
         return hits[0], None
     if hits:
         return None, {"status": "ambiguous_patient", "candidates": hits,
@@ -85,6 +192,47 @@ def discover(paths: list[str | Path]) -> list[Path]:
     return out
 
 
+def _value_kind(v) -> str | None:
+    """How to ground a free-text relation value: by the clock times or the date it contains, else not at all."""
+    if not isinstance(v, str):
+        return None
+    if times_in(v):
+        return "time"
+    return "date" if re.fullmatch(r"\d{4}-\d{2}-\d{2}", v.strip()) else None
+
+
+def grounding_fields(kind: str, p: dict) -> list[tuple[str, str, object, list[str]]]:
+    """The payload values of one claim that must be stated in its own quotes (#36): clock times, stated minutes,
+    scores and thresholds, and dates. A nontherapeutic interval may be grounded by its own quote or the event's."""
+    if kind == "service_event":
+        q = list(p.get("quotes") or [])
+        out = [("service_date", "date", p.get("service_date"), q),
+               ("patient_arrival", "time", p.get("patient_arrival"), q),
+               ("patient_departure", "time", p.get("patient_departure"), q),
+               ("stated_minutes", "minutes", p.get("stated_minutes"), q)]
+        if p.get("scheduled"):
+            out += [(f"scheduled.{k}", "time", p["scheduled"].get(k), q) for k in ("start", "end")]
+        for i, iv in enumerate(p.get("patient_contact_intervals") or []):
+            out += [(f"patient_contact_intervals[{i}].{k}", "time", iv.get(k), q) for k in ("start", "end")]
+        for i, iv in enumerate(p.get("nontherapeutic_intervals") or []):
+            out += [(f"nontherapeutic_intervals[{i}].{k}", "time", iv.get(k), [iv.get("quote")] + q)
+                    for k in ("start", "end")]
+        return out
+    q = [p.get("quote")]
+    if kind == "assessment":
+        return [("total_score", "number", p.get("total_score"), q), ("completed_date", "date", p.get("completed_date"), q),
+                ("completed_time", "time", p.get("completed_time"), q)]
+    if kind == "observation":
+        return [("date", "date", p.get("date"), q)]
+    if kind == "plan_requirement":
+        return [("threshold", "number", p.get("threshold"), q), ("effective_start", "date", p.get("effective_start"), q),
+                ("effective_end", "date", p.get("effective_end"), q)]
+    if kind == "relation":
+        return [("original_date", "date", p.get("original_date"), q)] + [
+            (k, _value_kind(p.get(k)), p.get(k), q) for k in ("old_value", "new_value") if _value_kind(p.get(k))]
+    return []
+
+
 def build_claims(sha: str, label: str, text: str, ex: Extraction, mrn: str | None) -> list[dict]:
     """Flatten one extraction into claims, verifying every quote against the document text."""
     idx = DocumentIndex(text)
@@ -100,6 +248,21 @@ def build_claims(sha: str, label: str, text: str, ex: Extraction, mrn: str | Non
         spans = own + [idx.locate(q).as_dict() for q in supporting]
         grounded = kind == "document" or any((q or "").strip() for q in quotes)
         verified = int(grounded and all(s["match"] != "missing" for s in spans))
+        if kind != "document":
+            # Value grounding (#36), recorded as a flag, not a verification failure: per payload value, "quote" (stated
+            # in the claim's own quotes), "document" (stated elsewhere in the text, e.g. a header date) or "absent".
+            # It is the last evidence entry, with no line span, so it is never cited as a passage.
+            fields = grounding_fields(kind, payload)
+            in_quote, in_doc = ground_values(fields), ground_values([(f, k, v, [text]) for f, k, v, _ in fields])
+            spans = spans + [{"quote": None, "line_start": None, "line_end": None, "match": "grounding",
+                              "grounding": {f: "quote" if ok else "document" if in_doc[f] else "absent"
+                                            for f, ok in in_quote.items()}}]
+            # The values that set a session's minutes (clock times, stated minutes) must be stated in the claim's own
+            # quotes: a verified quote must not carry an altered time into the arithmetic (#15, #36). Other values
+            # (e.g. a date from the document header) stay a flag. On the supplied corpus this rejects no claim.
+            kinds = {f: k for f, k, _, _ in fields}
+            if kind == "service_event" and any(not ok for f, ok in in_quote.items() if kinds[f] in ("time", "minutes")):
+                verified = 0
         claims.append({
             "claim_id": f"{sha[:12]}:{kind}:{i}", "sha256": sha, "doc_label": label, "patient_mrn": mrn,
             "kind": kind, "subject_key": subject, "evidence_type": evidence_type,
@@ -124,6 +287,76 @@ def build_claims(sha: str, label: str, text: str, ex: Extraction, mrn: str | Non
     return claims
 
 
+# --------------------------------------------------------------------------------------------- pending reconciles (#3)
+
+def pending_patients(conn: sqlite3.Connection) -> list[str]:
+    return [r[0] for r in conn.execute("SELECT mrn FROM pending_reconcile ORDER BY mrn")]
+
+
+def _mark_pending(conn: sqlite3.Connection, mrns) -> None:
+    """Record, inside the caller's transaction, that these patients' evidence changed and they need reconciling."""
+    conn.executemany("INSERT OR IGNORE INTO pending_reconcile VALUES (?,?)", [(m, _now()) for m in sorted(m for m in mrns if m)])
+
+
+def clear_pending(conn: sqlite3.Connection, mrns) -> None:
+    """Drop markers after a successful reconcile. Triggers already do this when a patients row is stamped or deleted;
+    this covers a marker whose patient row no longer exists."""
+    with conn:
+        conn.executemany("DELETE FROM pending_reconcile WHERE mrn=?", [(m,) for m in sorted(set(mrns))])
+
+
+# --------------------------------------------------------------------------------------------- attribution storage
+
+def _store_attribution(conn: sqlite3.Connection, sha: str, label: str, text: str, ex: Extraction, mrn: str | None,
+                       quarantine: dict | None) -> None:
+    """Point a document and all its claims at `mrn` (or quarantine them), and record any MRN correction its text
+    states. Used by first ingest and by re-attribution, so both apply the same guards."""
+    conn.execute("UPDATE documents SET patient_mrn=? WHERE sha256=?", (mrn, sha))
+    conn.execute("UPDATE claims SET patient_mrn=? WHERE sha256=?", (mrn, sha))
+    conn.execute("DELETE FROM quarantine WHERE sha256=?", (sha,))
+    if quarantine:
+        conn.execute("INSERT INTO quarantine VALUES (?,?,?,?,?,?)",
+                     (sha, label, quarantine["status"], quarantine["reason"], json.dumps(quarantine["candidates"]),
+                      _now()))
+    conn.execute("DELETE FROM identifier_changes WHERE sha256=?", (sha,))
+    conn.executemany("INSERT OR IGNORE INTO identifier_changes VALUES (?,?,?,?,?)",
+                     [(sha, *c) for c in text_identity(text).corrections])
+    if mrn and not conn.execute("SELECT 1 FROM patients WHERE mrn=?", (mrn,)).fetchone():
+        conn.execute("INSERT INTO patients(mrn, name, dob) VALUES (?,?,?)",
+                     (mrn, ex.document.patient_name, ex.document.patient_dob))
+
+
+def reattribute(conn: sqlite3.Connection, *, skip: set[str] = frozenset(), log=print) -> list[dict]:
+    """Re-run attribution (#41) for every quarantined document and every document attributed by name alone, using its
+    stored extraction (never the LLM): a patient that arrived later can claim a quarantined document, and a second
+    same-name patient makes a name-only match ambiguous. Only actual changes are applied, marked pending and reported.
+    One pass suffices: attribution by name never creates a patient, so one re-attribution cannot enable another."""
+    shas = {r[0] for r in conn.execute("SELECT sha256 FROM quarantine")}
+    shas |= {r[0] for r in conn.execute("SELECT sha256 FROM claims WHERE kind='document' "
+                                        "AND json_extract(payload, '$.patient_mrn') IS NULL")}
+    changes = []
+    for sha in sorted(shas - set(skip)):
+        raw = conn.execute("SELECT raw_json FROM extractions WHERE sha256=? ORDER BY rowid DESC LIMIT 1",
+                           (sha,)).fetchone()
+        if not raw:
+            continue
+        doc = conn.execute("SELECT doc_label, text, patient_mrn, paths FROM documents WHERE sha256=?", (sha,)).fetchone()
+        old_q = conn.execute("SELECT status, candidates FROM quarantine WHERE sha256=?", (sha,)).fetchone()
+        ex = Extraction.model_validate_json(raw[0])
+        mrn, quarantine = attribute(conn, doc["text"], ex)
+        before = (doc["patient_mrn"], old_q and old_q["status"], old_q and json.loads(old_q["candidates"]))
+        if before == (mrn, quarantine and quarantine["status"], quarantine and quarantine["candidates"]):
+            continue
+        _store_attribution(conn, sha, doc["doc_label"], doc["text"], ex, mrn, quarantine)
+        if mrn != doc["patient_mrn"]:
+            _mark_pending(conn, {doc["patient_mrn"], mrn})
+            changes.append({"file": json.loads(doc["paths"])[0], "doc_label": doc["doc_label"],
+                            "from": doc["patient_mrn"], "to": mrn,
+                            **({"status": quarantine["status"], "reason": quarantine["reason"]} if quarantine else {})})
+            log(f"  RE-ATTRIBUTED {doc['doc_label']}: {doc['patient_mrn'] or 'quarantine'} -> {mrn or 'quarantine'}")
+    return changes
+
+
 def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DEFAULT_MODEL,
            effort: str = "high", workers: int | None = None, log=print) -> dict:
     """Ingest files. Idempotent: byte-identical files are recorded once; cached extractions are reused."""
@@ -132,7 +365,8 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
     workers = workers or int(os.environ.get("BACKBONE_CONCURRENCY", "6"))
     todo: dict[str, tuple[Path, str]] = {}
     stats = {"files": len(files), "new_documents": 0, "duplicate_files": 0, "extracted_llm": 0,
-             "extracted_cache": 0, "already_ingested": 0, "failed": [], "affected_patients": set(), "quarantined": [],
+             "extracted_cache": 0, "already_ingested": 0, "failed": [], "affected_patients": [], "quarantined": [],
+             "reattributed": [], "pending_from_earlier_runs": pending_patients(conn),
              "llm_cost_usd": 0.0, "llm_input_tokens": 0, "llm_output_tokens": 0, "llm_latency_ms": []}
 
     for f in files:
@@ -191,16 +425,7 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
             "SELECT DISTINCT patient_mrn FROM claims WHERE sha256=? AND patient_mrn IS NOT NULL", (sha,))}
         former |= {r[0] for r in conn.execute(
             "SELECT patient_mrn FROM documents WHERE sha256=? AND patient_mrn IS NOT NULL", (sha,))}
-        stats["affected_patients"] |= former
         mrn, quarantine = attribute(conn, text, ex)
-        conn.execute("UPDATE documents SET patient_mrn=? WHERE sha256=?", (mrn, sha))
-        conn.execute("DELETE FROM quarantine WHERE sha256=?", (sha,))
-        if quarantine:
-            conn.execute("INSERT INTO quarantine VALUES (?,?,?,?,?,?)",
-                         (sha, label, quarantine["status"], quarantine["reason"],
-                          json.dumps(quarantine["candidates"]), _now()))
-            stats["quarantined"].append({"file": str(todo[sha][0]), "doc_label": label, **quarantine})
-            log(f"  QUARANTINED {todo[sha][0].name}: {quarantine['reason']}")
         conn.execute("DELETE FROM claims WHERE sha256=?", (sha,))
         for c in build_claims(sha, label, text, ex, mrn):
             conn.execute("INSERT INTO claims VALUES (:claim_id,:sha256,:doc_label,:patient_mrn,:kind,:subject_key,"
@@ -209,11 +434,11 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
                      (sha, EXTRACTOR_VERSION, model, json.dumps(ex.model_dump()), meta.get("latency_ms"),
                       meta.get("input_tokens"), meta.get("output_tokens"), meta.get("cost_usd"),
                       int(bool(meta.get("from_cache"))), _now()))
-        if mrn:
-            if not conn.execute("SELECT 1 FROM patients WHERE mrn=?", (mrn,)).fetchone():
-                conn.execute("INSERT INTO patients(mrn, name, dob) VALUES (?,?,?)",
-                             (mrn, ex.document.patient_name, ex.document.patient_dob))
-            stats["affected_patients"].add(mrn)
+        _store_attribution(conn, sha, label, text, ex, mrn, quarantine)
+        _mark_pending(conn, former | {mrn})
+        if quarantine:
+            stats["quarantined"].append({"file": str(todo[sha][0]), "doc_label": label, **quarantine})
+            log(f"  QUARANTINED {todo[sha][0].name}: {quarantine['reason']}")
         if meta.get("from_cache"):
             stats["extracted_cache"] += 1
         else:
@@ -222,8 +447,10 @@ def ingest(conn: sqlite3.Connection, paths: list[str | Path], *, model: str = DE
             stats["llm_input_tokens"] += meta.get("input_tokens") or 0
             stats["llm_output_tokens"] += meta.get("output_tokens") or 0
             stats["llm_latency_ms"].append(meta.get("latency_ms") or 0)
-    conn.commit()
-    stats["affected_patients"] = sorted(stats["affected_patients"])
+    stats["reattributed"] = reattribute(conn, skip={r[0] for r in results}, log=log)
+    conn.commit()        # claims, attribution and pending markers commit together (#3)
+    # Everyone owed a reconcile: this run's changes plus anything a crashed earlier run left pending.
+    stats["affected_patients"] = pending_patients(conn)
     stats["quarantined"].sort(key=lambda q: q["file"])
     stats["duration_ms"] = int((time.monotonic() - t0) * 1000)
     return stats

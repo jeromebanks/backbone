@@ -140,7 +140,9 @@ def test_guard_fires_on_no_corpus_document():
 def _p1_document(env):
     conn, tmp, by_file, run = env
     f = tmp / "note.txt"
-    f.write_text(f"Patient: Alex Doe | MRN ZZ-1 (later corrected to ZZ-2)\n{SESSION}\n")
+    # Both identifiers are printed, neither MRN-labelled nor phrased as a correction (#42/#43 would act on those), so
+    # which patient owns the document is decided by the extraction alone: what these #5 tests vary.
+    f.write_text(f"Patient: Alex Doe | chart ZZ-1 (record merged into ZZ-2)\n{SESSION}\n")
     by_file["note.txt"] = extraction(SESSION, name="Alex Doe", mrn="ZZ-1")
     stats = run(f)
     assert stats["affected_patients"] == ["ZZ-1"]

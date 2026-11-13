@@ -32,12 +32,14 @@ def _log_run(conn, command: str, t0: float, details: dict):
 
 
 def cmd_ingest(args):
-    from .ingest import ingest
+    from .ingest import clear_pending, ingest
     from .reconcile import reconcile_patients
     conn = connect(args.db)
     t0 = time.monotonic()
+    # affected_patients includes patients a crashed earlier run left pending (#3); markers clear only on success.
     stats = ingest(conn, args.paths, effort=args.effort, workers=args.workers)
     rec = reconcile_patients(conn, stats["affected_patients"]) if stats["affected_patients"] else {}
+    clear_pending(conn, stats["affected_patients"])
     stats["reconcile"] = rec
     _log_run(conn, "ingest " + " ".join(args.paths), t0, stats)
     lat = stats.pop("llm_latency_ms")
@@ -47,11 +49,14 @@ def cmd_ingest(args):
 
 
 def cmd_reconcile(args):
+    from .ingest import clear_pending, pending_patients
     from .reconcile import reconcile_patients
     conn = connect(args.db)
     t0 = time.monotonic()
-    mrns = [args.patient] if args.patient else [r["mrn"] for r in conn.execute("SELECT mrn FROM patients")]
+    mrns = [args.patient] if args.patient else sorted(
+        {r["mrn"] for r in conn.execute("SELECT mrn FROM patients")} | set(pending_patients(conn)))
     rec = reconcile_patients(conn, mrns)
+    clear_pending(conn, mrns)
     _log_run(conn, "reconcile", t0, rec)
     print(json.dumps(rec, indent=2, default=str))
 

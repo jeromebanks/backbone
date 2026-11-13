@@ -38,6 +38,24 @@ nontherapeutic-interval quotes are verified too, but they cannot stand in for th
 claim carries no quotes and is exempt. Unverified claims are dropped by R0. In this corpus 254 claims
 were extracted, with 0 fuzzy matches and 0 unverified.
 
+## Value grounding (`evidence.ground_values`, `ingest.grounding_fields`) — a flag, not a filter (#36)
+
+A located quote proves the quote exists, not that the payload says what the quote says. For every non-document claim,
+ingest checks each clock time (arrival, departure, scheduled, contact and nontherapeutic intervals, completed time,
+time-bearing relation values), stated minute count, score/threshold and date against the claim's own quotes, after
+normalising (`9:00` = `09:00` = `9:00 am`, en dashes, `50 min` = `50 minutes`, `January 7, 2026` = `Jan07` =
+`2026-01-07`, number words). A nontherapeutic interval may be grounded by its own quote. The result is the **last**
+`claims.evidence` entry: `{"quote": null, "line_start": null, "line_end": null, "match": "grounding",
+"grounding": {field: "quote" | "document" | "absent"}}` (`document` = stated elsewhere in the text, e.g. a header
+date). It has no line span, so operators and exports never cite it. It does **not** change `verified`.
+
+Why a flag: measured on the corpus (223 non-document claims), 165 have a value not in their own quote, almost all
+dates taken from the header (165 `document`). Times: 116 `quote`, 1 `document`; stated minutes: 11/11 `quote`;
+scores/thresholds: 4 `quote`, 2 `document`. Only **one** value is `absent` from the whole document (BH-D015, an
+observation dated the day before the note, inferred from "a poor night of sleep"). Dropping on ungrounded values would
+have removed real evidence and moved golden results. Making `absent` (or an ungrounded time/minute) R0-fatal is a
+possible later tightening.
+
 ## Cache
 
 `cache/extractions/<sha256>.<EXTRACTOR_VERSION>.<model>.json` holds `{sha256, filename, meta, extraction}`.
