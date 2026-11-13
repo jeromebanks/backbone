@@ -66,7 +66,9 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
         for f in facts[:max_rows]:
             k = f.get("kind")
             if k == "assessment":
-                out.append(f"ASSESSMENT {f['date']} {f['instrument']}={f['total_score']} form={f['form_id']} "
+                score = f["total_score"] if f["total_score"] is not None else (
+                    "disputed" if f.get("status") == "disputed" else "not stated")   # never "None" (#80)
+                out.append(f"ASSESSMENT {f['date']} {f['instrument']}={score} form={f['form_id']} "
                            f"items={f['item_scores']} in={f['recorded_in']} copies_not_counted={f['copies_not_counted']}")
             elif k == "observation":
                 out.append(f"OBS {f['date']} [{f['domain']}/{f['source']}] {_clip(f['statement'])} {f['documents']}")

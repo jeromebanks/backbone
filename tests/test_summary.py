@@ -48,3 +48,10 @@ def test_summary_cites_shared_label_documents_with_their_sha():
          "received_at": None, "finality": "final", "assertions": []}
     out = summarize(_res(evidence=[ev], facts=[d]))
     assert "EVIDENCE (NOTE [0a1b2c3d4e5f] L4)" in out and "DOC NOTE [0a1b2c3d4e5f] (" in out
+
+
+def test_summary_shows_a_disputed_score_as_disputed():
+    a = {"kind": "assessment", "date": "2026-01-16", "instrument": "PHQ-9", "total_score": None, "item_scores": [],
+         "form_id": "Q1", "status": "disputed", "recorded_in": ["D1", "D2"], "copies_not_counted": []}
+    out = summarize(_res(facts=[a]))
+    assert "PHQ-9=disputed" in out and "None" not in out.split("ASSESSMENT", 1)[1].split("form=")[0]
