@@ -195,3 +195,50 @@ def test_fuzzy_window_at_document_end_does_not_crash():
     text = "Individual therapy 10:00-10:30 local, patient attended throughout"
     s = DocumentIndex(text).locate("Individual therapy 10:00-10:30 local, patient atended throughout the")
     assert s.match == "fuzzy" and s.line_start == 1
+
+
+# ---------------------------------------------------------------- #69 hyphenated numbers, #70 dates
+
+def _dated_results(extra_calc=()):
+    r = _results()
+    r["results"][0]["calculation"] += list(extra_calc)
+    r["results"][0]["params"] = {"scope": {"start": "2026-01-05", "end": "2026-01-30"}}
+    r["results"][0]["facts"] = [{"kind": "encounter", "service_date": "2026-01-07"},
+                                {"kind": "week", "week_start": "2026-01-26"}]
+    return r
+
+
+def test_postcheck_checks_numbers_joined_to_a_hyphen(tmp_path):
+    conn = _pc_conn(tmp_path)
+    # (10 is in the fixture's quote "line 10", so 20 is the unbacked number here.)
+    assert postcheck(conn, "A 20-minute gap (T-D1 L1).", _results())["numbers_not_in_results"] == ["20"]
+    assert postcheck(conn, "A 50-minute session (T-D1 L1).", _results())["ok"]
+    assert postcheck(conn, "Between 30-50 minutes (T-D1 L1).", _results())["numbers_not_in_results"] == ["30"]
+
+
+def test_postcheck_rejects_a_date_no_result_states(tmp_path):
+    conn = _pc_conn(tmp_path)
+    pc = postcheck(conn, "Seen on January 8 for 50 minutes (T-D1 L1).", _dated_results())
+    assert pc["dates_not_in_results"] == ["01-08"] and not pc["ok"]
+    pc = postcheck(conn, "Seen on 2026-01-09 (T-D1 L1).", _dated_results())
+    assert pc["dates_not_in_results"] == ["2026-01-09"] and not pc["ok"]
+
+
+def test_postcheck_accepts_dates_the_results_state(tmp_path):
+    conn = _pc_conn(tmp_path)
+    for text in ("Seen on January 7, 2026 for 50 minutes (T-D1 L1).",
+                 "Seen on Jan 7 (T-D1 L1).",
+                 "Seen on 2026-01-07 (T-D1 L1).",
+                 "From January 5 to January 30 (the period asked about) (T-D1 L1).",
+                 "The week of Jan 26–Feb 1 (T-D1 L1).",
+                 "The week of 26 January 2026 (T-D1 L1)."):
+        pc = postcheck(conn, text, _dated_results())
+        assert pc["ok"], (text, pc)
+
+
+def test_postcheck_reads_zero_padded_month_day_and_ignores_unidentified_contact_ids(tmp_path):
+    conn = _pc_conn(tmp_path)
+    assert postcheck(conn, "Week 01-26 to 02-01 (T-D1 L1).", _dated_results())["ok"]
+    assert postcheck(conn, "Week 01-27 (T-D1 L1).", _dated_results())["dates_not_in_results"] == ["01-27"]
+    r = _dated_results()
+    assert postcheck(conn, "Contact U-2026-01-07-outreach_call-1 (T-D1 L1).", r)["ok"]

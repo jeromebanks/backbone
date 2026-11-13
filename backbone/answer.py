@@ -24,7 +24,7 @@ from .llm import complete_json
 from .paths import safe_output_path
 from .query import QueryPlan, execute_plan
 
-PROMPT_VERSION = "a2"
+PROMPT_VERSION = "a3"
 OUT_DIR = ROOT / "out" / "answers"
 
 PLANNER_SYSTEM = """You translate a question about clinical records into a QueryPlan: a list of typed operations that \
@@ -59,7 +59,12 @@ with kinds [encounters, documents, decisions].
 NARRATOR_SYSTEM = """You write the final answer to a question about clinical records, using ONLY the computed results \
 provided (produced by deterministic software from source documents). Rules:
 - Every number you state must appear in the results. Do not compute new numbers (no new sums, differences, averages \
-or conversions); quote the computed values, including [low–high] bounds.
+or conversions); quote the computed values, including [low–high] bounds. This includes numbers inside compounds \
+such as "10-minute": do not derive a gap or a duration the results do not state.
+- State only dates that appear in the results (or the period asked about). Do not derive dates, e.g. the days of a \
+week that fall after the period ends; say "the rest of that week" instead.
+- When the results name a document as "LABEL [sha12]" (several documents share that label), cite it the same \
+way, e.g. (NOTE [0a1b2c3d4e5f] L4).
 - Cite sources inline as (DOC-ID L<lines>) using the evidence entries, e.g. (BH-D103 L7). Cite only documents that \
 appear in the results, and only line numbers listed in that document's evidence passages (their "lines" field). A \
 range is allowed only when every line in it is listed: never join non-adjacent lines into a range. If the listed lines \
@@ -142,7 +147,9 @@ def _slim(results: dict) -> dict:
     return out
 
 
-_NUM = re.compile(r"(?<![\w-])\d+(?:\.\d+)?(?![\w-])")
+# A number in the answer. Hyphenated compounds and ranges ("10-minute", "30-45") are checked too (#69); IDs
+# (BH-D103, PHQ-9), line references, dates and clock times are removed before this runs.
+_NUM = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?!\w|\.\d)")
 
 # Calendar and clock notation: its digits name a date or a time, not a quantity. Stripped from the answer before its
 # numbers are checked, and from computed strings before their numbers are admitted (#44), so the two sides agree.
@@ -158,6 +165,7 @@ _CALENDAR = [
                rf"(?:(?:,\s*|,?\s+(?:and|&)\s+)\d{{1,2}}(?![\d.,])(?!\s*(?:min|hour|hr|h\b|session|day|week|wk|%)))*"
                rf"(?:,?\s*\d{{4}})?"),
     re.compile(rf"\b{_MONTHS}\s+\d{{4}}(?!\d)"),                                               # January 2026
+    re.compile(r"(?<![\w-])0[1-9]-[0-3]\d(?![\w-])"),                                       # 01-26
 ]
 # Identifiers inside computed strings: keys (MRN|ENC), claim ids, short shas and other hex, and labels or file names
 # such as BH-D103, HG-M042, PHQ-9 or note_88.txt. Their digits are never quantities.
@@ -176,6 +184,83 @@ _QUANTITY = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?!\w|\.\d)")
 # quantity: nothing under them is admitted, whatever its type.
 _ID_FIELDS = {"claim_id", "claim_ids", "file", "sha256", "doc_sha", "requirement", "doc_id", "lines", "line_start",
               "line_end", "mrn", "encounter_id", "form_id", "subject", "rule"}
+
+
+_MON_NAMES = {m: i for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov",
+                                          "dec"], start=1)}
+_NOT_A_DAY = r"(?!\s*(?:min|hour|hr|h\b|session|day|week|wk|%))"
+_D_ISO = re.compile(r"(?<!\d)(\d{4})-(\d{1,2})-(\d{1,2})(?!\d)")
+_D_MDY = re.compile(r"(?<![\d/])(\d{1,2})/(\d{1,2})/(\d{4})(?![\d/])")
+# "01-26" (zero-padded month-day, as in "01-26 to 02-01"). The leading zero keeps quantity ranges like "30-45" or
+# "10-12" out.
+_D_MD_PADDED = re.compile(r"(?<![\w-])(0[1-9])-([0-3]\d)(?![\w-])")
+_D_MONTH_FIRST = re.compile(
+    rf"\b({_MONTHS})\s*(\d{{1,2}})(?!\d)(?:st|nd|rd|th)?"
+    rf"(?:\s*[-–]\s*(?:({_MONTHS})\s*)?(\d{{1,2}})(?![\d:]))?"
+    rf"((?:(?:,\s*|,?\s+(?:and|&)\s+)\d{{1,2}}(?![\d.,:]){_NOT_A_DAY})*)"
+    rf"(?:,?\s*(\d{{4}}))?")
+_D_DAY_FIRST = re.compile(rf"(?<![\d:.])(\d{{1,2}})(?:st|nd|rd|th)?(?:\s*[-–]\s*(\d{{1,2}}))?\s+({_MONTHS})"
+                          rf"(?:\s+(\d{{4}}))?")
+
+
+def _month(name: str) -> int:
+    return _MON_NAMES[name[:3].lower()]
+
+
+def _dates_in(s: str) -> set[tuple[int | None, int, int]]:
+    """Calendar dates stated in `s` as (year or None, month, day): ISO, m/d/yyyy, "January 7[, 2026]", "Jan 26–30",
+    "Jan 26–Feb 1", day lists "Jan 8, 15 and 27", "26 January 2026" and "5–9 January"."""
+    out: set[tuple[int | None, int, int]] = set()
+    for y, m, d in _D_ISO.findall(s):
+        out.add((int(y), int(m), int(d)))
+    for m, d, y in _D_MDY.findall(s):
+        out.add((int(y), int(m), int(d)))
+    for m, d in _D_MD_PADDED.findall(s):
+        out.add((None, int(m), int(d)))
+    for mo in _D_MONTH_FIRST.finditer(s):
+        mon, d1, mon2, d2, days, y = mo.groups()
+        y = int(y) if y else None
+        out.add((y, _month(mon), int(d1)))
+        if d2:
+            out.add((y, _month(mon2 or mon), int(d2)))
+        for d in re.findall(r"\d{1,2}", days or ""):
+            out.add((y, _month(mon), int(d)))
+    for d1, d2, mon, y in _D_DAY_FIRST.findall(s):
+        y = int(y) if y else None
+        out.add((y, _month(mon), int(d1)))
+        if d2:
+            out.add((y, _month(mon), int(d2)))
+    return {(y, m, d) for y, m, d in out if 1 <= m <= 12 and 1 <= d <= 31}
+
+
+def _known_dates(results: dict) -> set[tuple[int | None, int, int]]:
+    """Dates an answer may state (#70): every date in the computed output (values, calculations, quotes), the scope
+    bounds each step was run over (restating the period asked about is not a claim of fact), and the last day of
+    every Monday–Sunday week the results report."""
+    from datetime import date, timedelta
+    out = _dates_in(_computed_blob(results))
+    for r in results.get("results", []):
+        sc = (r.get("params") or {}).get("scope") or {}
+        for k in ("start", "end"):
+            out |= _dates_in(str(sc.get(k) or ""))
+
+    def weeks(o, key=""):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                weeks(v, str(k))
+        elif isinstance(o, list):
+            for v in o:
+                weeks(v, key)
+        elif isinstance(o, str) and key == "week_start" and _D_ISO.fullmatch(o):
+            e = date.fromisoformat(o) + timedelta(days=6)
+            out.add((e.year, e.month, e.day))
+    weeks(json.loads(_computed_blob(results)))
+    return out
+
+
+def _dates_backed(stated, known) -> bool:
+    y, m, d = stated
+    return any(m == km and d == kd and (y is None or ky is None or y == ky) for ky, km, kd in known)
 
 
 def _strip_calendar(s: str) -> str:
@@ -232,10 +317,15 @@ def _computed_blob(results: dict) -> str:
 def postcheck(conn, answer_md: str, results: dict) -> dict:
     blob = _computed_blob(results)
     known = _known_numbers(results)
-    text = re.sub(r"\b[A-Z]{2,}-[A-Z]?\d+\b", " ", answer_md)          # drop IDs like BH-D103, HG-E110
+    # drop unidentified-contact keys (U-2026-01-08-outreach_call-1) before dates are read, then IDs like BH-D103
+    text = re.sub(r"\b[A-Z]+-\d{4}-\d{2}-\d{2}-[A-Za-z_]+-\d+\b", " ", answer_md)
+    text = re.sub(r"\b[A-Z]{2,}-[A-Z]?\d+\b", " ", text)
     text = re.sub(r"\[[0-9a-f]{12}\]", " ", text)                       # short shas disambiguating a label (#59)
     text = re.sub(r"\bL\d+(?:[-–]\d+)?\b", " ", text)                    # drop line refs
-    text = _strip_calendar(text)                                          # dates and clock times (checked via quotes)
+    known_dates = _known_dates(results)
+    bad_dates = sorted({(f"{y}-{m:02d}-{d:02d}" if y else f"{m:02d}-{d:02d}")
+                        for y, m, d in _dates_in(text) if not _dates_backed((y, m, d), known_dates)})
+    text = _strip_calendar(text)                                          # dates (checked above) and clock times
     unknown = sorted({n for n in _NUM.findall(text) if float(n) not in known}, key=float)
     # Citations: the pattern is built from the corpus's own document labels (any ID scheme or filename stem).
     shas: dict[str, list[str]] = {}
@@ -301,8 +391,8 @@ def postcheck(conn, answer_md: str, results: dict) -> dict:
     bad_lines = [f"{doc} {ref}" for doc, _, ref in sorted(set(bad_lines))]
     return {"numbers_not_in_results": unknown, "unknown_documents": bad_docs,
             "documents_not_in_results": not_in_results, "line_refs_outside_evidence": bad_lines,
-            "ambiguous_citations": ambiguous,
-            "ok": not (unknown or bad_docs or not_in_results or bad_lines or ambiguous)}
+            "ambiguous_citations": ambiguous, "dates_not_in_results": bad_dates,
+            "ok": not (unknown or bad_docs or not_in_results or bad_lines or ambiguous or bad_dates)}
 
 
 def _narration_prompt(question: str, results: dict) -> str:

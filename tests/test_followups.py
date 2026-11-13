@@ -378,6 +378,9 @@ def test_month_day_lists_are_dates_but_quantities_after_them_are_checked(tmp_pat
     # "Jan 8, 15 and 27" names dates; in "Jan 5–18, 2.0 wk" the 2.0 is a quantity that must still be backed.
     res = _results()
     res["results"][0]["totals"]["weeks"] = 2.0
+    # Since #70 the dates themselves must be backed too: the results state each one.
+    res["results"][0]["facts"] = [{"service_date": d} for d in
+                                  ("2026-01-05", "2026-01-07", "2026-01-08", "2026-01-15", "2026-01-18", "2026-01-27")]
     conn = _pc_db(tmp_path)
     assert A.postcheck(conn, "Calls on Jan 8, 15 and 27 (T-D1 L6).", res)["ok"]
     assert A.postcheck(conn, "Before (Jan 5–18, 2.0 wk) (T-D1 L6).", res)["ok"]
