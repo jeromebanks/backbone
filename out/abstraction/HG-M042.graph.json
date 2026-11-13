@@ -8,7 +8,7 @@
       "dob": "1991-04-12"
     },
     {
-      "id": "doc:BH-D001",
+      "id": "doc:d2240979a2de7d7782a34a6ca26e289ee829d01eea9932e4d61b3588c724ceb1",
       "type": "Document",
       "doc_id": "BH-D001",
       "sha256": "d2240979a2de7d7782a34a6ca26e289ee829d01eea9932e4d61b3588c724ceb1",
@@ -22,7 +22,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D002",
+      "id": "doc:7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
       "type": "Document",
       "doc_id": "BH-D002",
       "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
@@ -36,7 +36,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D003",
+      "id": "doc:3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
       "type": "Document",
       "doc_id": "BH-D003",
       "sha256": "3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
@@ -50,7 +50,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D004",
+      "id": "doc:5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
       "type": "Document",
       "doc_id": "BH-D004",
       "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
@@ -64,7 +64,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D005",
+      "id": "doc:6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
       "type": "Document",
       "doc_id": "BH-D005",
       "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
@@ -78,7 +78,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D006",
+      "id": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "Document",
       "doc_id": "BH-D006",
       "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
@@ -92,7 +92,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D007",
+      "id": "doc:924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b",
       "type": "Document",
       "doc_id": "BH-D007",
       "sha256": "924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b",
@@ -106,7 +106,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D008",
+      "id": "doc:ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed",
       "type": "Document",
       "doc_id": "BH-D008",
       "sha256": "ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed",
@@ -120,7 +120,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D009",
+      "id": "doc:d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7",
       "type": "Document",
       "doc_id": "BH-D009",
       "sha256": "d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7",
@@ -134,7 +134,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D010",
+      "id": "doc:95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
       "type": "Document",
       "doc_id": "BH-D010",
       "sha256": "95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
@@ -148,7 +148,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D011",
+      "id": "doc:8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
       "type": "Document",
       "doc_id": "BH-D011",
       "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
@@ -162,7 +162,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D012",
+      "id": "doc:432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
       "type": "Document",
       "doc_id": "BH-D012",
       "sha256": "432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
@@ -176,7 +176,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D013",
+      "id": "doc:300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
       "type": "Document",
       "doc_id": "BH-D013",
       "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
@@ -190,7 +190,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D014",
+      "id": "doc:85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
       "type": "Document",
       "doc_id": "BH-D014",
       "sha256": "85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
@@ -204,7 +204,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D015",
+      "id": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "Document",
       "doc_id": "BH-D015",
       "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
@@ -218,7 +218,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D016",
+      "id": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "Document",
       "doc_id": "BH-D016",
       "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
@@ -232,7 +232,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D101",
+      "id": "doc:05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
       "type": "Document",
       "doc_id": "BH-D101",
       "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
@@ -246,7 +246,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D102",
+      "id": "doc:514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
       "type": "Document",
       "doc_id": "BH-D102",
       "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
@@ -260,7 +260,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D103",
+      "id": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
       "type": "Document",
       "doc_id": "BH-D103",
       "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
@@ -274,7 +274,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D104",
+      "id": "doc:f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
       "type": "Document",
       "doc_id": "BH-D104",
       "sha256": "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
@@ -288,7 +288,7 @@
       "finality": "unknown"
     },
     {
-      "id": "doc:BH-D105",
+      "id": "doc:91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
       "type": "Document",
       "doc_id": "BH-D105",
       "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
@@ -302,7 +302,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D106",
+      "id": "doc:09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
       "type": "Document",
       "doc_id": "BH-D106",
       "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
@@ -316,7 +316,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D107",
+      "id": "doc:c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
       "type": "Document",
       "doc_id": "BH-D107",
       "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
@@ -330,7 +330,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D108",
+      "id": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "Document",
       "doc_id": "BH-D108",
       "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
@@ -344,7 +344,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D109",
+      "id": "doc:069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
       "type": "Document",
       "doc_id": "BH-D109",
       "sha256": "069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
@@ -358,7 +358,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D110",
+      "id": "doc:4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
       "type": "Document",
       "doc_id": "BH-D110",
       "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
@@ -372,7 +372,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D111",
+      "id": "doc:d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
       "type": "Document",
       "doc_id": "BH-D111",
       "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
@@ -386,7 +386,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D112",
+      "id": "doc:b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
       "type": "Document",
       "doc_id": "BH-D112",
       "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
@@ -400,7 +400,7 @@
       "finality": "draft"
     },
     {
-      "id": "doc:BH-D113",
+      "id": "doc:36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9",
       "type": "Document",
       "doc_id": "BH-D113",
       "sha256": "36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9",
@@ -414,7 +414,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D114",
+      "id": "doc:9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c",
       "type": "Document",
       "doc_id": "BH-D114",
       "sha256": "9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c",
@@ -428,7 +428,7 @@
       "finality": "final"
     },
     {
-      "id": "doc:BH-D115",
+      "id": "doc:4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
       "type": "Document",
       "doc_id": "BH-D115",
       "sha256": "4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
@@ -877,157 +877,157 @@
   "edges": [
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D001",
+      "to": "doc:d2240979a2de7d7782a34a6ca26e289ee829d01eea9932e4d61b3588c724ceb1",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D002",
+      "to": "doc:7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D003",
+      "to": "doc:3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D004",
+      "to": "doc:5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D005",
+      "to": "doc:6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D007",
+      "to": "doc:924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D008",
+      "to": "doc:ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D009",
+      "to": "doc:d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D010",
+      "to": "doc:95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D011",
+      "to": "doc:8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D012",
+      "to": "doc:432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D013",
+      "to": "doc:300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D014",
+      "to": "doc:85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D015",
+      "to": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D016",
+      "to": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D101",
+      "to": "doc:05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D102",
+      "to": "doc:514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D103",
+      "to": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D104",
+      "to": "doc:f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D105",
+      "to": "doc:91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D106",
+      "to": "doc:09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D107",
+      "to": "doc:c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D109",
+      "to": "doc:069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D110",
+      "to": "doc:4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D111",
+      "to": "doc:d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D112",
+      "to": "doc:b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D113",
+      "to": "doc:36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D114",
+      "to": "doc:9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c",
       "type": "HAS_DOCUMENT"
     },
     {
       "from": "patient:HG-M042",
-      "to": "doc:BH-D115",
+      "to": "doc:4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
       "type": "HAS_DOCUMENT"
     },
     {
@@ -1037,7 +1037,7 @@
     },
     {
       "from": "req:HG-M042|plan|BH-D003|patient_present_minutes|2026-01-05",
-      "to": "doc:BH-D003",
+      "to": "doc:3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
       "type": "STATED_IN",
       "passages": [
         {
@@ -1056,7 +1056,7 @@
     },
     {
       "from": "req:HG-M042|plan|BH-D003|therapy_days|2026-01-05",
-      "to": "doc:BH-D003",
+      "to": "doc:3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
       "type": "STATED_IN",
       "passages": [
         {
@@ -1074,17 +1074,17 @@
       "type": "HAS_WEEK"
     },
     {
-      "from": "enc:HG-E101",
+      "from": "enc:HG-M042|HG-E101",
       "to": "week:HG-M042:2026-01-05",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E102",
+      "from": "enc:HG-M042|HG-E102",
       "to": "week:HG-M042:2026-01-05",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E104",
+      "from": "enc:HG-M042|HG-E104",
       "to": "week:HG-M042:2026-01-05",
       "type": "COUNTED_IN"
     },
@@ -1094,12 +1094,12 @@
       "type": "HAS_WEEK"
     },
     {
-      "from": "enc:HG-E105",
+      "from": "enc:HG-M042|HG-E105",
       "to": "week:HG-M042:2026-01-12",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E107",
+      "from": "enc:HG-M042|HG-E107",
       "to": "week:HG-M042:2026-01-12",
       "type": "COUNTED_IN"
     },
@@ -1109,22 +1109,22 @@
       "type": "HAS_WEEK"
     },
     {
-      "from": "enc:HG-E110",
+      "from": "enc:HG-M042|HG-E110",
       "to": "week:HG-M042:2026-01-19",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E111",
+      "from": "enc:HG-M042|HG-E111",
       "to": "week:HG-M042:2026-01-19",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E112",
+      "from": "enc:HG-M042|HG-E112",
       "to": "week:HG-M042:2026-01-19",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E113",
+      "from": "enc:HG-M042|HG-E113",
       "to": "week:HG-M042:2026-01-19",
       "type": "COUNTED_IN"
     },
@@ -1134,17 +1134,17 @@
       "type": "HAS_WEEK"
     },
     {
-      "from": "enc:HG-E115",
+      "from": "enc:HG-M042|HG-E115",
       "to": "week:HG-M042:2026-01-26",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E118",
+      "from": "enc:HG-M042|HG-E118",
       "to": "week:HG-M042:2026-01-26",
       "type": "COUNTED_IN"
     },
     {
-      "from": "enc:HG-E119",
+      "from": "enc:HG-M042|HG-E119",
       "to": "week:HG-M042:2026-01-26",
       "type": "COUNTED_IN"
     },
@@ -1155,7 +1155,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E101",
-      "to": "doc:BH-D002",
+      "to": "doc:7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1185,7 +1185,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E101",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1206,7 +1206,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E102",
-      "to": "doc:BH-D004",
+      "to": "doc:5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1243,7 +1243,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E102",
-      "to": "doc:BH-D005",
+      "to": "doc:6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -1273,7 +1273,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E102",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1294,7 +1294,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E103",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1317,7 +1317,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E103",
-      "to": "doc:BH-D015",
+      "to": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1352,7 +1352,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-08-outreach_call-1",
-      "to": "doc:BH-D015",
+      "to": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1368,7 +1368,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-08-outreach_call-1",
-      "to": "doc:BH-D015",
+      "to": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1396,7 +1396,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E104",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1412,7 +1412,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E104",
-      "to": "doc:BH-D007",
+      "to": "doc:924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1449,7 +1449,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E104",
-      "to": "doc:BH-D008",
+      "to": "doc:ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1479,7 +1479,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E104",
-      "to": "doc:BH-D015",
+      "to": "doc:4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1500,7 +1500,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E105",
-      "to": "doc:BH-D005",
+      "to": "doc:6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -1523,7 +1523,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E105",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1539,7 +1539,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E105",
-      "to": "doc:BH-D009",
+      "to": "doc:d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1581,7 +1581,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E106",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1597,7 +1597,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E106",
-      "to": "doc:BH-D010",
+      "to": "doc:95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1639,7 +1639,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E107",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1655,7 +1655,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E107",
-      "to": "doc:BH-D011",
+      "to": "doc:8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1683,7 +1683,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E108",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1706,7 +1706,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E108",
-      "to": "doc:BH-D016",
+      "to": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1741,7 +1741,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-15-administrative-1",
-      "to": "doc:BH-D016",
+      "to": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1769,7 +1769,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-15-outreach_call-1",
-      "to": "doc:BH-D016",
+      "to": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1797,7 +1797,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E109",
-      "to": "doc:BH-D006",
+      "to": "doc:0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -1820,7 +1820,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E109",
-      "to": "doc:BH-D012",
+      "to": "doc:432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1869,7 +1869,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-16-administrative-1",
-      "to": "doc:BH-D013",
+      "to": "doc:300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1897,7 +1897,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-16-other-1",
-      "to": "doc:BH-D016",
+      "to": "doc:5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
       "type": "DOCUMENTED_BY",
       "record_type": "administrative_notice",
       "used_as_evidence": true,
@@ -1918,7 +1918,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E110",
-      "to": "doc:BH-D101",
+      "to": "doc:05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -1962,7 +1962,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E110",
-      "to": "doc:BH-D102",
+      "to": "doc:514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -1999,7 +1999,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E110",
-      "to": "doc:BH-D103",
+      "to": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_correction",
       "used_as_evidence": true,
@@ -2029,7 +2029,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E110",
-      "to": "doc:BH-D104",
+      "to": "doc:f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
       "type": "DOCUMENTED_BY",
       "record_type": "retransmitted_copy",
       "used_as_evidence": false,
@@ -2065,14 +2065,14 @@
       ]
     },
     {
-      "from": "doc:BH-D103",
-      "to": "doc:BH-D102",
+      "from": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
+      "to": "doc:514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
       "type": "CORRECTS",
       "detail": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
     },
     {
-      "from": "doc:BH-D103",
-      "to": "doc:BH-D104",
+      "from": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
+      "to": "doc:f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
       "type": "CORRECTS",
       "detail": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
     },
@@ -2083,7 +2083,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E111",
-      "to": "doc:BH-D103",
+      "to": "doc:674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
       "type": "DOCUMENTED_BY",
       "record_type": "other",
       "used_as_evidence": true,
@@ -2106,7 +2106,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E111",
-      "to": "doc:BH-D105",
+      "to": "doc:91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2148,7 +2148,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E112",
-      "to": "doc:BH-D106",
+      "to": "doc:09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2192,7 +2192,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E112",
-      "to": "doc:BH-D106",
+      "to": "doc:09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
       "type": "DOCUMENTED_BY",
       "record_type": "platform_log",
       "used_as_evidence": true,
@@ -2234,7 +2234,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E113",
-      "to": "doc:BH-D107",
+      "to": "doc:c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2278,7 +2278,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E113",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -2313,7 +2313,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E114",
-      "to": "doc:BH-D109",
+      "to": "doc:069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2355,7 +2355,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E115",
-      "to": "doc:BH-D110",
+      "to": "doc:4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2392,7 +2392,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E115",
-      "to": "doc:BH-D111",
+      "to": "doc:d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2434,7 +2434,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E116",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -2464,7 +2464,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E116",
-      "to": "doc:BH-D112",
+      "to": "doc:b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
       "type": "DOCUMENTED_BY",
       "record_type": "draft_template",
       "used_as_evidence": false,
@@ -2501,7 +2501,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E116",
-      "to": "doc:BH-D112",
+      "to": "doc:b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
       "type": "DOCUMENTED_BY",
       "record_type": "billing",
       "used_as_evidence": false,
@@ -2543,7 +2543,7 @@
     },
     {
       "from": "enc:HG-M042|U-2026-01-27-outreach_call-1",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -2564,7 +2564,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E117",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "DOCUMENTED_BY",
       "record_type": "schedule_listing",
       "used_as_evidence": true,
@@ -2599,7 +2599,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E118",
-      "to": "doc:BH-D107",
+      "to": "doc:c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2636,7 +2636,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E118",
-      "to": "doc:BH-D108",
+      "to": "doc:805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
       "type": "DOCUMENTED_BY",
       "record_type": "attendance_record",
       "used_as_evidence": true,
@@ -2671,7 +2671,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E119",
-      "to": "doc:BH-D113",
+      "to": "doc:36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2720,7 +2720,7 @@
     },
     {
       "from": "enc:HG-M042|HG-E120",
-      "to": "doc:BH-D114",
+      "to": "doc:9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c",
       "type": "DOCUMENTED_BY",
       "record_type": "clinical_note",
       "used_as_evidence": true,
@@ -2755,7 +2755,7 @@
     },
     {
       "from": "assess:HG-M042|PHQ-9|2026-01-05|-",
-      "to": "doc:BH-D002",
+      "to": "doc:7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
       "type": "RECORDED_IN"
     },
     {
@@ -2765,12 +2765,12 @@
     },
     {
       "from": "assess:HG-M042|PHQ-9|2026-01-16|HG-Q116",
-      "to": "doc:BH-D013",
+      "to": "doc:300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
       "type": "RECORDED_IN"
     },
     {
       "from": "assess:HG-M042|PHQ-9|2026-01-16|HG-Q116",
-      "to": "doc:BH-D014",
+      "to": "doc:85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
       "type": "COPIED_IN"
     },
     {
@@ -2780,7 +2780,7 @@
     },
     {
       "from": "assess:HG-M042|PHQ-9|2026-01-30|-",
-      "to": "doc:BH-D115",
+      "to": "doc:4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
       "type": "RECORDED_IN"
     }
   ]

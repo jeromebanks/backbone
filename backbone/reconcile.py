@@ -497,7 +497,10 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
         c.doc = docs.get(c.sha256, {})
     for c in claims:
         if not c.verified and c.kind != "document":
-            res.decide(c.subject_key or c.doc_label, "R0", "claim_rejected",
+            # Keyed like the subject it would have supported: the patient's encounter when the claim names one
+            # (so operators attach it to that encounter), else a per-claim key under the patient.
+            eid = _norm_id(c.payload.get("encounter_id")) if c.kind in ("service_event", "relation") else None
+            res.decide(f"{mrn}|{eid}" if eid else f"{mrn}|claim|{c.claim_id}", "R0", "claim_rejected",
                        f"{c.doc_label} {c.kind}: quote not found in source text", [c.claim_id])
     claims = [c for c in claims if c.verified or c.kind == "document"]
     rel = [c for c in claims if c.kind == "relation"]

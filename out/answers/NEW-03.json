@@ -1334,14 +1334,18 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "0bf056f3769e:service_event:0",
               "7f5f7d4bbfc9:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "sql": "SELECT doc_label FROM documents GROUP BY doc_label HAVING COUNT(*) > 1",
+            "params": []
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?,?)",
             "params": [
               "0bf056f3769e:service_event:1",
               "5edddc6b2093:service_event:0",
@@ -1349,7 +1353,7 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?,?,?)",
             "params": [
               "0bf056f3769e:service_event:3",
               "4521a120a4d7:service_event:3",
@@ -1358,7 +1362,7 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?,?)",
             "params": [
               "0bf056f3769e:service_event:4",
               "6f205f89f8d3:service_event:1",
@@ -1366,14 +1370,14 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "0bf056f3769e:service_event:6",
               "8c2fbaf5bb45:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?,?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?,?,?)",
             "params": [
               "05a234a8adc9:service_event:0",
               "514ca20809f6:service_event:0",
@@ -1382,42 +1386,42 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "674440968b5d:service_event:1",
               "91fd8e8b1b31:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "09c946a2248a:service_event:0",
               "09c946a2248a:service_event:1"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "805b2c69c7fa:service_event:0",
               "c5953bcb242e:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "4b64c46a13b8:service_event:0",
               "d03451942797:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
             "params": [
               "805b2c69c7fa:service_event:4",
               "c5953bcb242e:service_event:1"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
               "36764827bcb3:service_event:0"
             ]
@@ -1440,13 +1444,13 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
               "4b64c46a13b8:service_event:0"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label FROM claims WHERE claim_id IN (?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
               "d03451942797:service_event:0"
             ]
@@ -1472,7 +1476,7 @@
             ]
           },
           {
-            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths, c.sha256 FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
             "params": [
               "05a234a8adc9:service_event:0",
               "09c946a2248a:service_event:0",

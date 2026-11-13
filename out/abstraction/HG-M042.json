@@ -3,13 +3,13 @@
     "mrn": "HG-M042",
     "name": "Rowan Mercer",
     "dob": "1991-04-12",
-    "reconciled_at": "2026-11-12T11:31:02",
-    "ruleset_version": "r1"
+    "reconciled_at": "2026-11-12T16:16:01",
+    "ruleset_version": "r3"
   },
   "abstraction_version": {
     "extractor": "x1",
-    "ruleset": "r1",
-    "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c"
+    "ruleset": "r3",
+    "fingerprint": "d4193d4bf6e0e5afcbeb4f1470cdcb0c1a21ef96988ccc2804d771d20c791d35"
   },
   "documents": [
     {
@@ -407,6 +407,7 @@
         {
           "claim_id": "3b3f50db40b3:plan_requirement:1",
           "doc_id": "BH-D003",
+          "sha256": "3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
           "file": "signed_treatment_plan_jan05.txt",
           "record_type": "plan_requirement",
           "passages": [
@@ -442,6 +443,7 @@
         {
           "claim_id": "3b3f50db40b3:plan_requirement:0",
           "doc_id": "BH-D003",
+          "sha256": "3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12",
           "file": "signed_treatment_plan_jan05.txt",
           "record_type": "plan_requirement",
           "passages": [
@@ -786,7 +788,7 @@
       "minutes_status": "established",
       "calculation": "09:00\u201309:50 (stated contact intervals; BH-D002) = 50 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -806,6 +808,7 @@
         {
           "claim_id": "7f5f7d4bbfc9:service_event:0",
           "doc_id": "BH-D002",
+          "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
           "file": "intake_and_individual_jan05.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -835,6 +838,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:0",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -852,22 +856,55 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D002 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D002 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "7f5f7d4bbfc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "individual_therapy, attended, patient present"
+          "reason": "individual_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:0",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "7f5f7d4bbfc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=50",
-          "reason": "09:00\u201309:50 (stated contact intervals; BH-D002) = 50 min"
+          "reason": "09:00\u201309:50 (stated contact intervals; BH-D002) = 50 min",
+          "claims": [
+            {
+              "claim_id": "7f5f7d4bbfc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747"
+            }
+          ]
         },
         {
           "rule": "R9",
           "outcome": "counted_under_plan",
-          "reason": "session began before the plan signature (2026-01-05T13:05) on the plan's first effective day; counted because plan effectivity is by date"
+          "reason": "session began before the plan signature (2026-01-05T13:05) on the plan's first effective day; counted because plan effectivity is by date",
+          "claims": [
+            {
+              "claim_id": "3b3f50db40b3:plan_requirement:0",
+              "kind": "plan_requirement",
+              "sha256": "3b3f50db40b348bdd9e3baeb64b67a11d5edaf12699954762bec9633ad79ad12"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -890,7 +927,7 @@
       "minutes_status": "established",
       "calculation": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -916,6 +953,7 @@
         {
           "claim_id": "5edddc6b2093:service_event:0",
           "doc_id": "BH-D004",
+          "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11",
           "file": "group_facilitator_jan06.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -952,6 +990,7 @@
         {
           "claim_id": "6f205f89f8d3:service_event:0",
           "doc_id": "BH-D005",
+          "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
           "file": "early_group_attendance_roster.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -981,6 +1020,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:1",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -998,17 +1038,58 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D004 (clinical_note: attended), BH-D005 (attendance_record: attended_partial)"
+          "reason": "decided by tier-1 records: BH-D004 (clinical_note: attended), BH-D005 (attendance_record: attended_partial)",
+          "claims": [
+            {
+              "claim_id": "5edddc6b2093:service_event:0",
+              "kind": "service_event",
+              "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11"
+            },
+            {
+              "claim_id": "6f205f89f8d3:service_event:0",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "group_therapy, attended, patient present"
+          "reason": "group_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:1",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "5edddc6b2093:service_event:0",
+              "kind": "service_event",
+              "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11"
+            },
+            {
+              "claim_id": "6f205f89f8d3:service_event:0",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=45",
-          "reason": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min"
+          "reason": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min",
+          "claims": [
+            {
+              "claim_id": "5edddc6b2093:service_event:0",
+              "kind": "service_event",
+              "sha256": "5edddc6b20937ecdadf834b331c399375d0889d12a8595eb4084f1da2d4f4a11"
+            },
+            {
+              "claim_id": "6f205f89f8d3:service_event:0",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1031,7 +1112,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -1045,6 +1126,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:2",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1067,6 +1149,7 @@
         {
           "claim_id": "4521a120a4d7:service_event:0",
           "doc_id": "BH-D015",
+          "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
           "file": "missed_visit_outreach_jan08.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1098,12 +1181,36 @@
         {
           "rule": "R4",
           "outcome": "attended=no",
-          "reason": "decided by tier-2 records: BH-D006 (schedule_listing: no_show), BH-D015 (schedule_listing: no_show)"
+          "reason": "decided by tier-2 records: BH-D006 (schedule_listing: no_show), BH-D015 (schedule_listing: no_show)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:2",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "4521a120a4d7:service_event:0",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not attended (no_show)"
+          "reason": "not attended (no_show)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:2",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "4521a120a4d7:service_event:0",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1126,13 +1233,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-05",
       "intervals": [],
       "records": [
         {
           "claim_id": "4521a120a4d7:service_event:1",
           "doc_id": "BH-D015",
+          "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
           "file": "missed_visit_outreach_jan08.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -1148,6 +1256,7 @@
         {
           "claim_id": "4521a120a4d7:service_event:2",
           "doc_id": "BH-D015",
+          "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
           "file": "missed_visit_outreach_jan08.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -1172,22 +1281,60 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D015: no matching encounter (2026-01-08, outreach_call); kept as a separate contact"
+          "reason": "BH-D015: no matching encounter (2026-01-08, outreach_call); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "4521a120a4d7:service_event:1",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         },
         {
           "rule": "R1",
           "outcome": "matched_without_id",
-          "reason": "BH-D015 names no encounter ID; matched on date 2026-01-08 + service type outreach_call"
+          "reason": "BH-D015 names no encounter ID; matched on date 2026-01-08 + service type outreach_call",
+          "claims": [
+            {
+              "claim_id": "4521a120a4d7:service_event:2",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-2 records: BH-D015 (administrative_notice: unknown), BH-D015 (administrative_notice: attended)"
+          "reason": "decided by tier-2 records: BH-D015 (administrative_notice: unknown), BH-D015 (administrative_notice: attended)",
+          "claims": [
+            {
+              "claim_id": "4521a120a4d7:service_event:1",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            },
+            {
+              "claim_id": "4521a120a4d7:service_event:2",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (outreach_call)"
+          "reason": "not a psychotherapy service (outreach_call)",
+          "claims": [
+            {
+              "claim_id": "4521a120a4d7:service_event:1",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            },
+            {
+              "claim_id": "4521a120a4d7:service_event:2",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1210,7 +1357,7 @@
       "minutes_status": "established",
       "calculation": "14:00\u201314:45 (stated contact intervals; BH-D007, BH-D008) = 45 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -1230,6 +1377,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:3",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1245,6 +1393,7 @@
         {
           "claim_id": "924dee06b05c:service_event:0",
           "doc_id": "BH-D007",
+          "sha256": "924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b",
           "file": "family_primary_jan09.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1281,6 +1430,7 @@
         {
           "claim_id": "ad416fbda806:service_event:0",
           "doc_id": "BH-D008",
+          "sha256": "ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed",
           "file": "family_cofacilitator_jan09.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1310,6 +1460,7 @@
         {
           "claim_id": "4521a120a4d7:service_event:3",
           "doc_id": "BH-D015",
+          "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4",
           "file": "missed_visit_outreach_jan08.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1327,22 +1478,75 @@
         {
           "rule": "R1",
           "outcome": "matched_without_id",
-          "reason": "BH-D015 names no encounter ID; matched on date 2026-01-09 + service type family_therapy"
+          "reason": "BH-D015 names no encounter ID; matched on date 2026-01-09 + service type family_therapy",
+          "claims": [
+            {
+              "claim_id": "4521a120a4d7:service_event:3",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D007 (clinical_note: attended_full), BH-D008 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D007 (clinical_note: attended_full), BH-D008 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "924dee06b05c:service_event:0",
+              "kind": "service_event",
+              "sha256": "924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b"
+            },
+            {
+              "claim_id": "ad416fbda806:service_event:0",
+              "kind": "service_event",
+              "sha256": "ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "family_therapy, attended, patient present"
+          "reason": "family_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:3",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "4521a120a4d7:service_event:3",
+              "kind": "service_event",
+              "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+            },
+            {
+              "claim_id": "924dee06b05c:service_event:0",
+              "kind": "service_event",
+              "sha256": "924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b"
+            },
+            {
+              "claim_id": "ad416fbda806:service_event:0",
+              "kind": "service_event",
+              "sha256": "ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=45",
-          "reason": "14:00\u201314:45 (stated contact intervals; BH-D007, BH-D008) = 45 min"
+          "reason": "14:00\u201314:45 (stated contact intervals; BH-D007, BH-D008) = 45 min",
+          "claims": [
+            {
+              "claim_id": "924dee06b05c:service_event:0",
+              "kind": "service_event",
+              "sha256": "924dee06b05c0a841c3f86d0c394c7af39447db6c9ea7b643cc6eb3a3c40df6b"
+            },
+            {
+              "claim_id": "ad416fbda806:service_event:0",
+              "kind": "service_event",
+              "sha256": "ad416fbda80683308baa15c433c7d1df7fe9221b9e8baf1f2189964bc0421aed"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1365,7 +1569,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1391,6 +1595,7 @@
         {
           "claim_id": "6f205f89f8d3:service_event:1",
           "doc_id": "BH-D005",
+          "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616",
           "file": "early_group_attendance_roster.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -1413,6 +1618,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:4",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1428,6 +1634,7 @@
         {
           "claim_id": "d30d18d0335d:service_event:0",
           "doc_id": "BH-D009",
+          "sha256": "d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7",
           "file": "group_facilitator_jan12.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1466,17 +1673,58 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D005 (attendance_record: attended_full), BH-D009 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D005 (attendance_record: attended_full), BH-D009 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "6f205f89f8d3:service_event:1",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            },
+            {
+              "claim_id": "d30d18d0335d:service_event:0",
+              "kind": "service_event",
+              "sha256": "d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "group_therapy, attended, patient present"
+          "reason": "group_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:4",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "6f205f89f8d3:service_event:1",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            },
+            {
+              "claim_id": "d30d18d0335d:service_event:0",
+              "kind": "service_event",
+              "sha256": "d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=75",
-          "reason": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min"
+          "reason": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min",
+          "claims": [
+            {
+              "claim_id": "6f205f89f8d3:service_event:1",
+              "kind": "service_event",
+              "sha256": "6f205f89f8d3dbd05094e647925bb3c5955f11e9fb44f255f8cdedc3edb49616"
+            },
+            {
+              "claim_id": "d30d18d0335d:service_event:0",
+              "kind": "service_event",
+              "sha256": "d30d18d0335d5d428acea2e5ee0334fbbafc10665133a462061a01c94baa09b7"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1499,7 +1747,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1513,6 +1761,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:5",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1528,6 +1777,7 @@
         {
           "claim_id": "95debafd3a72:service_event:0",
           "doc_id": "BH-D010",
+          "sha256": "95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482",
           "file": "medication_review_jan13.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1566,12 +1816,31 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D010 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D010 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "95debafd3a72:service_event:0",
+              "kind": "service_event",
+              "sha256": "95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (medication_management)"
+          "reason": "not a psychotherapy service (medication_management)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:5",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "95debafd3a72:service_event:0",
+              "kind": "service_event",
+              "sha256": "95debafd3a72e32fd806d7aa4b420b1984f9c565d2af3c0d807269ee71aa8482"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1594,7 +1863,7 @@
       "minutes_status": "established",
       "calculation": "11:00\u201311:45 (stated contact intervals; BH-D011) = 45 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1614,6 +1883,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:6",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1629,6 +1899,7 @@
         {
           "claim_id": "8c2fbaf5bb45:service_event:0",
           "doc_id": "BH-D011",
+          "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a",
           "file": "individual_therapy_jan14.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1653,17 +1924,43 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D011 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D011 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "8c2fbaf5bb45:service_event:0",
+              "kind": "service_event",
+              "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "individual_therapy, attended, patient present"
+          "reason": "individual_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:6",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "8c2fbaf5bb45:service_event:0",
+              "kind": "service_event",
+              "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=45",
-          "reason": "11:00\u201311:45 (stated contact intervals; BH-D011) = 45 min"
+          "reason": "11:00\u201311:45 (stated contact intervals; BH-D011) = 45 min",
+          "claims": [
+            {
+              "claim_id": "8c2fbaf5bb45:service_event:0",
+              "kind": "service_event",
+              "sha256": "8c2fbaf5bb4545cc4590b288d768ab893a4d727f6946bcc88339669d0629eb8a"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1686,7 +1983,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1700,6 +1997,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:7",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1722,6 +2020,7 @@
         {
           "claim_id": "5f3375f11c85:service_event:0",
           "doc_id": "BH-D016",
+          "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
           "file": "group_cancellation_notice_jan15.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -1753,12 +2052,36 @@
         {
           "rule": "R4",
           "outcome": "attended=no",
-          "reason": "decided by tier-2 records: BH-D006 (schedule_listing: clinic_cancelled), BH-D016 (administrative_notice: clinic_cancelled)"
+          "reason": "decided by tier-2 records: BH-D006 (schedule_listing: clinic_cancelled), BH-D016 (administrative_notice: clinic_cancelled)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:7",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "5f3375f11c85:service_event:0",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not attended (clinic_cancelled)"
+          "reason": "not attended (clinic_cancelled)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:7",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "5f3375f11c85:service_event:0",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1781,13 +2104,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
         {
           "claim_id": "5f3375f11c85:service_event:1",
           "doc_id": "BH-D016",
+          "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
           "file": "group_cancellation_notice_jan15.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -1812,12 +2136,26 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D016: no matching encounter (2026-01-15, administrative); kept as a separate contact"
+          "reason": "BH-D016: no matching encounter (2026-01-15, administrative); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:1",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (administrative)"
+          "reason": "not a psychotherapy service (administrative)",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:1",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1840,13 +2178,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
         {
           "claim_id": "5f3375f11c85:service_event:2",
           "doc_id": "BH-D016",
+          "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
           "file": "group_cancellation_notice_jan15.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -1871,17 +2210,38 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D016: no matching encounter (2026-01-15, outreach_call); kept as a separate contact"
+          "reason": "BH-D016: no matching encounter (2026-01-15, outreach_call); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:2",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-2 records: BH-D016 (administrative_notice: attended)"
+          "reason": "decided by tier-2 records: BH-D016 (administrative_notice: attended)",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:2",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (outreach_call)"
+          "reason": "not a psychotherapy service (outreach_call)",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:2",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -1904,7 +2264,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1924,6 +2284,7 @@
         {
           "claim_id": "0bf056f3769e:service_event:8",
           "doc_id": "BH-D006",
+          "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96",
           "file": "early_appointment_status_export.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -1946,6 +2307,7 @@
         {
           "claim_id": "432c973d1a4d:service_event:0",
           "doc_id": "BH-D012",
+          "sha256": "432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea",
           "file": "partner_collateral_jan16.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -1991,12 +2353,31 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D012 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D012 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "432c973d1a4d:service_event:0",
+              "kind": "service_event",
+              "sha256": "432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (family_collateral)"
+          "reason": "not a psychotherapy service (family_collateral)",
+          "claims": [
+            {
+              "claim_id": "0bf056f3769e:service_event:8",
+              "kind": "service_event",
+              "sha256": "0bf056f3769e7daf39941514e6f3e1c40c99cbc00dbb4228ee0fac07d9f75f96"
+            },
+            {
+              "claim_id": "432c973d1a4d:service_event:0",
+              "kind": "service_event",
+              "sha256": "432c973d1a4d505b49ba85c3c92dead5c2a70faca6b6dd66e87db92b95329fea"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2019,13 +2400,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
         {
           "claim_id": "300a30dbe42b:service_event:0",
           "doc_id": "BH-D013",
+          "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
           "file": "symptom_measure_review_jan16.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2050,12 +2432,26 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D013: no matching encounter (2026-01-16, administrative); kept as a separate contact"
+          "reason": "BH-D013: no matching encounter (2026-01-16, administrative); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "300a30dbe42b:service_event:0",
+              "kind": "service_event",
+              "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (administrative)"
+          "reason": "not a psychotherapy service (administrative)",
+          "claims": [
+            {
+              "claim_id": "300a30dbe42b:service_event:0",
+              "kind": "service_event",
+              "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2078,13 +2474,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
         {
           "claim_id": "5f3375f11c85:service_event:3",
           "doc_id": "BH-D016",
+          "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9",
           "file": "group_cancellation_notice_jan15.txt",
           "record_type": "administrative_notice",
           "passages": [
@@ -2102,12 +2499,26 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D016: no matching encounter (2026-01-16, other); kept as a separate contact"
+          "reason": "BH-D016: no matching encounter (2026-01-16, other); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:3",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (other)"
+          "reason": "not a psychotherapy service (other)",
+          "claims": [
+            {
+              "claim_id": "5f3375f11c85:service_event:3",
+              "kind": "service_event",
+              "sha256": "5f3375f11c857ad3e9917ad2eefffffd5ee0412e6ab56885901c1b5d5b2115f9"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2130,7 +2541,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2156,6 +2567,7 @@
         {
           "claim_id": "05a234a8adc9:service_event:0",
           "doc_id": "BH-D101",
+          "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
           "file": "BH-D101_group_content_2026-01-19.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2199,6 +2611,7 @@
         {
           "claim_id": "514ca20809f6:service_event:0",
           "doc_id": "BH-D102",
+          "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
           "file": "BH-D102_original_attendance_2026-01-19.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -2235,6 +2648,7 @@
         {
           "claim_id": "674440968b5d:service_event:0",
           "doc_id": "BH-D103",
+          "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
           "file": "BH-D103_attendance_correction_2026-01-20.txt",
           "record_type": "attendance_correction",
           "passages": [
@@ -2264,6 +2678,7 @@
         {
           "claim_id": "f3f25065559f:service_event:0",
           "doc_id": "BH-D104",
+          "sha256": "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5",
           "file": "BH-D104_resent_roster_received_2026-01-26.txt",
           "record_type": "retransmitted_copy",
           "passages": [
@@ -2302,37 +2717,125 @@
         {
           "rule": "R3",
           "outcome": "evidence_excluded",
-          "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'"
+          "reason": "BH-D104 (retransmitted_copy): a retransmitted/copied record is not independent evidence; it states disposition 'attended'",
+          "claims": [
+            {
+              "claim_id": "f3f25065559f:service_event:0",
+              "kind": "service_event",
+              "sha256": "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5"
+            }
+          ]
         },
         {
           "rule": "R3",
           "outcome": "field_corrected",
-          "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          "reason": "BH-D102 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)",
+          "claims": [
+            {
+              "claim_id": "514ca20809f6:service_event:0",
+              "kind": "service_event",
+              "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
+            },
+            {
+              "claim_id": "674440968b5d:relation:0",
+              "kind": "relation",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            }
+          ]
         },
         {
           "rule": "R3",
           "outcome": "field_corrected",
-          "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)"
+          "reason": "BH-D104 departure 11:30 replaced by 11:15 per explicit correction in BH-D103 (correction applies to this field only)",
+          "claims": [
+            {
+              "claim_id": "674440968b5d:relation:0",
+              "kind": "relation",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            },
+            {
+              "claim_id": "f3f25065559f:service_event:0",
+              "kind": "service_event",
+              "sha256": "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)"
+          "reason": "decided by tier-1 records: BH-D101 (clinical_note: attended), BH-D102 (attendance_record: attended), BH-D103 (attendance_correction: attended_partial)",
+          "claims": [
+            {
+              "claim_id": "05a234a8adc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6"
+            },
+            {
+              "claim_id": "514ca20809f6:service_event:0",
+              "kind": "service_event",
+              "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
+            },
+            {
+              "claim_id": "674440968b5d:service_event:0",
+              "kind": "service_event",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "group_therapy, attended, patient present"
+          "reason": "group_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "05a234a8adc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6"
+            },
+            {
+              "claim_id": "514ca20809f6:service_event:0",
+              "kind": "service_event",
+              "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
+            },
+            {
+              "claim_id": "674440968b5d:service_event:0",
+              "kind": "service_event",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            },
+            {
+              "claim_id": "f3f25065559f:service_event:0",
+              "kind": "service_event",
+              "sha256": "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=60",
-          "reason": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min"
+          "reason": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
+          "claims": [
+            {
+              "claim_id": "05a234a8adc9:service_event:0",
+              "kind": "service_event",
+              "sha256": "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6"
+            },
+            {
+              "claim_id": "514ca20809f6:service_event:0",
+              "kind": "service_event",
+              "sha256": "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
+            },
+            {
+              "claim_id": "674440968b5d:service_event:0",
+              "kind": "service_event",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            }
+          ]
         },
         {
           "rule": "R7",
           "outcome": "correction_consistent",
-          "reason": "the superseded value in BH-D102 (10:00\u201311:30) would overlap HG-M042|HG-E111 11:15\u201311:45; the corrected value does not"
+          "reason": "the superseded value in BH-D102 (10:00\u201311:30) would overlap HG-M042|HG-E111 11:15\u201311:45; the corrected value does not",
+          "claims": []
         }
       ],
       "conflicts": []
@@ -2355,7 +2858,7 @@
       "minutes_status": "established",
       "calculation": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2369,6 +2872,7 @@
         {
           "claim_id": "674440968b5d:service_event:1",
           "doc_id": "BH-D103",
+          "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
           "file": "BH-D103_attendance_correction_2026-01-20.txt",
           "record_type": "other",
           "passages": [
@@ -2391,6 +2895,7 @@
         {
           "claim_id": "91fd8e8b1b31:service_event:0",
           "doc_id": "BH-D105",
+          "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
           "file": "BH-D105_individual_2026-01-19.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2429,22 +2934,55 @@
         {
           "rule": "R1",
           "outcome": "matched_without_id",
-          "reason": "BH-D103 names no encounter ID; matched on date 2026-01-19 + service type individual_therapy"
+          "reason": "BH-D103 names no encounter ID; matched on date 2026-01-19 + service type individual_therapy",
+          "claims": [
+            {
+              "claim_id": "674440968b5d:service_event:1",
+              "kind": "service_event",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D105 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D105 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "91fd8e8b1b31:service_event:0",
+              "kind": "service_event",
+              "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "individual_therapy, attended, patient present"
+          "reason": "individual_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "674440968b5d:service_event:1",
+              "kind": "service_event",
+              "sha256": "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
+            },
+            {
+              "claim_id": "91fd8e8b1b31:service_event:0",
+              "kind": "service_event",
+              "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=30",
-          "reason": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min"
+          "reason": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min",
+          "claims": [
+            {
+              "claim_id": "91fd8e8b1b31:service_event:0",
+              "kind": "service_event",
+              "sha256": "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2467,7 +3005,7 @@
       "minutes_status": "established",
       "calculation": "13:00\u201313:20 + 13:30\u201313:55 (stated contact intervals; BH-D106) = 45 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2487,6 +3025,7 @@
         {
           "claim_id": "09c946a2248a:service_event:0",
           "doc_id": "BH-D106",
+          "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
           "file": "BH-D106_telehealth_2026-01-21.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2530,6 +3069,7 @@
         {
           "claim_id": "09c946a2248a:service_event:1",
           "doc_id": "BH-D106",
+          "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46",
           "file": "BH-D106_telehealth_2026-01-21.txt",
           "record_type": "platform_log",
           "passages": [
@@ -2568,17 +3108,48 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D106 (clinical_note: attended), BH-D106 (platform_log: unknown)"
+          "reason": "decided by tier-1 records: BH-D106 (clinical_note: attended), BH-D106 (platform_log: unknown)",
+          "claims": [
+            {
+              "claim_id": "09c946a2248a:service_event:0",
+              "kind": "service_event",
+              "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46"
+            },
+            {
+              "claim_id": "09c946a2248a:service_event:1",
+              "kind": "service_event",
+              "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "individual_therapy, attended, patient present"
+          "reason": "individual_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "09c946a2248a:service_event:0",
+              "kind": "service_event",
+              "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46"
+            },
+            {
+              "claim_id": "09c946a2248a:service_event:1",
+              "kind": "service_event",
+              "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=45",
-          "reason": "13:00\u201313:20 + 13:30\u201313:55 (stated contact intervals; BH-D106) = 45 min"
+          "reason": "13:00\u201313:20 + 13:30\u201313:55 (stated contact intervals; BH-D106) = 45 min",
+          "claims": [
+            {
+              "claim_id": "09c946a2248a:service_event:0",
+              "kind": "service_event",
+              "sha256": "09c946a2248a5a81b2c1dc85b7620babe57b72f1bd4bed3d49eba574be5ccd46"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2601,7 +3172,7 @@
       "minutes_status": "established",
       "calculation": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2627,6 +3198,7 @@
         {
           "claim_id": "c5953bcb242e:service_event:0",
           "doc_id": "BH-D107",
+          "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
           "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2670,6 +3242,7 @@
         {
           "claim_id": "805b2c69c7fa:service_event:0",
           "doc_id": "BH-D108",
+          "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
           "file": "BH-D108_final_attendance_and_cancellation_register.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -2701,17 +3274,53 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:0",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:0",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "group_therapy, attended, patient present"
+          "reason": "group_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:0",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:0",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=45",
-          "reason": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min"
+          "reason": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:0",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:0",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2734,7 +3343,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2748,6 +3357,7 @@
         {
           "claim_id": "069ea4112779:service_event:0",
           "doc_id": "BH-D109",
+          "sha256": "069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be",
           "file": "BH-D109_care_coordination_2026-01-23.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2786,12 +3396,26 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D109 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D109 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "069ea4112779:service_event:0",
+              "kind": "service_event",
+              "sha256": "069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (care_coordination)"
+          "reason": "not a psychotherapy service (care_coordination)",
+          "claims": [
+            {
+              "claim_id": "069ea4112779:service_event:0",
+              "kind": "service_event",
+              "sha256": "069ea4112779b68e7ba7bc9d06a73a6ad6dbb8110d7a1e7dfd3307769c6305be"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -2814,7 +3438,7 @@
       "minutes_status": "disputed",
       "calculation": "09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -2834,6 +3458,7 @@
         {
           "claim_id": "4b64c46a13b8:service_event:0",
           "doc_id": "BH-D110",
+          "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b",
           "file": "BH-D110_individual_primary_record_2026-01-26.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2870,6 +3495,7 @@
         {
           "claim_id": "d03451942797:service_event:0",
           "doc_id": "BH-D111",
+          "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380",
           "file": "BH-D111_individual_second_record_2026-01-26.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -2908,17 +3534,53 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D110 (clinical_note: attended), BH-D111 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D110 (clinical_note: attended), BH-D111 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "4b64c46a13b8:service_event:0",
+              "kind": "service_event",
+              "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b"
+            },
+            {
+              "claim_id": "d03451942797:service_event:0",
+              "kind": "service_event",
+              "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "individual_therapy, attended, patient present"
+          "reason": "individual_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "4b64c46a13b8:service_event:0",
+              "kind": "service_event",
+              "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b"
+            },
+            {
+              "claim_id": "d03451942797:service_event:0",
+              "kind": "service_event",
+              "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "minutes_disputed",
-          "reason": "tier-1 records give different patient-contact intervals and none corrects the other: 09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min; carried as bounds [40, 50]"
+          "reason": "tier-1 records give different patient-contact intervals and none corrects the other: 09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min; carried as bounds [40, 50]",
+          "claims": [
+            {
+              "claim_id": "4b64c46a13b8:service_event:0",
+              "kind": "service_event",
+              "sha256": "4b64c46a13b80c09ec46d1cbb7b577dbfe8027cb62366631c15efa8ec1a1f58b"
+            },
+            {
+              "claim_id": "d03451942797:service_event:0",
+              "kind": "service_event",
+              "sha256": "d03451942797c3fb189a5083c80950887657a79d0d1da9bb7f74bda8731d9380"
+            }
+          ]
         }
       ],
       "conflicts": [
@@ -2962,7 +3624,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -2976,6 +3638,7 @@
         {
           "claim_id": "805b2c69c7fa:service_event:1",
           "doc_id": "BH-D108",
+          "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
           "file": "BH-D108_final_attendance_and_cancellation_register.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -3005,6 +3668,7 @@
         {
           "claim_id": "b4390ed6b672:service_event:0",
           "doc_id": "BH-D112",
+          "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
           "file": "BH-D112_draft_note_and_charge_extract_2026-01-27.txt",
           "record_type": "draft_template",
           "passages": [
@@ -3041,6 +3705,7 @@
         {
           "claim_id": "b4390ed6b672:service_event:1",
           "doc_id": "BH-D112",
+          "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f",
           "file": "BH-D112_draft_note_and_charge_extract_2026-01-27.txt",
           "record_type": "billing",
           "passages": [
@@ -3079,22 +3744,60 @@
         {
           "rule": "R2",
           "outcome": "evidence_excluded",
-          "reason": "BH-D112 (draft_template): draft/template text is not attendance evidence; it states disposition 'attended_full'"
+          "reason": "BH-D112 (draft_template): draft/template text is not attendance evidence; it states disposition 'attended_full'",
+          "claims": [
+            {
+              "claim_id": "b4390ed6b672:service_event:0",
+              "kind": "service_event",
+              "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f"
+            }
+          ]
         },
         {
           "rule": "R2",
           "outcome": "evidence_excluded",
-          "reason": "BH-D112 (billing): a billing/charge row is not attendance evidence"
+          "reason": "BH-D112 (billing): a billing/charge row is not attendance evidence",
+          "claims": [
+            {
+              "claim_id": "b4390ed6b672:service_event:1",
+              "kind": "service_event",
+              "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f"
+            }
+          ]
         },
         {
           "rule": "R4",
           "outcome": "attended=no",
-          "reason": "decided by tier-1 records: BH-D108 (attendance_record: no_show)"
+          "reason": "decided by tier-1 records: BH-D108 (attendance_record: no_show)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:1",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not attended (no_show)"
+          "reason": "not attended (no_show)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:1",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "b4390ed6b672:service_event:0",
+              "kind": "service_event",
+              "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f"
+            },
+            {
+              "claim_id": "b4390ed6b672:service_event:1",
+              "kind": "service_event",
+              "sha256": "b4390ed6b672381f671aae23dbfa937d9c5585ca4b6db83cd811797e2a34505f"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3117,13 +3820,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [],
       "records": [
         {
           "claim_id": "805b2c69c7fa:service_event:2",
           "doc_id": "BH-D108",
+          "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
           "file": "BH-D108_final_attendance_and_cancellation_register.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -3141,12 +3845,26 @@
         {
           "rule": "R1",
           "outcome": "unidentified_contact",
-          "reason": "BH-D108: no matching encounter (2026-01-27, outreach_call); kept as a separate contact"
+          "reason": "BH-D108: no matching encounter (2026-01-27, outreach_call); kept as a separate contact",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:2",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (outreach_call)"
+          "reason": "not a psychotherapy service (outreach_call)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:2",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3169,7 +3887,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3183,6 +3901,7 @@
         {
           "claim_id": "805b2c69c7fa:service_event:3",
           "doc_id": "BH-D108",
+          "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
           "file": "BH-D108_final_attendance_and_cancellation_register.txt",
           "record_type": "schedule_listing",
           "passages": [
@@ -3214,12 +3933,26 @@
         {
           "rule": "R4",
           "outcome": "attended=no",
-          "reason": "decided by tier-2 records: BH-D108 (schedule_listing: patient_cancelled)"
+          "reason": "decided by tier-2 records: BH-D108 (schedule_listing: patient_cancelled)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:3",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not attended (patient_cancelled)"
+          "reason": "not attended (patient_cancelled)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:3",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3242,7 +3975,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min",
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3268,6 +4001,7 @@
         {
           "claim_id": "c5953bcb242e:service_event:1",
           "doc_id": "BH-D107",
+          "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70",
           "file": "BH-D107_group_activity_records_2026-01-22_and_29.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -3304,6 +4038,7 @@
         {
           "claim_id": "805b2c69c7fa:service_event:4",
           "doc_id": "BH-D108",
+          "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1",
           "file": "BH-D108_final_attendance_and_cancellation_register.txt",
           "record_type": "attendance_record",
           "passages": [
@@ -3335,17 +4070,53 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)"
+          "reason": "decided by tier-1 records: BH-D108 (attendance_record: attended), BH-D107 (clinical_note: attended)",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:4",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:1",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "group_therapy, attended, patient present"
+          "reason": "group_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:4",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:1",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=75",
-          "reason": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min"
+          "reason": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min",
+          "claims": [
+            {
+              "claim_id": "805b2c69c7fa:service_event:4",
+              "kind": "service_event",
+              "sha256": "805b2c69c7fa18ab31b618b4a313c39dcdbde570cc0890de2dfd52d77ca547e1"
+            },
+            {
+              "claim_id": "c5953bcb242e:service_event:1",
+              "kind": "service_event",
+              "sha256": "c5953bcb242ef0143301019cf06964a4b759d432e26dc0e34f0ad1c2b819df70"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3370,7 +4141,7 @@
       "flags": [
         "BH-D113 states 45 min; patient-present computation gives 30 min"
       ],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3390,6 +4161,7 @@
         {
           "claim_id": "36764827bcb3:service_event:0",
           "doc_id": "BH-D113",
+          "sha256": "36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9",
           "file": "BH-D113_family_therapy_2026-01-30.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -3435,17 +4207,38 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D113 (clinical_note: attended_partial)"
+          "reason": "decided by tier-1 records: BH-D113 (clinical_note: attended_partial)",
+          "claims": [
+            {
+              "claim_id": "36764827bcb3:service_event:0",
+              "kind": "service_event",
+              "sha256": "36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=yes",
-          "reason": "family_therapy, attended, patient present"
+          "reason": "family_therapy, attended, patient present",
+          "claims": [
+            {
+              "claim_id": "36764827bcb3:service_event:0",
+              "kind": "service_event",
+              "sha256": "36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9"
+            }
+          ]
         },
         {
           "rule": "R6",
           "outcome": "minutes=30",
-          "reason": "13:15\u201313:45 (stated contact intervals; BH-D113) = 30 min"
+          "reason": "13:15\u201313:45 (stated contact intervals; BH-D113) = 30 min",
+          "claims": [
+            {
+              "claim_id": "36764827bcb3:service_event:0",
+              "kind": "service_event",
+              "sha256": "36764827bcb39caf2e9304c881f55e4acba9744a9792228bf36981f19a0feaf9"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3468,13 +4261,14 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r1",
+      "ruleset_version": "r3",
       "week_start": "2026-01-26",
       "intervals": [],
       "records": [
         {
           "claim_id": "9942bd886fcd:service_event:0",
           "doc_id": "BH-D114",
+          "sha256": "9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c",
           "file": "BH-D114_medication_management_2026-01-30.txt",
           "record_type": "clinical_note",
           "passages": [
@@ -3506,12 +4300,26 @@
         {
           "rule": "R4",
           "outcome": "attended=yes",
-          "reason": "decided by tier-1 records: BH-D114 (clinical_note: attended_full)"
+          "reason": "decided by tier-1 records: BH-D114 (clinical_note: attended_full)",
+          "claims": [
+            {
+              "claim_id": "9942bd886fcd:service_event:0",
+              "kind": "service_event",
+              "sha256": "9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c"
+            }
+          ]
         },
         {
           "rule": "R5",
           "outcome": "eligible=no",
-          "reason": "not a psychotherapy service (medication_management)"
+          "reason": "not a psychotherapy service (medication_management)",
+          "claims": [
+            {
+              "claim_id": "9942bd886fcd:service_event:0",
+              "kind": "service_event",
+              "sha256": "9942bd886fcd2158bbd56914551519397d70eef7103b6d33ba2fa90cc424093c"
+            }
+          ]
         }
       ],
       "conflicts": []
@@ -3531,6 +4339,7 @@
         {
           "claim_id": "7f5f7d4bbfc9:assessment:0",
           "doc_id": "BH-D002",
+          "sha256": "7f5f7d4bbfc9b47a632fb33cca1b261999078d058cbd7601c63f6c6e5be3c747",
           "file": "intake_and_individual_jan05.txt",
           "record_type": "assessment",
           "passages": [
@@ -3560,6 +4369,7 @@
         {
           "claim_id": "300a30dbe42b:assessment:0",
           "doc_id": "BH-D013",
+          "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e",
           "file": "symptom_measure_review_jan16.txt",
           "record_type": "assessment",
           "passages": [
@@ -3577,6 +4387,7 @@
         {
           "claim_id": "85e2c780abde:assessment:0",
           "doc_id": "BH-D014",
+          "sha256": "85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b",
           "file": "imported_measure_summary_received_jan26.txt",
           "record_type": "assessment",
           "passages": [
@@ -3594,7 +4405,19 @@
         {
           "rule": "R8",
           "outcome": "copy_not_distinct",
-          "reason": "BH-D014 restate(s) the PHQ-9 completed 2026-01-16 (form HG-Q116) recorded in BH-D013; not counted as a separate assessment"
+          "reason": "BH-D014 restate(s) the PHQ-9 completed 2026-01-16 (form HG-Q116) recorded in BH-D013; not counted as a separate assessment",
+          "claims": [
+            {
+              "claim_id": "300a30dbe42b:assessment:0",
+              "kind": "assessment",
+              "sha256": "300a30dbe42be8dcfdf7ad644f23c583259611467ae32e944e8d7154c78b968e"
+            },
+            {
+              "claim_id": "85e2c780abde:assessment:0",
+              "kind": "assessment",
+              "sha256": "85e2c780abded9efe663fd61ac6e6a7a56e5b30c9597b24f35f90076b6f7358b"
+            }
+          ]
         }
       ]
     },
@@ -3613,6 +4436,7 @@
         {
           "claim_id": "4a3859fd81fc:assessment:0",
           "doc_id": "BH-D115",
+          "sha256": "4a3859fd81fc5afc5533e9add8718ce4b89492121bf68f812f73db92d319755e",
           "file": "BH-D115_symptom_measure_review_2026-01-30.txt",
           "record_type": "assessment",
           "passages": [

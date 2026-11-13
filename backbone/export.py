@@ -14,6 +14,7 @@ from . import EXTRACTOR_VERSION, RULESET_VERSION
 from .answer import fingerprint
 from .db import ROOT
 from .intervals import fmt
+from .operators import _batches
 from .paths import safe_output_path
 from .project import SqlLog, weekly_compliance
 from .query import Scope
@@ -24,13 +25,25 @@ OUT = ROOT / "out" / "abstraction"
 def _claims(conn, ids):
     if not ids:
         return []
-    rows = conn.execute(f"SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths FROM claims c "
-                        f"JOIN documents d USING(sha256) WHERE c.claim_id IN ({','.join('?' * len(ids))}) "
-                        f"ORDER BY c.doc_label, c.claim_id", list(ids)).fetchall()
-    return [{"claim_id": r["claim_id"], "doc_id": r["doc_label"], "file": Path(json.loads(r["paths"])[0]).name,
-             "record_type": r["evidence_type"] or r["kind"],
+    rows = []
+    for b in _batches(conn, sorted(set(ids))):            # stay under SQLite's variable limit (#25)
+        rows += conn.execute(f"SELECT c.claim_id, c.doc_label, c.sha256, c.kind, c.evidence_type, c.evidence, d.paths "
+                             f"FROM claims c JOIN documents d USING(sha256) WHERE c.claim_id IN ({','.join('?' * len(b))}) "
+                             f"ORDER BY c.doc_label, c.claim_id", b).fetchall()
+    rows.sort(key=lambda r: (r["doc_label"], r["claim_id"]))
+    return [{"claim_id": r["claim_id"], "doc_id": r["doc_label"], "sha256": r["sha256"],
+             "file": Path(json.loads(r["paths"])[0]).name, "record_type": r["evidence_type"] or r["kind"],
              "passages": [{"lines": [s["line_start"], s["line_end"]], "quote": s["quote"]}
                           for s in json.loads(r["evidence"]) if s["line_start"]]} for r in rows]
+
+
+def _claim_docs(conn, ids) -> dict[str, dict]:
+    """claim_id -> {kind, sha256} for the claims behind decisions (graph edges need document identity, #24)."""
+    out = {}
+    for b in (_batches(conn, sorted(set(ids))) if ids else []):
+        out.update({r["claim_id"]: {"kind": r["kind"], "sha256": r["sha256"]} for r in conn.execute(
+            f"SELECT claim_id, kind, sha256 FROM claims WHERE claim_id IN ({','.join('?' * len(b))})", b)})
+    return out
 
 
 def build_abstraction(conn, mrn: str) -> dict:
@@ -43,8 +56,12 @@ def build_abstraction(conn, mrn: str) -> dict:
                      "title": m.get("title"), "signed": m.get("signed"), "signed_at": m.get("signed_at"),
                      "received_at": m.get("received_at"), "finality": m.get("finality")})
     decisions, conflicts = defaultdict(list), defaultdict(list)
-    for r in conn.execute("SELECT * FROM decisions WHERE mrn=? ORDER BY decision_id", (mrn,)):
-        decisions[r["subject_key"]].append({"rule": r["rule"], "outcome": r["outcome"], "reason": r["reason"]})
+    rows = conn.execute("SELECT * FROM decisions WHERE mrn=? ORDER BY decision_id", (mrn,)).fetchall()
+    cdocs = _claim_docs(conn, [c for r in rows for c in json.loads(r["claim_ids"])])
+    for r in rows:
+        decisions[r["subject_key"]].append({"rule": r["rule"], "outcome": r["outcome"], "reason": r["reason"],
+                                            "claims": [{"claim_id": c, **cdocs[c]} for c in json.loads(r["claim_ids"])
+                                                       if c in cdocs]})
     for r in conn.execute("SELECT * FROM conflicts WHERE mrn=? ORDER BY conflict_id", (mrn,)):
         conflicts[r["subject_key"]].append({"field": r["field"], "resolution": r["resolution"],
                                             "candidates": json.loads(r["candidates"])})
@@ -97,51 +114,56 @@ def build_abstraction(conn, mrn: str) -> dict:
 
 
 def build_graph(ab: dict) -> dict:
+    """Node identities: documents by sha256 (doc_label is not unique), encounters by their full `MRN|ID` key."""
     nodes, edges = [], []
     mrn = ab["patient"]["mrn"]
+
+    def doc(x: dict) -> str:
+        return f"doc:{x['sha256']}"
     nodes.append({"id": f"patient:{mrn}", "type": "Patient", **{k: ab["patient"][k] for k in ("mrn", "name", "dob")}})
     for d in ab["documents"]:
-        nodes.append({"id": f"doc:{d['doc_id']}", "type": "Document", **d})
-        edges.append({"from": f"patient:{mrn}", "to": f"doc:{d['doc_id']}", "type": "HAS_DOCUMENT"})
+        nodes.append({"id": doc(d), "type": "Document", **d})
+        edges.append({"from": f"patient:{mrn}", "to": doc(d), "type": "HAS_DOCUMENT"})
     for r in ab["treatment_plan_requirements"]:
         nid = f"req:{r['requirement_key']}"
         nodes.append({"id": nid, "type": "Requirement", "metric": r["metric"], "goal": f"{r['comparator']} {r['threshold']:g}",
                       "effective": [r["effective_start"], r["effective_end"]]})
         edges.append({"from": f"patient:{mrn}", "to": nid, "type": "HAS_REQUIREMENT"})
         for ev in r["evidence"]:
-            edges.append({"from": nid, "to": f"doc:{ev['doc_id']}", "type": "STATED_IN", "passages": ev["passages"]})
+            edges.append({"from": nid, "to": doc(ev), "type": "STATED_IN", "passages": ev["passages"]})
     for w in ab["weeks"]:
         wid = f"week:{mrn}:{w['week_start']}"
         nodes.append({"id": wid, "type": "Week", "week_start": w["week_start"], "status": w["status"]})
         edges.append({"from": f"patient:{mrn}", "to": wid, "type": "HAS_WEEK"})
         for ev in w["evaluations"]:
-            for k in ev["encounters"]:
-                edges.append({"from": f"enc:{k}", "to": wid, "type": "COUNTED_IN"})
+            for k in ev["encounters"]:              # week lists show the short ID; encounter nodes use MRN|ID
+                edges.append({"from": f"enc:{mrn}|{k}", "to": wid, "type": "COUNTED_IN"})
     for e in ab["encounters"]:
         eid = f"enc:{e['encounter_key']}"
         nodes.append({"id": eid, "type": "Encounter", **{k: e[k] for k in (
             "encounter_id", "service_date", "service_type", "disposition", "eligible", "exclusion_reason",
             "minutes_low", "minutes_high", "minutes_status", "calculation")}})
         edges.append({"from": f"patient:{mrn}", "to": eid, "type": "HAS_ENCOUNTER"})
-        excluded = {d["reason"].split(" ")[0] for d in e["decisions"] if d["outcome"] == "evidence_excluded"}
+        excluded = {c["claim_id"] for d in e["decisions"] if d["outcome"] == "evidence_excluded" for c in d["claims"]}
         for rec in e["records"]:
-            edges.append({"from": eid, "to": f"doc:{rec['doc_id']}", "type": "DOCUMENTED_BY",
-                          "record_type": rec["record_type"], "used_as_evidence": rec["doc_id"] not in excluded,
+            edges.append({"from": eid, "to": doc(rec), "type": "DOCUMENTED_BY",
+                          "record_type": rec["record_type"], "used_as_evidence": rec["claim_id"] not in excluded,
                           "passages": rec["passages"]})
         for d in e["decisions"]:
-            if d["outcome"] == "field_corrected":
-                src = d["reason"].split(" ")[0]
-                corr = d["reason"].split("correction in ")[-1].split(" ")[0]
-                edges.append({"from": f"doc:{corr}", "to": f"doc:{src}", "type": "CORRECTS", "detail": d["reason"]})
+            if d["outcome"] == "field_corrected":   # claims: the corrected record and the correcting relation
+                corr = [c for c in d["claims"] if c["kind"] == "relation"]
+                for src in (c for c in d["claims"] if c["kind"] != "relation"):
+                    for c in corr:
+                        edges.append({"from": doc(c), "to": doc(src), "type": "CORRECTS", "detail": d["reason"]})
     for a in ab["assessments"]:
         aid = f"assess:{a['assessment_key']}"
         nodes.append({"id": aid, "type": "Assessment", "instrument": a["instrument"], "score": a["total_score"],
                       "completed": a["completed_date"], "form_id": a["form_id"]})
         edges.append({"from": f"patient:{mrn}", "to": aid, "type": "HAS_ASSESSMENT"})
         for ev in a["evidence"]:
-            edges.append({"from": aid, "to": f"doc:{ev['doc_id']}", "type": "RECORDED_IN"})
+            edges.append({"from": aid, "to": doc(ev), "type": "RECORDED_IN"})
         for ev in a["copies_not_counted"]:
-            edges.append({"from": aid, "to": f"doc:{ev['doc_id']}", "type": "COPIED_IN"})
+            edges.append({"from": aid, "to": doc(ev), "type": "COPIED_IN"})
     seen, uniq = set(), []
     for e in edges:
         k = json.dumps(e, sort_keys=True, default=str)

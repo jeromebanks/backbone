@@ -9,6 +9,7 @@ reported).
 from __future__ import annotations
 
 import difflib
+from functools import lru_cache
 import re
 from dataclasses import dataclass
 
@@ -166,6 +167,7 @@ def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").translate(_TRANS))
 
 
+@lru_cache(maxsize=1024)          # pure; grounding asks the same document text once per value (#36)
 def times_in(s: str) -> set[int]:
     """Clock times stated in `s`, as minutes after midnight ("9:00", "09:00", "9.00 am", "2 pm")."""
     out: set[int] = set()
@@ -180,21 +182,24 @@ def times_in(s: str) -> set[int]:
         h = int(h) % 12 + (12 if ap.lower().startswith("p") else 0)
         if h < 24:
             out.add(h * 60)
-    return out
+    return frozenset(out)
 
 
+@lru_cache(maxsize=1024)          # pure; grounding asks the same document text once per value (#36)
 def minutes_in(s: str) -> set[float]:
     """Durations stated with a unit ("50 minutes", "50 min", "45-minute", "1 hour" = 60)."""
     s = _clean(s)
-    return {float(m) for m in _MINUTES.findall(s)} | {float(h) * 60 for h in _HOURS.findall(s)}
+    return frozenset({float(m) for m in _MINUTES.findall(s)} | {float(h) * 60 for h in _HOURS.findall(s)})
 
 
+@lru_cache(maxsize=1024)          # pure; grounding asks the same document text once per value (#36)
 def numbers_in(s: str) -> set[float]:
     """Every number stated in `s`, including the number words zero..twelve."""
     s = _clean(s).lower()
-    return {float(n) for n in _NUMBER.findall(s)} | {float(v) for w, v in _WORDS.items() if re.search(rf"\b{w}\b", s)}
+    return frozenset({float(n) for n in _NUMBER.findall(s)} | {float(v) for w, v in _WORDS.items() if re.search(rf"\b{w}\b", s)})
 
 
+@lru_cache(maxsize=1024)          # pure; grounding asks the same document text once per value (#36)
 def dates_in(s: str) -> set[tuple[int | None, int, int]]:
     """Dates stated in `s` as (year or None, month, day): ISO, m/d[/y], "January 5, 2026", "Jan05", "5 Jan"."""
     s = _clean(s)
@@ -207,7 +212,7 @@ def dates_in(s: str) -> set[tuple[int | None, int, int]]:
         out.add((int(y) if y else None, _MONTHS[mon[:3].lower()], int(d)))
     for d, mon, y in _DAY_MONTH.findall(s):
         out.add((int(y) if y else None, _MONTHS[mon[:3].lower()], int(d)))
-    return out
+    return frozenset(out)
 
 
 def _value_in(kind: str, value, text: str) -> bool:

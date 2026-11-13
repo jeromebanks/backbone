@@ -44,6 +44,7 @@ QueryPlan: How many group therapy sessions were scheduled for Rowan in January 2
 
 - numbers in the answer not found in computed results: none
 - cited documents not in the corpus: none
+- cited documents not in the computed results: none
 - line references outside the evidence passages: none
 
 ## Evidence passages

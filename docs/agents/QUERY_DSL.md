@@ -26,18 +26,27 @@ There are two front-ends that build the **same object**:
 
 | op | uses | notable output |
 |---|---|---|
-| `care` | `select_encounters`, `aggregate` | totals with bounds, `by_service_type`, groups (bucketed once), facts per encounter, exclusions with records, R0–R4/R7/R9 decisions, evidence |
+| `care` | `select_encounters`, `aggregate` | totals with bounds, `by_service_type`, groups (bucketed once), facts per encounter, exclusions with records (plus R0-rejected claims when `include_excluded`), R0–R4/R7/R9 decisions, evidence |
 | `compliance` | `weekly_compliance`, `consecutive_runs` | weeks (status, evaluations per requirement set, `minutes_calculation`, notes), runs, exclusions, R2/R3/R4/R9 decisions, plan evidence |
-| `timeline` | encounters, claims, relations, assessments, observations | documents with what each asserted (disposition, arrival/departure, intervals) and corrections/retransmissions; assessments with `copies_not_counted` |
-| `compare` | `plan_change_dates`, `aggregate` | before/after totals, minutes per week, by type, conflicts, evidence; an explicit note when there is no plan change |
+| `timeline` | encounters, claims, relations, assessments, observations | documents with what each asserted (disposition, arrival/departure, intervals) and corrections/retransmissions; assessments with `copies_not_counted`; `exclusions` lists R0-rejected claims in scope (dated by the claim's own date, undated ones always listed; a claim's service type must match `service_types`) |
+| `compare` | `plan_change_dates`, `aggregate` | before/after totals, minutes per week, by type, conflicts, evidence; an explicit note when there is no plan change. Both sides are clipped to the scope; a split outside it gives one side and a note |
 
 Rules for operators:
 - They take semantics only from `project.py` and never re-derive eligibility or minutes.
 - They use parameterized SQL only, recorded through `SqlLog.run` so the envelope's `sql` is exact.
-- Cap per-row detail with `_cap` (`DETAIL_LIMIT = 200`), with a note. Totals stay complete. Keep `IN (...)` lists
-  bounded, since SQLite has a variable limit.
+- Cap per-row detail with `_cap` (`DETAIL_LIMIT = 200`), with a note, in every operator (timeline caps encounters,
+  documents, assessments, observations and rejected claims; compare caps facts and exclusions, never its per-side
+  groups, which are its totals). Totals stay complete; conflicts, decisions and evidence follow the shown rows.
+- Build every `IN (...)` list through `_batches(conn, items, reserved=…)`. It splits lists at the connection's
+  SQLite variable limit (999 on old builds). A list that fits stays one statement, so the logged SQL is unchanged.
+  Re-sort merged rows on the statement's ORDER BY. `tests/test_operators_export.py` checks that batched and single
+  runs give the same results.
 - Output must be deterministic: sort everything, and include no timestamps.
 - Identity: `documents.sha256` identifies a document (`doc_label` is display only and not unique), and an encounter ID is unique only within a patient. Join and group by sha256, and match encounter IDs together with the MRN (or use the `mrn|id` encounter key). `tests/test_isolation.py` covers this for `timeline`.
+- Same-label documents (#40): `doc_id` stays the label. When a label is carried by more than one document in the
+  corpus, evidence entries and timeline document facts gain `doc_sha` (sha256[:12]), and label lists (`records`,
+  `recorded_in`, `copies_not_counted`, `documents`) name the document `LABEL [sha12]`. Unique labels are
+  unchanged. The post-check does not use `doc_sha` yet.
 
 ## Adding an operator
 
