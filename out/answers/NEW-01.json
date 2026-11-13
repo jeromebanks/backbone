@@ -871,6 +871,12 @@
             ]
           },
           {
+            "sql": "SELECT claim_id, evidence FROM claims WHERE claim_id IN (?) ORDER BY claim_id",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
             "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
             "params": [
               "HG-M042|HG-E102",
@@ -942,6 +948,8 @@
     "unknown_documents": [],
     "documents_not_in_results": [],
     "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
     "ok": true
   },
   "timings_ms": {

@@ -1528,6 +1528,8 @@
     "unknown_documents": [],
     "documents_not_in_results": [],
     "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
     "ok": true
   },
   "timings_ms": {

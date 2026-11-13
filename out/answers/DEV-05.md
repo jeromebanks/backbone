@@ -2,77 +2,67 @@
 
 > Summarize the documented symptom course during the episode and the reason for the additional individual contact on January 19. Which symptom assessments are distinct, and what conclusions about progress can and cannot be supported?
 
-# Rowan (HG-M042): symptom course, January 5–30, 2026
+# HG-M042 (Rowan): symptom course, 5–30 January 2026
 
 ## Direct answer
-- **Symptom scores:** Three distinct PHQ-9 administrations are on record. The totals were **18** on Jan 5, **14** on Jan 16 and **10** on Jan 30. Each later score is lower than the one before.
-- **What the clinician concluded:** On Jan 16 the clinician noted "some improvement in depressive symptoms." On Jan 30 the clinician judged "partial improvement." Both times the clinician also recorded that avoidance and functional impact around returning to work were still present.
-- **Why there was an extra visit on January 19:** Rowan became anxious during the skills group and needed individual grounding and a review of coping strategies (BH-D105 L9). The group facilitator arranged a same-day individual visit (BH-D101 L10). That visit (encounter HG-E111) ran 11:15–11:45, 30 min (BH-D105 L6).
+- **PHQ-9 scores:** three distinct PHQ-9s were recorded. The totals were 18 on 5 January (BH-D002 L15), 14 on 16 January (BH-D013 L7, L11) and 10 on 30 January, with item 9 scored 0 (BH-D115 L6).
+- **Clinician judgement:** the treating clinician called this "partial improvement, with persistent avoidance and meaningful functional impact around returning to work" (BH-D115 L10).
+- **Other symptoms:** sleep difficulty and anxiety about work were documented at every point through 30 January.
+- **Why there was an extra contact on 19 January:** the individual visit (HG-E111) "was added because Rowan became anxious during group and needed individual grounding and review of coping strategies" (BH-D105 L9).
 
-## Distinct symptom assessments
+## Why the 19 January contact was added
+- **In group (HG-E110):** Rowan first followed the exercise. When the talk turned to returning to the workplace, Rowan "became visibly tense and said the amount of discussion felt difficult to manage." The facilitator offered grounding and set up a same-day individual meeting (BH-D101 L10). Staff arranged access to the individual clinician after Rowan asked for more help (BH-D102 L14).
+- **In the individual session:** Rowan said they felt overwhelmed when other members discussed work demands. Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation (BH-D105 L9). Rowan took part for the whole contact and said the anxiety "eased enough to discuss a next step" (BH-D105 L11).
+- **Safety:** Rowan denied current suicidal thoughts and no acute safety concern was found (BH-D105 L13).
+- **Timing:**
+  - The group ran 10:00–11:15 with a break at 10:45–11:00, giving 60 minutes.
+  - The individual contact ran 11:15–11:45, giving 30 minutes (BH-D105 L6).
+  - The total for the day was 90 minutes.
+  - A later correction changed the group departure time from 11:30 to 11:15 (BH-D103 L7). A room-transfer record shows Rowan going straight to the individual clinician at 11:15 (BH-D103 L9).
 
-| Date | Instrument | Total | Recorded in | Notes |
+## Course by domain
+
+| Date | PHQ-9 | Mood | Sleep | Anxiety / avoidance |
 |---|---|---|---|---|
-| 2026-01-05 | PHQ-9 | 18 | BH-D002 L15 | Intake; no form ID; no item scores recorded |
-| 2026-01-16 | PHQ-9 | 14 | BH-D013 L7, L11 | Form HG-Q116; completed via portal |
-| 2026-01-30 | PHQ-9 | 10 | BH-D115 L6 | Item 9: 0 |
+| Jan 5 (intake) | 18 (BH-D002 L15) | Low mood and reduced interest; affect subdued but responsive (BH-D002 L11, L13) | Fragmented; waking at night (BH-D002 L11, L13) | Worry about returning to work; putting off emails (BH-D002 L11) |
+| Jan 13–14 | — | "Somewhat less heavy" on days with a planned activity (BH-D010 L11); affect more varied than at intake (BH-D011 L15) | Still interrupted (BH-D010 L11; BH-D011 L11) | Opened a work message but has not replied (BH-D011 L11) |
+| Jan 16 | 14 (BH-D013 L7) | Clinician: "some improvement in depressive symptoms" (BH-D013 L13) | Inconsistent (BH-D013 L11) | Avoidance still clinically relevant (BH-D013 L13); partner says mornings are still difficult (BH-D012 L13) |
+| Jan 19 | — | — | Disrupted (BH-D105 L13) | Anxiety in group led to the added visit (BH-D105 L9) |
+| Jan 21–26 | — | Low mood ongoing (BH-D111 L14) | One better night, then a night of long wakefulness (BH-D106 L11); uneven (BH-D110 L9) | Drafted a message but did not send it (BH-D106 L9); later sent one, but kept putting off scheduling the conversation (BH-D110 L9) |
+| Jan 30 | 10, item 9 = 0 (BH-D115 L6) | Fewer days of pervasive low mood than at intake (BH-D115 L8); less persistently low (BH-D114 L8) | Sleep difficulty continues (BH-D115 L8, L10); variable (BH-D114 L8) | Still delays follow-up (BH-D115 L10); anxiety still noticeable (BH-D114 L8) |
 
-**Excluded as a copy:** BH-D014, an imported measure summary received Jan 26, repeats the same Jan 16 PHQ-9 (14, form HG-Q116) (BH-D014 L13). It is not counted as a separate assessment. No anxiety measure or other instrument appears in the results.
+## Which assessments are distinct
+- **Counted:** the three PHQ-9s above.
+- **Not counted (copy):** BH-D014 is an imported summary received on 26 January. It restates the 16 January PHQ-9 (form HG-Q116, score 14) (BH-D014 L13), so it was not counted as a separate assessment. Its clinical comments repeat BH-D013 (BH-D014 L15).
+- **Not assessments:** the other "measurement" entries in the results are restatements of these scores, not further administrations.
 
-## Documented course (facts from the record)
-- **Intake (Jan 5):**
-  - Rowan reported several weeks of low mood, reduced interest, fragmented sleep, trouble starting tasks, and avoidance of email and of conversations about a return date (BH-D002 L11).
-  - The clinician's impression was depressive symptoms with anxiety and behavioral avoidance (BH-D002 L15; BH-D003 L10).
-- **Jan 13–14:**
-  - Mood was "somewhat less heavy on days with a planned activity," but sleep interruption continued (BH-D010 L11). The clinician assessed ongoing depressive and anxiety symptoms (BH-D010 L15).
-  - Rowan opened a work message and took two short walks but had not replied to the message (BH-D011 L11).
-  - Affect was "more varied than at intake" (BH-D011 L15).
-- **Jan 16:**
-  - The PHQ-9 of 14 was reviewed. The clinician recorded that persistent avoidance, difficulty starting work communication and sleep disruption "remain clinically relevant" (BH-D013 L13).
-  - The partner contact that day was collateral only; Rowan told the office they could not take part (BH-D012 L11). Casey reported short walks and fewer unplanned reminders, but said mornings are still difficult (BH-D012 L13).
-- **Jan 19:**
-  - In group, Rowan became visibly tense when talk turned to returning to the workplace (BH-D101 L10) and asked for more help (BH-D102 L14).
-  - In the added individual visit, Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation. Rowan said the anxiety "eased enough to discuss a next step" (BH-D105 L9, L11).
-  - Rowan denied suicidal thoughts and the clinician found no acute safety concern (BH-D105 L13).
-- **Jan 21–26:**
-  - Rowan drafted a message to work but did not send it, and reported one better night of sleep followed by prolonged wakefulness (BH-D106 L9, L11).
-  - By Jan 26, Rowan had sent a short message to the supervisor but kept putting off scheduling the follow-up conversation (BH-D110 L9).
-  - The clinician recorded "ongoing anxiety, low mood, and functional difficulty around work demands" (BH-D111 L14).
-- **Jan 30:**
-  - Rowan reported fewer days of pervasive low mood than at intake, and that sleep was still a problem (BH-D115 L8; BH-D114 L8).
-  - Anxiety was still noticeable when anticipating contact with work (BH-D114 L8).
-  - The clinician judged partial improvement, recommended continued treatment (BH-D115 L10, L12), and found no new acute safety issue (BH-D114 L10).
-- **Missed or partial attendance:**
-  - Jan 8: no-show for an individual visit (BH-D015 L9).
-  - Jan 22: arrived late to group and stayed until it closed (BH-D108 L14).
-  - Jan 27: missed the whole group (BH-D108 L16).
-  - Jan 28: cancelled an individual visit (BH-D108 L18).
+## What can be supported
+- PHQ-9 totals fell across the three distinct administrations (18, then 14, then 10).
+- Patients' reports and the clinician's notes agree that mood was less pervasively low by 30 January (BH-D115 L8; BH-D114 L8).
+- The clinician's own conclusion is partial improvement (BH-D115 L10).
+- The records show small behavioural steps: opening a message, short walks, and sending a message to the supervisor (BH-D011 L11; BH-D110 L9).
 
-## January 19 records
-- **Group (HG-E110):**
-  - The original roster said Rowan left at 11:30 (BH-D102 L9). A signed correction changed this to 11:15 (BH-D103 L7). It is supported by a room-transfer record showing Rowan was received by the individual clinician at 11:15 (BH-D103 L9).
-  - With the 10:45–11:00 break removed (BH-D101 L6), group time counts as 60 min.
-- **Individual visit (HG-E111):** 30 min (BH-D105 L6).
-- **Day total:** 90 patient-present minutes over 2 sessions.
-- **Excluded record:** BH-D104 is a resent copy of the roster with the old 11:30 departure time (BH-D104 L14). It is not independent evidence and records no additional visit (BH-D104 L20).
+## What cannot be supported
+- **Cause:** nothing in the record links the score changes to any specific treatment part (group, individual, family therapy or medication). The records give no reason for the change.
+- **Resolution or recovery:** these are not documented. The clinician states that avoidance, sleep disruption and work-related functional impact persist, and that continued treatment is appropriate (BH-D115 L10, L12).
+- **Item-level change:** item scores exist only for 30 January (item 9 = 0). The record does not show which symptoms drove the lower totals.
+- **Better coping skills:** this should not be assumed. On 26 January Rowan could use the grounding cue in rehearsal but "remained uncertain about using it independently when anxious" (BH-D111 L12). The 19 January clinician warned that taking part in a group exercise should not be read as completing the patient's own work task (BH-D101 L12).
+- **Reliable attendance:** this cannot be claimed.
+  - A missed individual visit was discussed on 14 January (BH-D011 L15).
+  - Rowan was absent from the 16 January contact, which only the partner attended (BH-D012 L11).
+  - Rowan missed the whole 27 January group (BH-D108 L16) and cancelled the 28 January individual visit (BH-D108 L18).
 
-## What the record supports
-- The PHQ-9 totals went down across the three distinct administrations (18 → 14 → 10).
-- The clinician documented "some" improvement on Jan 16 (BH-D013 L13) and "partial" improvement on Jan 30 (BH-D115 L10). Rowan's own reports describe mood as less persistently low (BH-D114 L8; BH-D115 L8).
-- Rowan took small behavioral steps: opening a work message (BH-D011 L11), then sending one to the supervisor (BH-D110 L9).
-
-## What the record does not support
-- **A clinical response or remission label.** The record never states one, and the clinician's own wording is limited to "some" and "partial" improvement.
-- **That treatment or medication caused the change.** No document makes that link.
-- **Improvement in anxiety, sleep or work functioning.** Anxiety is still documented on Jan 30 (BH-D114 L8; BH-D113 L13). Sleep is still "variable" (BH-D114 L8), and avoidance and delayed follow-through persist (BH-D115 L10). There was no anxiety instrument to measure change.
-- **Item-level change in symptoms.** The only item score is item 9 = 0 on Jan 30.
-- **That Rowan completed their own work task on Jan 19.** The clinician cautioned that taking part in the group exercise should not be read as completing their own work task (BH-D101 L12).
+## Records excluded or merged
+- **BH-D014:** a copy of the 16 January PHQ-9, not counted separately.
+- **BH-D104:** a resent copy (received 26 January) of the 19 January attendance list. It is not independent evidence and "records no additional visit" (BH-D104 L20).
+- **BH-D102 departure time:** 11:30 was replaced by 11:15 under the correction in BH-D103 (BH-D103 L7).
+- **BH-D015:** one observation was rejected because the document gives no date for it.
+- **Partner and outside reports:** the partner's 16 January report (BH-D012) and the outside social worker's report (BH-D109) are second-hand accounts, not direct symptom observations.
 
 ## Not settled by the record
 
-- No item-level PHQ-9 data except item 9 on Jan 30, so it is unclear which symptoms changed.
-- No standardized anxiety measure is in the record, so change in anxiety can't be measured.
-- The Jan 5 PHQ-9 has no form ID.
+- PHQ-9 item scores are not available for 5 and 16 January, so the record does not show which symptoms account for the lower totals.
+- No documented link between the score changes and any specific treatment part.
 
 ## How this was computed
 
@@ -176,4 +166,4 @@ QueryPlan: Summarize the documented symptom course during the episode and the re
 | BH-D115 | 10 | BH-D115_symptom_measure_review_2026-01-30.txt | observation | Sleep disruption remains an intermittent barrier to establishing a steadier daytime routine. |
 | BH-D115 | 12 | BH-D115_symptom_measure_review_2026-01-30.txt | observation | Continued treatment is appropriate given the remaining difficulties with follow-through and work-related functioning. |
 
-_timings (ms): {'plan_llm': 3486, 'execute': 9.95, 'narrate_llm': 48709, 'total': 52205}; LLM calls: 2, tokens in/out: 96642/6345, list-price cost $0.177; cached: False_
+_timings (ms): {'plan_llm': 4656, 'execute': 3.2, 'narrate_llm': 48712, 'total': 53373}; LLM calls: 2, tokens in/out: 49349/6292, list-price cost $0.488; cached: False_

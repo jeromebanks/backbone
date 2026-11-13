@@ -327,17 +327,6 @@
           },
           {
             "kind": "observation",
-            "date": "2026-01-07",
-            "patient": "HG-M042",
-            "domain": "sleep",
-            "source": "patient_report",
-            "statement": "Patient reported a poor night of sleep before the missed appointment.",
-            "documents": [
-              "BH-D015"
-            ]
-          },
-          {
-            "kind": "observation",
             "date": "2026-01-08",
             "patient": "HG-M042",
             "domain": "engagement",
@@ -951,17 +940,6 @@
             "date": "2026-01-19",
             "patient": "HG-M042",
             "domain": "anxiety",
-            "source": "clinician_observation",
-            "statement": "Patient became visibly tense when discussion turned to returning to the workplace.",
-            "documents": [
-              "BH-D101"
-            ]
-          },
-          {
-            "kind": "observation",
-            "date": "2026-01-19",
-            "patient": "HG-M042",
-            "domain": "anxiety",
             "source": "patient_report",
             "statement": "Rowan felt overwhelmed when other group members talked about work demands and worried about keeping up after returning to work.",
             "documents": [
@@ -983,9 +961,9 @@
             "kind": "observation",
             "date": "2026-01-19",
             "patient": "HG-M042",
-            "domain": "avoidance",
-            "source": "patient_report",
-            "statement": "Patient identified postponing a message to a supervisor as a familiar avoidance pattern.",
+            "domain": "anxiety",
+            "source": "clinician_observation",
+            "statement": "Patient became visibly tense when discussion turned to returning to the workplace.",
             "documents": [
               "BH-D101"
             ]
@@ -994,11 +972,22 @@
             "kind": "observation",
             "date": "2026-01-19",
             "patient": "HG-M042",
-            "domain": "engagement",
-            "source": "clinician_observation",
-            "statement": "Patient attended the group's opening check-in and accepted the exercise handout.",
+            "domain": "anxiety",
+            "source": "patient_report",
+            "statement": "Patient said the amount of discussion felt difficult to manage.",
             "documents": [
-              "BH-D104"
+              "BH-D101"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "avoidance",
+            "source": "patient_report",
+            "statement": "Patient identified postponing a message to a supervisor as a familiar avoidance pattern.",
+            "documents": [
+              "BH-D101"
             ]
           },
           {
@@ -1039,10 +1028,32 @@
             "date": "2026-01-19",
             "patient": "HG-M042",
             "domain": "engagement",
+            "source": "patient_report",
+            "statement": "Patient requested additional help from the individual clinician.",
+            "documents": [
+              "BH-D104"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
             "source": "clinician_observation",
             "statement": "Rowan took part for the whole contact and said the anxiety eased enough to discuss a next step.",
             "documents": [
               "BH-D105"
+            ]
+          },
+          {
+            "kind": "observation",
+            "date": "2026-01-19",
+            "patient": "HG-M042",
+            "domain": "engagement",
+            "source": "clinician_observation",
+            "statement": "Patient attended the group's opening check-in and accepted the exercise handout.",
+            "documents": [
+              "BH-D104"
             ]
           },
           {
@@ -1679,7 +1690,25 @@
           }
         ],
         "calculation": [],
-        "exclusions": [],
+        "exclusions": [
+          {
+            "encounter": null,
+            "date": null,
+            "service_type": null,
+            "reason": "BH-D015 observation: the date is not stated anywhere in the document (the extracted value was inferred)",
+            "records": [
+              "BH-D015"
+            ],
+            "rule": "R0",
+            "patient": "HG-M042",
+            "record_kind": "observation",
+            "claim_id": "4521a120a4d7:observation:1",
+            "undated": true,
+            "unstated_dates": [
+              "date"
+            ]
+          }
+        ],
         "conflicts": [],
         "decisions": [
           {
@@ -2539,18 +2568,6 @@
               {
                 "lines": "9",
                 "quote": "There was no arrival call or cancellation message on the scheduling line."
-              }
-            ]
-          },
-          {
-            "claim_id": "4521a120a4d7:observation:1",
-            "doc_id": "BH-D015",
-            "file": "missed_visit_outreach_jan08.txt",
-            "record_type": "observation",
-            "passages": [
-              {
-                "lines": "15",
-                "quote": "They said the morning had gotten away from them after a poor night of sleep"
               }
             ]
           },
@@ -3419,7 +3436,9 @@
             ]
           }
         ],
-        "notes": [],
+        "notes": [
+          "1 rejected claim (R0) has no date of its own (none stated, or one the document does not state; flagged undated): listed for every date scope of the patient, so not necessarily about this period"
+        ],
         "sql": [
           {
             "sql": "SELECT * FROM assessments WHERE completed_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, completed_date",
@@ -3571,12 +3590,6 @@
             "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
               "5edddc6b2093:observation:0"
-            ]
-          },
-          {
-            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
-            "params": [
-              "4521a120a4d7:observation:1"
             ]
           },
           {
@@ -3904,13 +3917,6 @@
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
-            "params": [
-              "05a234a8adc9:observation:2",
-              "05a234a8adc9:observation:3"
-            ]
-          },
-          {
             "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
               "91fd8e8b1b31:observation:1"
@@ -3925,14 +3931,19 @@
           {
             "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
-              "05a234a8adc9:observation:1"
+              "05a234a8adc9:observation:2"
             ]
           },
           {
-            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?,?)",
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
-              "f3f25065559f:observation:0",
-              "f3f25065559f:observation:1"
+              "05a234a8adc9:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "05a234a8adc9:observation:1"
             ]
           },
           {
@@ -3956,7 +3967,19 @@
           {
             "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
             "params": [
+              "f3f25065559f:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
+            "params": [
               "91fd8e8b1b31:observation:3"
+            ]
+          },
+          {
+            "sql": "SELECT DISTINCT doc_label, sha256 FROM claims WHERE claim_id IN (?)",
+            "params": [
+              "f3f25065559f:observation:0"
             ]
           },
           {
@@ -4318,7 +4341,13 @@
             ]
           },
           {
-            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths, c.sha256 FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
+            "sql": "SELECT claim_id, evidence FROM claims WHERE claim_id IN (?) ORDER BY claim_id",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
+            "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths, c.sha256 FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
             "params": [
               "05a234a8adc9:observation:0",
               "05a234a8adc9:observation:1",
@@ -4360,7 +4389,6 @@
               "432c973d1a4d:observation:4",
               "432c973d1a4d:observation:5",
               "4521a120a4d7:observation:0",
-              "4521a120a4d7:observation:1",
               "4521a120a4d7:observation:2",
               "4521a120a4d7:observation:3",
               "4a3859fd81fc:assessment:0",
@@ -4696,7 +4724,25 @@
         "calculation": [
           "patient-present minutes = 60 (HG-E110) + 30 (HG-E111) = 90"
         ],
-        "exclusions": [],
+        "exclusions": [
+          {
+            "encounter": null,
+            "date": null,
+            "service_type": null,
+            "reason": "BH-D015 observation: the date is not stated anywhere in the document (the extracted value was inferred)",
+            "records": [
+              "BH-D015"
+            ],
+            "rule": "R0",
+            "patient": "HG-M042",
+            "record_kind": "observation",
+            "claim_id": "4521a120a4d7:observation:1",
+            "undated": true,
+            "unstated_dates": [
+              "date"
+            ]
+          }
+        ],
         "conflicts": [],
         "decisions": [
           {
@@ -4904,7 +4950,9 @@
             ]
           }
         ],
-        "notes": [],
+        "notes": [
+          "1 rejected claim (R0) has no date of its own (none stated, or one the document does not state; flagged undated): listed for every date scope of the patient, so not necessarily about this period"
+        ],
         "sql": [
           {
             "sql": "SELECT encounter_key, mrn, encounter_id, service_date, week_start, service_type, modality, disposition, attended, patient_present, is_therapy, eligible, exclusion_reason, minutes_low, minutes_high, minutes_status, calculation, claim_ids, flags FROM v_encounter_week WHERE service_date BETWEEN ? AND ? AND mrn IN (?) ORDER BY mrn, service_date, encounter_key",
@@ -4946,39 +4994,13 @@
             ]
           },
           {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
+            "sql": "SELECT sha256, payload FROM claims WHERE kind='document' AND sha256 IN (?,?,?,?,?) ORDER BY sha256, claim_id",
             "params": [
-              "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6"
-            ]
-          },
-          {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
-            "params": [
-              "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5"
-            ]
-          },
-          {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
-            "params": [
-              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
-            ]
-          },
-          {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
-            "params": [
-              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9"
-            ]
-          },
-          {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
-            "params": [
+              "05a234a8adc98e72a51ba9e82c13e5975ee5026f03bb03e66575015b22562fb6",
+              "514ca20809f682607e91b924c6cef0bb22f43a3d12cedbd23ea5fa362910cce5",
+              "674440968b5d6d38d68b8b513cc7ac3b3516ddd97285bde1e4af69cb9f128bd9",
+              "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935",
               "f3f25065559f4e82b110b5c284df5c2c4f81c55c950721e7bd6a9c23a91241d5"
-            ]
-          },
-          {
-            "sql": "SELECT payload FROM claims WHERE sha256=? AND kind='document'",
-            "params": [
-              "91fd8e8b1b3182207971dbecd77e3d2bd13e5f49608f4083e4a9245b8a2d8935"
             ]
           },
           {
@@ -5016,6 +5038,12 @@
             ]
           },
           {
+            "sql": "SELECT claim_id, evidence FROM claims WHERE claim_id IN (?) ORDER BY claim_id",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
             "sql": "SELECT c.claim_id, c.doc_label, c.kind, c.evidence_type, c.evidence, d.paths, c.sha256 FROM claims c JOIN documents d ON d.sha256 = c.sha256 WHERE c.claim_id IN (?,?,?,?,?,?) ORDER BY c.doc_label, c.claim_id",
             "params": [
               "05a234a8adc9:service_event:0",
@@ -5030,38 +5058,40 @@
       }
     ]
   },
-  "answer_markdown": "# Rowan (HG-M042): symptom course, January 5\u201330, 2026\n\n## Direct answer\n- **Symptom scores:** Three distinct PHQ-9 administrations are on record. The totals were **18** on Jan 5, **14** on Jan 16 and **10** on Jan 30. Each later score is lower than the one before.\n- **What the clinician concluded:** On Jan 16 the clinician noted \"some improvement in depressive symptoms.\" On Jan 30 the clinician judged \"partial improvement.\" Both times the clinician also recorded that avoidance and functional impact around returning to work were still present.\n- **Why there was an extra visit on January 19:** Rowan became anxious during the skills group and needed individual grounding and a review of coping strategies (BH-D105 L9). The group facilitator arranged a same-day individual visit (BH-D101 L10). That visit (encounter HG-E111) ran 11:15\u201311:45, 30 min (BH-D105 L6).\n\n## Distinct symptom assessments\n\n| Date | Instrument | Total | Recorded in | Notes |\n|---|---|---|---|---|\n| 2026-01-05 | PHQ-9 | 18 | BH-D002 L15 | Intake; no form ID; no item scores recorded |\n| 2026-01-16 | PHQ-9 | 14 | BH-D013 L7, L11 | Form HG-Q116; completed via portal |\n| 2026-01-30 | PHQ-9 | 10 | BH-D115 L6 | Item 9: 0 |\n\n**Excluded as a copy:** BH-D014, an imported measure summary received Jan 26, repeats the same Jan 16 PHQ-9 (14, form HG-Q116) (BH-D014 L13). It is not counted as a separate assessment. No anxiety measure or other instrument appears in the results.\n\n## Documented course (facts from the record)\n- **Intake (Jan 5):**\n  - Rowan reported several weeks of low mood, reduced interest, fragmented sleep, trouble starting tasks, and avoidance of email and of conversations about a return date (BH-D002 L11).\n  - The clinician's impression was depressive symptoms with anxiety and behavioral avoidance (BH-D002 L15; BH-D003 L10).\n- **Jan 13\u201314:**\n  - Mood was \"somewhat less heavy on days with a planned activity,\" but sleep interruption continued (BH-D010 L11). The clinician assessed ongoing depressive and anxiety symptoms (BH-D010 L15).\n  - Rowan opened a work message and took two short walks but had not replied to the message (BH-D011 L11).\n  - Affect was \"more varied than at intake\" (BH-D011 L15).\n- **Jan 16:**\n  - The PHQ-9 of 14 was reviewed. The clinician recorded that persistent avoidance, difficulty starting work communication and sleep disruption \"remain clinically relevant\" (BH-D013 L13).\n  - The partner contact that day was collateral only; Rowan told the office they could not take part (BH-D012 L11). Casey reported short walks and fewer unplanned reminders, but said mornings are still difficult (BH-D012 L13).\n- **Jan 19:**\n  - In group, Rowan became visibly tense when talk turned to returning to the workplace (BH-D101 L10) and asked for more help (BH-D102 L14).\n  - In the added individual visit, Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation. Rowan said the anxiety \"eased enough to discuss a next step\" (BH-D105 L9, L11).\n  - Rowan denied suicidal thoughts and the clinician found no acute safety concern (BH-D105 L13).\n- **Jan 21\u201326:**\n  - Rowan drafted a message to work but did not send it, and reported one better night of sleep followed by prolonged wakefulness (BH-D106 L9, L11).\n  - By Jan 26, Rowan had sent a short message to the supervisor but kept putting off scheduling the follow-up conversation (BH-D110 L9).\n  - The clinician recorded \"ongoing anxiety, low mood, and functional difficulty around work demands\" (BH-D111 L14).\n- **Jan 30:**\n  - Rowan reported fewer days of pervasive low mood than at intake, and that sleep was still a problem (BH-D115 L8; BH-D114 L8).\n  - Anxiety was still noticeable when anticipating contact with work (BH-D114 L8).\n  - The clinician judged partial improvement, recommended continued treatment (BH-D115 L10, L12), and found no new acute safety issue (BH-D114 L10).\n- **Missed or partial attendance:**\n  - Jan 8: no-show for an individual visit (BH-D015 L9).\n  - Jan 22: arrived late to group and stayed until it closed (BH-D108 L14).\n  - Jan 27: missed the whole group (BH-D108 L16).\n  - Jan 28: cancelled an individual visit (BH-D108 L18).\n\n## January 19 records\n- **Group (HG-E110):**\n  - The original roster said Rowan left at 11:30 (BH-D102 L9). A signed correction changed this to 11:15 (BH-D103 L7). It is supported by a room-transfer record showing Rowan was received by the individual clinician at 11:15 (BH-D103 L9).\n  - With the 10:45\u201311:00 break removed (BH-D101 L6), group time counts as 60 min.\n- **Individual visit (HG-E111):** 30 min (BH-D105 L6).\n- **Day total:** 90 patient-present minutes over 2 sessions.\n- **Excluded record:** BH-D104 is a resent copy of the roster with the old 11:30 departure time (BH-D104 L14). It is not independent evidence and records no additional visit (BH-D104 L20).\n\n## What the record supports\n- The PHQ-9 totals went down across the three distinct administrations (18 \u2192 14 \u2192 10).\n- The clinician documented \"some\" improvement on Jan 16 (BH-D013 L13) and \"partial\" improvement on Jan 30 (BH-D115 L10). Rowan's own reports describe mood as less persistently low (BH-D114 L8; BH-D115 L8).\n- Rowan took small behavioral steps: opening a work message (BH-D011 L11), then sending one to the supervisor (BH-D110 L9).\n\n## What the record does not support\n- **A clinical response or remission label.** The record never states one, and the clinician's own wording is limited to \"some\" and \"partial\" improvement.\n- **That treatment or medication caused the change.** No document makes that link.\n- **Improvement in anxiety, sleep or work functioning.** Anxiety is still documented on Jan 30 (BH-D114 L8; BH-D113 L13). Sleep is still \"variable\" (BH-D114 L8), and avoidance and delayed follow-through persist (BH-D115 L10). There was no anxiety instrument to measure change.\n- **Item-level change in symptoms.** The only item score is item 9 = 0 on Jan 30.\n- **That Rowan completed their own work task on Jan 19.** The clinician cautioned that taking part in the group exercise should not be read as completing their own work task (BH-D101 L12).",
+  "answer_markdown": "# HG-M042 (Rowan): symptom course, 5\u201330 January 2026\n\n## Direct answer\n- **PHQ-9 scores:** three distinct PHQ-9s were recorded. The totals were 18 on 5 January (BH-D002 L15), 14 on 16 January (BH-D013 L7, L11) and 10 on 30 January, with item 9 scored 0 (BH-D115 L6).\n- **Clinician judgement:** the treating clinician called this \"partial improvement, with persistent avoidance and meaningful functional impact around returning to work\" (BH-D115 L10).\n- **Other symptoms:** sleep difficulty and anxiety about work were documented at every point through 30 January.\n- **Why there was an extra contact on 19 January:** the individual visit (HG-E111) \"was added because Rowan became anxious during group and needed individual grounding and review of coping strategies\" (BH-D105 L9).\n\n## Why the 19 January contact was added\n- **In group (HG-E110):** Rowan first followed the exercise. When the talk turned to returning to the workplace, Rowan \"became visibly tense and said the amount of discussion felt difficult to manage.\" The facilitator offered grounding and set up a same-day individual meeting (BH-D101 L10). Staff arranged access to the individual clinician after Rowan asked for more help (BH-D102 L14).\n- **In the individual session:** Rowan said they felt overwhelmed when other members discussed work demands. Rowan named muscle tension, rapid breathing and an urge to leave as early signs of activation (BH-D105 L9). Rowan took part for the whole contact and said the anxiety \"eased enough to discuss a next step\" (BH-D105 L11).\n- **Safety:** Rowan denied current suicidal thoughts and no acute safety concern was found (BH-D105 L13).\n- **Timing:**\n  - The group ran 10:00\u201311:15 with a break at 10:45\u201311:00, giving 60 minutes.\n  - The individual contact ran 11:15\u201311:45, giving 30 minutes (BH-D105 L6).\n  - The total for the day was 90 minutes.\n  - A later correction changed the group departure time from 11:30 to 11:15 (BH-D103 L7). A room-transfer record shows Rowan going straight to the individual clinician at 11:15 (BH-D103 L9).\n\n## Course by domain\n\n| Date | PHQ-9 | Mood | Sleep | Anxiety / avoidance |\n|---|---|---|---|---|\n| Jan 5 (intake) | 18 (BH-D002 L15) | Low mood and reduced interest; affect subdued but responsive (BH-D002 L11, L13) | Fragmented; waking at night (BH-D002 L11, L13) | Worry about returning to work; putting off emails (BH-D002 L11) |\n| Jan 13\u201314 | \u2014 | \"Somewhat less heavy\" on days with a planned activity (BH-D010 L11); affect more varied than at intake (BH-D011 L15) | Still interrupted (BH-D010 L11; BH-D011 L11) | Opened a work message but has not replied (BH-D011 L11) |\n| Jan 16 | 14 (BH-D013 L7) | Clinician: \"some improvement in depressive symptoms\" (BH-D013 L13) | Inconsistent (BH-D013 L11) | Avoidance still clinically relevant (BH-D013 L13); partner says mornings are still difficult (BH-D012 L13) |\n| Jan 19 | \u2014 | \u2014 | Disrupted (BH-D105 L13) | Anxiety in group led to the added visit (BH-D105 L9) |\n| Jan 21\u201326 | \u2014 | Low mood ongoing (BH-D111 L14) | One better night, then a night of long wakefulness (BH-D106 L11); uneven (BH-D110 L9) | Drafted a message but did not send it (BH-D106 L9); later sent one, but kept putting off scheduling the conversation (BH-D110 L9) |\n| Jan 30 | 10, item 9 = 0 (BH-D115 L6) | Fewer days of pervasive low mood than at intake (BH-D115 L8); less persistently low (BH-D114 L8) | Sleep difficulty continues (BH-D115 L8, L10); variable (BH-D114 L8) | Still delays follow-up (BH-D115 L10); anxiety still noticeable (BH-D114 L8) |\n\n## Which assessments are distinct\n- **Counted:** the three PHQ-9s above.\n- **Not counted (copy):** BH-D014 is an imported summary received on 26 January. It restates the 16 January PHQ-9 (form HG-Q116, score 14) (BH-D014 L13), so it was not counted as a separate assessment. Its clinical comments repeat BH-D013 (BH-D014 L15).\n- **Not assessments:** the other \"measurement\" entries in the results are restatements of these scores, not further administrations.\n\n## What can be supported\n- PHQ-9 totals fell across the three distinct administrations (18, then 14, then 10).\n- Patients' reports and the clinician's notes agree that mood was less pervasively low by 30 January (BH-D115 L8; BH-D114 L8).\n- The clinician's own conclusion is partial improvement (BH-D115 L10).\n- The records show small behavioural steps: opening a message, short walks, and sending a message to the supervisor (BH-D011 L11; BH-D110 L9).\n\n## What cannot be supported\n- **Cause:** nothing in the record links the score changes to any specific treatment part (group, individual, family therapy or medication). The records give no reason for the change.\n- **Resolution or recovery:** these are not documented. The clinician states that avoidance, sleep disruption and work-related functional impact persist, and that continued treatment is appropriate (BH-D115 L10, L12).\n- **Item-level change:** item scores exist only for 30 January (item 9 = 0). The record does not show which symptoms drove the lower totals.\n- **Better coping skills:** this should not be assumed. On 26 January Rowan could use the grounding cue in rehearsal but \"remained uncertain about using it independently when anxious\" (BH-D111 L12). The 19 January clinician warned that taking part in a group exercise should not be read as completing the patient's own work task (BH-D101 L12).\n- **Reliable attendance:** this cannot be claimed.\n  - A missed individual visit was discussed on 14 January (BH-D011 L15).\n  - Rowan was absent from the 16 January contact, which only the partner attended (BH-D012 L11).\n  - Rowan missed the whole 27 January group (BH-D108 L16) and cancelled the 28 January individual visit (BH-D108 L18).\n\n## Records excluded or merged\n- **BH-D014:** a copy of the 16 January PHQ-9, not counted separately.\n- **BH-D104:** a resent copy (received 26 January) of the 19 January attendance list. It is not independent evidence and \"records no additional visit\" (BH-D104 L20).\n- **BH-D102 departure time:** 11:30 was replaced by 11:15 under the correction in BH-D103 (BH-D103 L7).\n- **BH-D015:** one observation was rejected because the document gives no date for it.\n- **Partner and outside reports:** the partner's 16 January report (BH-D012) and the outside social worker's report (BH-D109) are second-hand accounts, not direct symptom observations.",
   "unresolved": [
-    "No item-level PHQ-9 data except item 9 on Jan 30, so it is unclear which symptoms changed.",
-    "No standardized anxiety measure is in the record, so change in anxiety can't be measured.",
-    "The Jan 5 PHQ-9 has no form ID."
+    "PHQ-9 item scores are not available for 5 and 16 January, so the record does not show which symptoms account for the lower totals.",
+    "No documented link between the score changes and any specific treatment part."
   ],
   "caveats": [
-    "BH-D014 repeats the Jan 16 PHQ-9 and was not counted as a separate assessment.",
-    "BH-D104 is a resent copy of the Jan 19 roster and was excluded as evidence. The group departure time of 11:15 comes from the correction in BH-D103.",
-    "The Jan 16 partner contact (BH-D012) was collateral only; Rowan was absent.",
-    "Improvement statements are the clinician's judgments or Rowan's reports. Causation is not documented."
+    "The 5 January PHQ-9 has no form ID; it is treated as distinct based on the intake note alone.",
+    "The 16 January PHQ-9 was completed through the portal on a day Rowan missed the direct contact; only the partner attended that contact.",
+    "One BH-D015 observation was rejected because the document gives no date for it."
   ],
   "postcheck": {
     "numbers_not_in_results": [],
     "unknown_documents": [],
     "documents_not_in_results": [],
     "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
     "ok": true
   },
+  "postcheck_attempts": 1,
+  "postcheck_first_attempt": null,
   "timings_ms": {
-    "plan_llm": 3486,
-    "execute": 9.95,
-    "narrate_llm": 48709,
-    "total": 52205
+    "plan_llm": 4656,
+    "execute": 3.2,
+    "narrate_llm": 48712,
+    "total": 53373
   },
   "llm": {
     "calls": 2,
-    "input_tokens": 96642,
-    "output_tokens": 6345,
-    "cost_usd": 0.1770142
+    "input_tokens": 49349,
+    "output_tokens": 6292,
+    "cost_usd": 0.48752059999999997
   },
   "cached": false,
-  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
-  "created_at": "2026-11-12T11:59:07"
+  "fingerprint": "9c48bc2924ff8d1a5bdbfeda02aea2145da64a3f6d3dbade18604faa0fc7879d",
+  "created_at": "2026-11-12T20:32:27"
 }

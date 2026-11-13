@@ -2374,6 +2374,12 @@
             ]
           },
           {
+            "sql": "SELECT claim_id, evidence FROM claims WHERE claim_id IN (?) ORDER BY claim_id",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
             "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
             "params": [
               "HG-M042|HG-E101",
@@ -4935,6 +4941,12 @@
             ]
           },
           {
+            "sql": "SELECT claim_id, evidence FROM claims WHERE claim_id IN (?) ORDER BY claim_id",
+            "params": [
+              "4521a120a4d7:observation:1"
+            ]
+          },
+          {
             "sql": "SELECT subject_key, field, candidates, resolution FROM conflicts WHERE subject_key IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ORDER BY subject_key, conflict_id",
             "params": [
               "HG-M042|HG-E101",
@@ -5074,36 +5086,50 @@
       }
     ]
   },
-  "answer_markdown": "# Rowan's therapy minutes and hours, 5\u201330 January 2026\n\n**Answer:** Rowan received **12 therapy sessions on 11 days**, totalling **585\u2013595 patient-present minutes (9.75\u20139.92 hours)**. The total is a range rather than one number because of a single dispute: the 26 January individual session (HG-E115) is recorded in two notes as either 40 or 50 minutes. Every other session's minutes are settled by the records.\n\nBy service type: individual therapy was 5 sessions and 210\u2013220 min, group therapy 5 sessions and 300 min, and family therapy 2 sessions and 75 min.\n\n## By Monday\u2013Sunday week\n\n| Week starting | Sessions (days) | Calculation | Minutes | Hours |\n|---|---|---|---|---|\n| 2026-01-05 | 3 (3) | 50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104) | 140 | 2.33 |\n| 2026-01-12 | 2 (2) | 75 (HG-E105) + 45 (HG-E107) | 120 | 2 |\n| 2026-01-19 | 4 (3) | 60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113) | 180 | 3 |\n| 2026-01-26 | 3 (3) | [40\u201350] (HG-E115) + 75 (HG-E118) + 30 (HG-E119) | 145\u2013155 | 2.42\u20132.58 |\n| **Total** | **12 (11)** | | **585\u2013595** | **9.75\u20139.92** |\n\nThe review period ends on Friday 30 January, so the last week covers Monday to Friday only.\n\n## Where each session's minutes come from\n- **HG-E101, 5 Jan, individual:** 09:00\u201309:50, so 50 min (BH-D002 L8).\n  - It was counted even though it started before the plan was signed (13:05 that day). The plan takes effect by date, and 5 January is its first effective day.\n- **HG-E102, 6 Jan, group:** Rowan was present 10:15\u201311:15 (BH-D005 L10), minus a 10:45\u201311:00 group break (BH-D004 L12), so 45 min.\n- **HG-E104, 9 Jan, family:** 14:00\u201314:45, so 45 min. Both clinicians' notes describe the same session (BH-D007 L6, L9; BH-D008 L8), so it counts once.\n- **HG-E105, 12 Jan, group:** 10:00\u201311:30 (BH-D005 L11), minus a 10:40\u201310:55 break (BH-D009 L12), so 75 min.\n- **HG-E107, 14 Jan, individual:** 11:00\u201311:45, so 45 min (BH-D011 L7).\n- **HG-E110, 19 Jan, group:** 10:00\u201311:15, minus a 10:45\u201311:00 break (BH-D101 L6), so 60 min.\n  - The original roster said Rowan left at 11:30 (BH-D102 L9). A formal correction changed this to 11:15 (BH-D103 L7).\n  - The 11:15 time also fits the room-transfer record (BH-D103 L9) and the individual session that started at 11:15.\n- **HG-E111, 19 Jan, individual:** 11:15\u201311:45, so 30 min (BH-D105 L6).\n- **HG-E112, 21 Jan, video individual:** 13:00\u201313:20 plus 13:30\u201313:55, so 45 min. The 10-minute disconnection is excluded (BH-D106 L7, L17\u201318).\n- **HG-E113, 22 Jan, group:** Rowan arrived late at 10:30 and stayed to 11:30 (BH-D108 L9, L14), minus the 10:45\u201311:00 break (BH-D107 L8), so 45 min.\n- **HG-E118, 29 Jan, group:** 10:00\u201311:30 (BH-D108 L12, L20), minus the 10:45\u201311:00 break (BH-D107 L8), so 75 min.\n- **HG-E119, 30 Jan, family:** 30 min counted. The therapist's session ran 13:00\u201313:45 (45 min), but the partner was seen alone for the first 15 minutes. Rowan was present only from 13:15 to 13:45 (BH-D113 L6\u20137, L11).\n\n## What the record does not settle\n- **HG-E115 (26 Jan) is either 40 or 50 minutes.** Two signed clinical notes for the same appointment disagree, and neither corrects the other:\n  - BH-D110 L7 records 09:00\u201309:50, which is 50 min.\n  - BH-D111 L7 and L10 record 09:10\u201309:50, which is 40 min, and says \"Rowan entered the treatment room at 09:10.\"\n  - Because of this, the total for the week of 26 January and the overall total are ranges. Resolving it would require the clinicians to confirm which note is accurate or to file a formal correction.\n\n## Records excluded or set aside\n**Scheduled but not attended:**\n- HG-E103, 8 Jan, individual: no-show (BH-D006 L12; BH-D015 L11).\n- HG-E108, 15 Jan, group: cancelled by the clinic because of staff illness (BH-D016 L9, L15).\n- HG-E116, 27 Jan, group: no-show (BH-D108 L10, L16). Two documents suggest Rowan attended, but neither counts as attendance evidence:\n  - An unsigned draft note generated from a template before the group took place (BH-D112 L9, L11, L16).\n  - A billing charge for one group session (BH-D112 L19\u201322).\n- HG-E117, 28 Jan, individual: cancelled by Rowan before the appointment (BH-D108 L11, L18).\n\n**Contacts that were not psychotherapy:**\n- Medication management on 13 Jan (HG-E106; BH-D010 L17) and 30 Jan (HG-E120; BH-D114 L12).\n- Partner-only collateral session on 16 Jan (HG-E109). Rowan was absent (BH-D012 L8, L17).\n- Care coordination between professionals on 23 Jan (HG-E114). There was no contact with Rowan (BH-D109 L7, L13).\n- Outreach and scheduling calls on 8 Jan (BH-D015 L17), 15 Jan (BH-D016 L15) and 27 Jan (BH-D108 L16).\n- Portal notices and a symptom-measure review (BH-D016 L11; BH-D013 L15).\n\n**Copies that are not independent evidence:**\n- BH-D104 is a re-sent copy of the 19 January roster. It still shows the uncorrected 11:30 departure and \"records no additional visit\" (BH-D104 L14, L20), so it was not counted separately.\n\nThese figures count only the minutes Rowan was actually present. They show how much therapy was delivered, not whether Rowan's symptoms or functioning changed.",
+  "answer_markdown": "# Rowan's therapy minutes and hours, 2026-01-05 to 2026-01-30\n\n**Rowan received 585\u2013595 minutes (9.75\u20139.92 hours) of therapy with Rowan present.** This covers 12 therapy sessions on 11 days. The total is a range rather than one figure because of one encounter: the two notes for HG-E115 on 2026-01-26 record different contact times. The records settle the minutes for every other session.\n\n## By Monday\u2013Sunday week\n\n| Week starting | Sessions | Therapy days | Calculation | Minutes | Hours |\n|---|---|---|---|---|---|\n| 2026-01-05 | 3 | 3 | 50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104) | 140 | 2.33 |\n| 2026-01-12 | 2 | 2 | 75 (HG-E105) + 45 (HG-E107) | 120 | 2 |\n| 2026-01-19 | 4 | 3 | 60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113) | 180 | 3 |\n| 2026-01-26 | 3 | 3 | [40\u201350] (HG-E115) + 75 (HG-E118) + 30 (HG-E119) | 145\u2013155 | 2.42\u20132.58 |\n| **Total** | **12** | **11** | | **585\u2013595** | **9.75\u20139.92** |\n\nThe review period ends 2026-01-30, so the last week is counted only through that date. The rest of that week is not covered.\n\n**By service type:**\n- **Group:** 5 sessions, 300 minutes.\n- **Individual:** 5 sessions, 210\u2013220 minutes.\n- **Family:** 2 sessions, 75 minutes.\n\n## How each session's minutes were worked out\n\n- **HG-E101 (2026-01-05, individual):** 09:00\u201309:50 = 50 min (BH-D002 L8). The session began before the treatment plan was signed that day. It was still counted because the plan takes effect by date.\n- **HG-E102 (2026-01-06, group):** Rowan arrived at 10:15 and left at 11:15 (BH-D005 L10). Subtracting the group break from 10:45 to 11:00 (BH-D004 L12) gives 45 min.\n- **HG-E104 (2026-01-09, family):** 14:00\u201314:45 = 45 min, with Rowan present (BH-D007 L9; BH-D008 L8).\n- **HG-E105 (2026-01-12, group):** Rowan attended 10:00\u201311:30 (BH-D005 L11). Subtracting the break from 10:40 to 10:55 (BH-D009 L12) gives 75 min.\n- **HG-E107 (2026-01-14, individual):** 11:00\u201311:45 = 45 min (BH-D011 L7).\n- **HG-E110 (2026-01-19, group):** Rowan attended 10:00\u201311:15. Subtracting the 10:45\u201311:00 break gives 60 min (BH-D103 L7; BH-D101 L6).\n  - The original roster had Rowan leaving at 11:30 (BH-D102 L9). The correction in BH-D103 changed that to 11:15 and changed nothing else.\n  - The uncorrected time would overlap the individual session that began at 11:15. A room-transfer record shows Rowan going to the individual clinician at 11:15 (BH-D103 L9).\n- **HG-E111 (2026-01-19, individual):** 11:15\u201311:45 = 30 min (BH-D105 L6).\n- **HG-E112 (2026-01-21, video):** 13:00\u201313:20 plus 13:30\u201313:55 = 45 min. The 13:20\u201313:30 connection loss is not counted, because no therapy took place during it (BH-D106 L7, L17\u201318).\n- **HG-E113 (2026-01-22, group):** Rowan arrived late at 10:30 and stayed until 11:30 (BH-D108 L9, L14). Subtracting the 10:45\u201311:00 break (BH-D107 L8) gives 45 min.\n- **HG-E115 (2026-01-26, individual):** 40\u201350 min. The two notes disagree; see below.\n- **HG-E118 (2026-01-29, group):** Rowan attended 10:00\u201311:30 (BH-D108 L12, L20). Subtracting the 10:45\u201311:00 break (BH-D107 L8) gives 75 min.\n- **HG-E119 (2026-01-30, family):** Rowan was present 13:15\u201313:45 = 30 min. The partner was seen alone from 13:00 to 13:15 (BH-D113 L7, L11).\n\n## What the records do not settle\n\n- **HG-E115 (2026-01-26):** The two notes give different contact times, and neither corrects the other. The minutes are therefore carried as a range of 40\u201350. This is the only reason the overall total and the 2026-01-26 week are ranges.\n  - BH-D110 records 09:00\u201309:50, 50 minutes (BH-D110 L7).\n  - BH-D111 records 09:10\u201309:50, 40 minutes, and says Rowan entered the room at 09:10 (BH-D111 L7, L10).\n- **HG-E119 (2026-01-30):** The note gives a therapist session time of 45 minutes (BH-D113 L6). Only the 30 minutes with Rowan present were counted. Whether 45 or 30 is the right figure depends on whether therapist time or patient-present time is the standard. The records do not decide that.\n\n## Records excluded from the count\n\n- **Not attended:**\n  - HG-E103: no-show on 2026-01-08 (BH-D015 L11).\n  - HG-E108: group cancelled by the clinic on 2026-01-15 (BH-D016 L9, L15).\n  - HG-E116: no-show on 2026-01-27 (BH-D108 L10, L16).\n  - HG-E117: cancelled by the patient on 2026-01-28 (BH-D108 L11).\n- **HG-E116 draft and billing:** An unsigned template note says Rowan attended in full (BH-D112 L9, L11), and a charge for one group session was posted (BH-D112 L19, L22). Neither counts as evidence of attendance. The final roster's no-show was used instead.\n- **Not therapy:**\n  - Medication management: HG-E106 (BH-D010 L17) and HG-E120 (BH-D114 L12).\n  - Partner-only collateral contact, with Rowan absent: HG-E109 (BH-D012 L8, L17).\n  - Care coordination between professionals only: HG-E114 (BH-D109 L7).\n  - Scheduling and outreach calls: BH-D015 L17, BH-D016 L15, BH-D108 L16.\n  - Portal review and notice: BH-D013 L15, BH-D016 L11.\n- **Copies:** BH-D104 is a resent copy of the 2026-01-19 roster that still shows a departure of 11:30. It is not independent evidence (BH-D104 L14, L20), and the correction to 11:15 applies to it as well.\n\nThe hours figures are the computed values as reported, rounded.",
   "unresolved": [
-    "HG-E115 (26 Jan individual session): two clinical notes disagree. BH-D110 records 09:00\u201309:50 (50 min) and BH-D111 records 09:10\u201309:50 (40 min), and neither corrects the other. The week of 26 Jan is therefore 145\u2013155 min and the overall total 585\u2013595 min (9.75\u20139.92 h)."
+    "HG-E115 (2026-01-26): BH-D110 records 50 minutes and BH-D111 records 40 minutes; neither corrects the other, so the encounter is carried as a range of 40\u201350.",
+    "HG-E119 (2026-01-30): the therapist session was 45 minutes, but Rowan was present for 30 minutes; only the 30 were counted."
   ],
   "caveats": [
-    "Minutes are the time Rowan was actually present. Group breaks, the video disconnection on 21 Jan and the partner-only first 15 minutes of the 30 Jan family session are excluded, so some totals are lower than the scheduled or billed times (for example, BH-D113 gives a 45-minute therapist session but Rowan was present for 30).",
-    "The review period ends Friday 2026-01-30, so the week starting 2026-01-26 covers Monday to Friday only.",
-    "HG-E101 was counted although it took place before the plan was signed that day, because the plan takes effect by date.",
-    "The billing charge and unsigned draft note for HG-E116 (27 Jan) were not treated as attendance evidence. The final attendance register records a no-show."
+    "The last week (starting 2026-01-26) is counted only through the end of the review period, 2026-01-30.",
+    "The minutes are time with Rowan present; scheduled times and billed time were not used.",
+    "HG-E101 began before the treatment plan was signed on 2026-01-05; it was counted because the plan takes effect by date."
   ],
   "postcheck": {
     "numbers_not_in_results": [],
     "unknown_documents": [],
     "documents_not_in_results": [],
     "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
     "ok": true
   },
+  "postcheck_attempts": 2,
+  "postcheck_first_attempt": {
+    "numbers_not_in_results": [
+      "10"
+    ],
+    "unknown_documents": [],
+    "documents_not_in_results": [],
+    "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
+    "ok": false
+  },
   "timings_ms": {
-    "plan_llm": 4177,
-    "execute": 8.86,
-    "narrate_llm": 41712,
-    "total": 45898
+    "plan_llm": 4756,
+    "execute": 2.83,
+    "narrate_llm": 67518,
+    "total": 72277
   },
   "llm": {
-    "calls": 2,
-    "input_tokens": 55520,
-    "output_tokens": 5954,
-    "cost_usd": 0.5297074
+    "calls": 3,
+    "input_tokens": 110574,
+    "output_tokens": 9090,
+    "cost_usd": 1.0237644000000001
   },
   "cached": false,
-  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
-  "created_at": "2026-11-12T11:57:26"
+  "fingerprint": "9c48bc2924ff8d1a5bdbfeda02aea2145da64a3f6d3dbade18604faa0fc7879d",
+  "created_at": "2026-11-12T20:30:47"
 }

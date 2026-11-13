@@ -2,83 +2,84 @@
 
 > For January 5–30, 2026, how many therapy sessions did Rowan attend, by service type and in total, and on how many distinct days? Provide a reviewable abstraction with source support and explain records that could lead to duplicate or ineligible counts.
 
-# Rowan's therapy attendance, January 5–30, 2026 (HG-M042)
+# Rowan (HG-M042): therapy sessions attended, January 5–30, 2026
 
-Rowan attended **12 therapy sessions on 11 distinct days**:
-- **5 individual therapy sessions**
-- **5 group therapy sessions**
-- **2 family therapy sessions**
+## Answer
 
-These counts are fully supported by the records. There are 11 days rather than 12 because Rowan had both a group session and an individual session on January 19. Patient-present time is 585–595 minutes (9.75–9.92 h). The range comes from one session whose start time the records disagree on.
+Rowan attended **12 therapy sessions on 11 distinct days**. Both counts are firm. Two sessions were on the same day: group and individual therapy on 2026-01-19.
 
-## Sessions counted
+| Service type | Sessions | Days | Patient-present minutes |
+|---|---|---|---|
+| Individual therapy | 5 | 5 | 210–220 (range) |
+| Group therapy | 5 | 5 | 300 |
+| Family therapy | 2 | 2 | 75 |
+| **Total** | **12** | **11** | **585–595 (9.75–9.92 h)** |
 
-| Date | Encounter | Type | Patient-present min | Source support |
-|---|---|---|---|---|
-| Jan 5 | HG-E101 | Individual | 50 | BH-D002 L6, L8; BH-D006 L10 |
-| Jan 6 | HG-E102 | Group (partial) | 45 | BH-D005 L10; BH-D004 L12 (break 10:45–11:00) |
-| Jan 9 | HG-E104 | Family | 45 | BH-D007 L6–7, L9; BH-D008 L6, L8 |
-| Jan 12 | HG-E105 | Group | 75 | BH-D005 L11; BH-D009 L12 (break 10:40–10:55) |
-| Jan 14 | HG-E107 | Individual | 45 | BH-D011 L6–7 |
-| Jan 19 | HG-E110 | Group (partial) | 60 | BH-D102 L4, L9; BH-D103 L5, L7; BH-D101 L6 |
-| Jan 19 | HG-E111 | Individual | 30 | BH-D105 L3, L6; BH-D103 L9 |
-| Jan 21 | HG-E112 | Individual (video) | 45 | BH-D106 L5, L7; platform log L17–18 |
-| Jan 22 | HG-E113 | Group (late arrival) | 45 | BH-D108 L9, L14; BH-D107 L7–8 |
-| Jan 26 | HG-E115 | Individual | 40–50 (disputed) | BH-D110 L3, L7; BH-D111 L4, L7 |
-| Jan 29 | HG-E118 | Group | 75 | BH-D108 L12, L20; BH-D107 L12 |
-| Jan 30 | HG-E119 | Family (partial) | 30 | BH-D113 L5–7, L11 |
+## Session-by-session abstraction
 
-Minutes by type: individual 210–220, group 300, family 75.
+| Date | Encounter | Type | Status | Minutes | Source |
+|---|---|---|---|---|---|
+| 2026-01-05 | HG-E101 | Individual | Attended in full | 50 | BH-D002 L6, L8, L13; BH-D006 L10 |
+| 2026-01-06 | HG-E102 | Group | Partial: 10:15–11:15, minus the 10:45–11:00 break | 45 | BH-D005 L10, L13; BH-D004 L12 |
+| 2026-01-09 | HG-E104 | Family | Attended in full | 45 | BH-D007 L6–7, L9; BH-D008 L6, L8 |
+| 2026-01-12 | HG-E105 | Group | Attended in full, minus the 10:40–10:55 break | 75 | BH-D005 L11, L15; BH-D009 L12 |
+| 2026-01-14 | HG-E107 | Individual | Attended in full | 45 | BH-D011 L6–7 |
+| 2026-01-19 | HG-E110 | Group | Partial: 10:00–11:15 (corrected), minus break | 60 | BH-D102 L9; BH-D103 L7; BH-D101 L6 |
+| 2026-01-19 | HG-E111 | Individual | 11:15–11:45 | 30 | BH-D105 L3, L5–6 |
+| 2026-01-21 | HG-E112 | Individual (video) | 13:00–13:20 + 13:30–13:55 | 45 | BH-D106 L7, L17–18 |
+| 2026-01-22 | HG-E113 | Group | Late arrival at 10:30, minus break | 45 | BH-D108 L9, L14; BH-D107 L7–9 |
+| 2026-01-26 | HG-E115 | Individual | Attended; length disputed | 40–50 | BH-D110 L7; BH-D111 L7, L10 |
+| 2026-01-29 | HG-E118 | Group | Attended in full, minus break | 75 | BH-D108 L12, L20; BH-D107 L8, L12 |
+| 2026-01-30 | HG-E119 | Family | Partial: Rowan present 13:15–13:45 | 30 | BH-D113 L6–7, L11 |
 
-## Records that could inflate the count if taken at face value
+## Records that could cause duplicate counts (each counted once)
 
-**More than one record for the same session (each counted once):**
-- **HG-E104, Jan 9:** The primary clinician's note (BH-D007 L6) and the co-facilitator's note (BH-D008 L6–7) describe the same family session.
-- **HG-E110, Jan 19:** BH-D104 is a resent copy of the original roster. It "contains no new clinician signature and records no additional visit" (BH-D104 L20), so it was not treated as separate evidence.
-  - The original roster gave a departure time of 11:30 (BH-D102 L9). The correction document changes this to 11:15 (BH-D103 L7).
-  - With the corrected time, the group no longer overlaps the individual session HG-E111 at 11:15–11:45 (BH-D105 L6). The room-transfer record shows Rowan leaving the group room at 11:15 and being received by the individual clinician at 11:15 (BH-D103 L9).
-  - So these are two real sessions on one day.
-- **HG-E112, Jan 21:** There were two video connections (VC-112A and VC-112B), but the second was a rejoin after a network disconnect. The note says the reconnection "continued the same clinical encounter" (BH-D106 L7, L17–19). It is one session; the 13:20–13:30 gap is excluded from minutes.
-- **HG-E115, Jan 26:** Notes from two clinicians describe one session (BH-D110 L3, L6; BH-D111 L4).
-- **Schedule and register listings** (BH-D006, BH-D015, BH-D108) and the combined group note covering two dates (BH-D107) support encounters that are already counted. They do not add sessions.
+- **HG-E104 (Jan 9):** two notes for one family session, one from the primary clinician (BH-D007 L6) and one from the co-facilitator (BH-D008 L6–7). Count it once.
+- **HG-E110 (Jan 19):**
+  - BH-D104 is a resent copy of the attendance roster. It says it "records no additional visit" (BH-D104 L11, L14, L20), so it is not separate evidence.
+  - The original roster's departure time of 11:30 (BH-D102 L9) was corrected to 11:15 (BH-D103 L7). With the original time, the group would overlap the 11:15 individual session (HG-E111).
+- **HG-E112 (Jan 21):** the video platform logged two calls, VC-112A and VC-112B. The second was a rejoin of the same appointment after a network drop, so it is one session (BH-D106 L7, L17–19).
+- **HG-E115 (Jan 26):** two clinical notes describe the same encounter and appointment (BH-D110 L3, L6; BH-D111 L4). It is one session, but the two notes give different times (see below).
+- **Schedule export BH-D006:** it lists encounters already documented in clinical notes (e.g., BH-D006 L10–11, L13–14, L16). It confirms those sessions and adds none.
+- **Records without an encounter ID:**
+  - BH-D015 was linked to HG-E104 by date and service type.
+  - BH-D103 was linked to HG-E111 the same way.
 
-**Not attended (excluded):**
-- **HG-E103, Jan 8, individual:** no-show (BH-D006 L12; BH-D015 L11).
-- **HG-E108, Jan 15, group:** cancelled by the clinic for staff illness; "No group was held" (BH-D016 L9, L15).
-- **HG-E116, Jan 27, group:** no-show; Rowan was "absent for the entire group" (BH-D108 L10, L16).
-  - This is the main risk of an ineligible count. BH-D112 contains an unsigned draft note generated from a template, which says "Patient attended the full session" (BH-D112 L9, L11, L16). It also contains a posted charge for "1 group session" (BH-D112 L19–22).
-  - Neither the draft nor the billing row counts as evidence of attendance, so the signed final register's no-show stands.
-- **HG-E117, Jan 28, individual:** cancelled by the patient before the appointment (BH-D108 L11, L18).
+## Records excluded as ineligible
 
-**Not psychotherapy (excluded):**
-- **Medication management:**
-  - HG-E106, Jan 13: "No separate psychotherapy component" (BH-D010 L17).
-  - HG-E120, Jan 30: "No separately documented psychotherapy" (BH-D114 L12).
-- **Partner collateral, HG-E109, Jan 16:** Rowan was absent for the whole contact (BH-D012 L8, L17). The schedule lists it as "Completed" (BH-D006 L18), which could be misread as a session.
-- **Care coordination, HG-E114, Jan 23:** professionals only, with no patient contact (BH-D109 L7, L13).
-- **Outreach and administrative contacts:**
-  - Jan 8 callback about scheduling; "No therapy intervention" (BH-D015 L15, L17).
-  - Jan 15 portal notice and phone call confirming the cancellation (BH-D016 L11, L13, L15).
-  - Jan 16 review of a PHQ-9 questionnaire submitted through the portal (BH-D013 L15).
-  - Jan 27 outreach message (BH-D108 L16).
+- **Scheduled but not attended:**
+  - HG-E103, Jan 8, individual: no-show (BH-D006 L12; BH-D015 L11).
+  - HG-E108, Jan 15, group: cancelled by the clinic (BH-D016 L9, L15).
+  - HG-E117, Jan 28, individual: cancelled by the patient (BH-D108 L11, L18).
+  - HG-E116, Jan 27, group: no-show (BH-D108 L10, L16). Two records in BH-D112 could make this look attended, and neither is attendance evidence:
+    - An unsigned draft note generated from a template, saying the patient "attended the full session" (BH-D112 L9, L11, L16).
+    - A billing charge for "1 group session" (BH-D112 L19, L21–22).
+- **Not psychotherapy:**
+  - Medication management on Jan 13 (HG-E106) and Jan 30 (HG-E120); both notes say no psychotherapy was provided (BH-D010 L17; BH-D114 L12).
+  - HG-E109, Jan 16: a meeting with Rowan's partner only. Rowan was absent and no patient-present psychotherapy took place (BH-D012 L8, L17).
+  - HG-E114, Jan 23: care coordination between professionals; no patient contact (BH-D109 L7, L13).
+  - Jan 16 portal review of a symptom questionnaire (BH-D013 L15).
+  - Outreach and scheduling calls or messages on Jan 8 (BH-D015 L13, L15, L17), Jan 15 (BH-D016 L11, L13, L15) and Jan 27 (BH-D108 L16).
 
 ## What the record does not settle
 
-- **HG-E115 minutes (40 vs 50):** The primary note gives 09:00–09:50, 50 minutes (BH-D110 L7). The second clinician's note gives 09:10–09:50, 40 minutes, and says Rowan "entered the treatment room at 09:10" (BH-D111 L7, L10). Neither note corrects the other, so the minutes are carried as a range. This affects minutes only, not the session count.
-- **HG-E119 duration:** The note gives the therapist's session as 13:00–13:45, 45 minutes. Rowan was present only from 13:15 to 13:45 (BH-D113 L6–7). The count uses the 30 patient-present minutes, so it would be overstated if 45 minutes were used.
-- **HG-E101 timing:** This session took place before the treatment plan was signed (2026-01-05T13:05), on the plan's first effective day. It is counted because the plan takes effect by date. A reviewer using a time-of-signature rule could treat it differently.
-- **Uneven documentation:** Several sessions rest on one clinical note: HG-E107 (plus a schedule listing), HG-E112, and HG-E119.
+- **HG-E115 length:**
+  - BH-D110 gives 09:00–09:50, or 50 minutes (BH-D110 L7).
+  - BH-D111 gives 09:10–09:50, or 40 minutes, and says Rowan entered the room at 09:10 (BH-D111 L7, L10).
+  - Neither note corrects the other, so the minutes stay as a range. The session counts either way.
+- **HG-E119 length:** the note gives a 45-minute therapist session (BH-D113 L6). Rowan was present only for 30 of those minutes, because the first part was partner only (BH-D113 L7). The 30 minutes is used.
+- **HG-E101 timing:** this session took place on the treatment plan's first effective day but before the plan was signed (13:05). It is counted because plan effectivity is applied by date. A reviewer using a time-of-signature rule could treat it differently.
+- **Format:** the records do not say whether these sessions were in person, video or phone: HG-E104, HG-E107, HG-E113 and HG-E118. This does not change the counts.
 
 ## Not settled by the record
 
-- HG-E115 (Jan 26) patient-present minutes are disputed: 50 min per BH-D110 vs 40 min per BH-D111. Neither note corrects the other, so minutes are carried as 40–50 and the total as 585–595.
+- HG-E115 (2026-01-26) length is disputed: BH-D110 gives 09:00–09:50 (50 min) and BH-D111 gives 09:10–09:50 (40 min). Neither note corrects the other, so it is carried as 40–50 minutes. The session count is not affected.
 
 ## How this was computed
 
 ```
 QueryPlan: For January 5–30, 2026, how many therapy sessions did Rowan attend, by service type and in total, and on how many distinct days? Provide a reviewable abstraction with source support and explain records that could lead to duplicate or ineligible counts.
   1. care(patients=['HG-M042'], 2026-01-05..2026-01-30, include_excluded, group_by=service_type)
-  2. timeline(patients=['HG-M042'], 2026-01-05..2026-01-30, include_excluded, kinds=['encounters', 'documents', 'decisions'])
 ```
 
 **care**
@@ -86,10 +87,6 @@ QueryPlan: For January 5–30, 2026, how many therapy sessions did Rowan attend,
 - sessions = count of encounters that count as therapy sessions = 12: HG-E101, HG-E102, HG-E104, HG-E105, HG-E107, HG-E110, HG-E111, HG-E112, HG-E113, HG-E115, HG-E118, HG-E119
 - therapy days = distinct (patient, date) pairs among them = 11: 2026-01-05, 2026-01-06, 2026-01-09, 2026-01-12, 2026-01-14, 2026-01-19, 2026-01-21, 2026-01-22, 2026-01-26, 2026-01-29, 2026-01-30
 - patient-present minutes = 50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104) + 75 (HG-E105) + 45 (HG-E107) + 60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113) + [40–50] (HG-E115) + 75 (HG-E118) + 30 (HG-E119) = 585–595 min (9.75–9.92 h)
-
-**timeline**
-
-- patient-present minutes = 50 (HG-E101) + 45 (HG-E102) + 45 (HG-E104) + 75 (HG-E105) + 45 (HG-E107) + 60 (HG-E110) + 30 (HG-E111) + 45 (HG-E112) + 45 (HG-E113) + [40–50] (HG-E115) + 75 (HG-E118) + 30 (HG-E119) = 585–595
 
 ## Post-check
 
@@ -217,4 +214,4 @@ QueryPlan: For January 5–30, 2026, how many therapy sessions did Rowan attend,
 | BH-D114 | 5 | BH-D114_medication_management_2026-01-30.txt | clinical_note | January 30, 2026 / 15:00–15:20 / Completed, 20 minutes |
 | BH-D114 | 12 | BH-D114_medication_management_2026-01-30.txt | clinical_note | No separately documented psychotherapy was provided. |
 
-_timings (ms): {'plan_llm': 5430, 'execute': 9.63, 'narrate_llm': 58488, 'total': 63928}; LLM calls: 2, tokens in/out: 129912/6184, list-price cost $0.173; cached: False_
+_timings (ms): {'plan_llm': 4228, 'execute': 3.89, 'narrate_llm': 51199, 'total': 55431}; LLM calls: 2, tokens in/out: 62514/6840, list-price cost $0.423; cached: False_

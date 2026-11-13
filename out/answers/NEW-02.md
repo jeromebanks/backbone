@@ -2,35 +2,36 @@
 
 > Which weeks met the therapy-day goal but not the minute goal?
 
-**Answer:** For patient HG-M042, only the **week of 2026-01-05 to 2026-01-11** clearly met the therapy-day goal but not the minute goal. It had 3 therapy days against a goal of at least 3, and 140 minutes against a goal of at least 150.
+**One week clearly fits: 2026-01-05 to 2026-01-11.** That week had 3 therapy days, which meets the goal of 3 or more. It had 140 patient-present minutes, which falls short of the goal of 150 or more. A second week, 2026-01-26 to 2026-01-30, met the therapy-day goal, but whether it met the minute goal is **UNDETERMINED**.
 
-The **week of 2026-01-26** also met the therapy-day goal (3 days). Whether it met the minute goal can't be settled from the record: the minutes fall between 145 and 155, which straddles the 150-minute threshold.
+The goal comes from the signed plan: "at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday–Sunday week." Individual, group and family therapy all count toward minutes (BH-D003 L12).
 
-The goal comes from the signed treatment plan: "at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday–Sunday week." Individual, group and family therapy count toward the minutes (BH-D003 L12).
-
-| Week | Therapy days (goal ≥3) | Minutes (goal ≥150) | Overall |
-|---|---|---|---|
-| 01-05 to 01-11 | 3 – MET | 140 (50 HG-E101 + 45 HG-E102 + 45 HG-E104) – NOT MET | **NOT_MET (days met, minutes not)** |
-| 01-12 to 01-18 | 2 – NOT MET | 120 – NOT MET | NOT_MET (both missed) |
-| 01-19 to 01-25 | 3 – MET | 180 – MET | MET |
-| 01-26 to 01-30 (partial) | 3 – MET | 145–155 – UNDETERMINED | **UNDETERMINED** |
+| Week | Therapy days (goal ≥3) | Minutes (goal ≥150) | Days goal | Minutes goal | Overall |
+|---|---|---|---|---|---|
+| 2026-01-05 – 01-11 | 3 | 140 (50 HG-E101 + 45 HG-E102 + 45 HG-E104) | MET | NOT_MET | NOT_MET |
+| 2026-01-12 – 01-18 | 2 | 120 | NOT_MET | NOT_MET | NOT_MET |
+| 2026-01-19 – 01-25 | 3 | 180 | MET | MET | MET |
+| 2026-01-26 – 01-30 (partial) | 3 | [145–155] | MET | UNDETERMINED | UNDETERMINED |
 
 **What the record does not settle**
-- **Week of 01-26:** Two clinical notes give different times for when the patient was present in HG-E115. BH-D110 says 09:00–09:50 (50 min) and BH-D111 says 09:10–09:50 (40 min). Neither note corrects the other, so the session is counted as 40 to 50 minutes. With HG-E118 (75) and HG-E119 (30), the week totals 145–155. If the 40-minute time is right, this week also fits "days met, minutes not." If the 50-minute time is right, the week met both goals.
-- Only 5 of the 7 days in that week (01-26 to 01-30) fall inside the review period, so contacts on 01-31 or 02-01 were not looked at.
+- **Week of 2026-01-26:** two clinical notes disagree on how long the patient was present for HG-E115. BH-D110 gives 09:00–09:50 (50 min) and BH-D111 gives 09:10–09:50 (40 min). Neither note corrects the other, so the session is carried as 40–50 minutes. That puts the week's total at 145–155, on both sides of the 150-minute goal. If the 40-minute figure is right, this week would also be "days met, minutes not met."
+- This week is also only partly inside the period asked about: 5 of 7 days (2026-01-26 to 2026-01-30). Sessions later that week are not counted.
 
-**Records not counted (relevant to these weeks)**
-- **Week of 01-05:**
-  - HG-E103 (individual therapy, 01-08) was a no-show (BH-D006, BH-D015).
-  - An outreach call on 01-08 is not a therapy service.
-- **Week of 01-26:**
-  - HG-E116 (group therapy, 01-27) was a no-show. A draft template and a billing row in BH-D112 show it as attended, but neither counts as attendance evidence.
-  - HG-E117 (01-28) was cancelled by the patient.
-  - HG-E120 (01-30, medication management) and an outreach call on 01-27 are not therapy services.
+**Excluded from the counts (relevant to the two weeks above)**
+- **Week of 2026-01-05:**
+  - HG-E103 (individual therapy, 2026-01-08) was a no-show.
+  - An outreach call on 2026-01-08 is not a therapy service.
+- **Week of 2026-01-26:**
+  - HG-E116 (group, 2026-01-27) was a no-show. A draft/template and a billing row in BH-D112 suggest attendance, but they were not accepted as attendance evidence.
+  - HG-E117 (individual, 2026-01-28) was cancelled by the patient.
+  - An outreach call on 2026-01-27 and medication management HG-E120 on 2026-01-30 are not therapy services.
+
+Line citations are given only for the plan, because no line-level evidence was provided for the encounter records.
 
 ## Not settled by the record
 
-- Week of 2026-01-26: the minute goal can't be settled (145–155 vs ≥150) because two notes give different patient-present times for HG-E115 (BH-D110: 50 min; BH-D111: 40 min).
+- Week of 2026-01-26: minute total is 145–155 against the 150 goal because the two notes disagree on HG-E115's patient-present time (BH-D110: 50 min, BH-D111: 40 min)
+- Week of 2026-01-26 was checked only through 2026-01-30 (5 of 7 days)
 
 ## How this was computed
 
@@ -59,4 +60,4 @@ QueryPlan: Which weeks met the therapy-day goal but not the minute goal?
 |---|---|---|---|---|
 | BH-D003 | 12 | signed_treatment_plan_jan05.txt | plan_requirement | Patient-present individual, group, and family therapy contribute to the minute goal. |
 
-_timings (ms): {'plan_llm': 2676, 'execute': 7.51, 'narrate_llm': 19147, 'total': 21830}; LLM calls: 2, tokens in/out: 23485/2509, list-price cost $0.069; cached: False_
+_timings (ms): {'plan_llm': 4888, 'execute': 5.28, 'narrate_llm': 14579, 'total': 19473}; LLM calls: 2, tokens in/out: 13346/1594, list-price cost $0.106; cached: False_

@@ -966,36 +966,38 @@
       }
     ]
   },
-  "answer_markdown": "# Rowan (HG-M042): weekly therapy vs. treatment-plan goal, Jan 5\u201330, 2026\n\n**Short answer:** Rowan met the goal in 1 week and missed it in 2. One week can't be determined from the current record.\n\n- **Met:** week of Jan 19.\n- **Not met:** weeks of Jan 5 and Jan 12.\n- **Cannot be determined:** week of Jan 26, because two notes give different session times.\n\n**The goal:** The signed treatment plan sets a \"Local treatment participation goal: at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday\u2013Sunday week\" (BH-D003 L12). Individual, group and family therapy all count toward the minute goal (BH-D003 L12).\n\n| Week | Therapy days (goal \u2265 3) | Patient-present minutes (goal \u2265 150) | Encounters counted | Status |\n|---|---|---|---|---|\n| Jan 5\u201311 | 3 (met) | 140 = 50 + 45 + 45 (not met) | HG-E101, HG-E102, HG-E104 | **Not met** |\n| Jan 12\u201318 | 2 (not met) | 120 = 75 + 45 (not met) | HG-E105, HG-E107 | **Not met** |\n| Jan 19\u201325 | 3 (met) | 180 = 60 + 30 + 45 + 45 (met) | HG-E110, HG-E111, HG-E112, HG-E113 | **Met** |\n| Jan 26\u201330 (partial) | 3 (met) | 145\u2013155 = [40\u201350] + 75 + 30 (undetermined) | HG-E115, HG-E118, HG-E119 | **Cannot be determined** |\n\n## What the record doesn't settle\n- **Week of Jan 26, minutes:** Two clinical notes for HG-E115 give different patient-contact times: 09:00\u201309:50 (50 min) in BH-D110 and 09:10\u201309:50 (40 min) in BH-D111. Neither note corrects the other, so the week's total is carried as 145\u2013155 minutes. That range runs from below to above the 150-minute goal. The day goal (3 days) is met either way.\n- **Partial week:** Only Jan 26\u201330 (5 of 7 days) falls inside the period you asked about. Any therapy on Jan 31\u2013Feb 1 wasn't evaluated.\n- **Week of Jan 5:** HG-E101 started before the plan was signed (2026-01-05T13:05). It was still counted because the plan takes effect by date, starting Jan 5.\n\n## What was excluded and why\n- **Missed sessions (no-show or cancelled):**\n  - HG-E103, Jan 8: no-show (BH-D006, BH-D015)\n  - HG-E108, Jan 15: group cancelled by the clinic (BH-D006, BH-D016)\n  - HG-E116, Jan 27: group no-show (BH-D108, BH-D112)\n  - HG-E117, Jan 28: cancelled by the patient (BH-D108)\n- **Not psychotherapy:**\n  - Medication management: HG-E106, Jan 13 (BH-D006, BH-D010) and HG-E120, Jan 30 (BH-D114)\n  - Family collateral contact: HG-E109, Jan 16 (BH-D006, BH-D012)\n  - Care coordination: HG-E114, Jan 23 (BH-D109)\n  - Outreach calls on Jan 8, 15 and 27 (BH-D015, BH-D016, BH-D108)\n  - Administrative or other contacts on Jan 15\u201316 (BH-D013, BH-D016)\n- **Records not accepted as evidence:**\n  - HG-E116: BH-D112 says \"attended_full,\" but it is a draft/template and a billing row, so it doesn't count as attendance evidence. The no-show stands.\n  - HG-E110: BH-D104 is a retransmitted copy, so it isn't independent evidence. A correction (BH-D103) changed the departure time in BH-D102 and BH-D104 from 11:30 to 11:15. This leaves 60 counted minutes.\n\nThe statuses above only compare documented attendance and minutes with the plan's participation goal. They say nothing about Rowan's clinical progress.",
+  "answer_markdown": "**Short answer:** Of the four weeks from 2026-01-05 to 2026-01-30, Rowan met the treatment-plan goal in one week. Two weeks fell short, and the last week can't be decided from the current record.\n\n**Goal (signed treatment plan BH-D003):** \"at least 3 therapy days and at least 150 minutes of patient-present therapy in each Monday\u2013Sunday week.\" Patient-present individual, group and family therapy count toward the minutes (BH-D003 L12). A week meets the goal only if both parts are met.\n\n| Week | Therapy days (goal \u2265 3) | Patient-present minutes (goal \u2265 150) | Encounters counted | Overall |\n|---|---|---|---|---|\n| 2026-01-05 \u2013 01-11 | 3: met | 140: not met (50 + 45 + 45) | HG-E101, HG-E102, HG-E104 | **NOT MET** |\n| 2026-01-12 \u2013 01-18 | 2: not met | 120: not met (75 + 45) | HG-E105, HG-E107 | **NOT MET** |\n| 2026-01-19 \u2013 01-25 | 3: met | 180: met (60 + 30 + 45 + 45) | HG-E110, HG-E111, HG-E112, HG-E113 | **MET** |\n| 2026-01-26 \u2013 01-30 (partial week) | 3: met | 145\u2013155: undetermined ([40\u201350] + 75 + 30) | HG-E115, HG-E118, HG-E119 | **CANNOT BE DETERMINED** |\n\n**Why the last week is undetermined**\n- Two signed clinical notes give different patient-contact times for HG-E115, and neither corrects the other:\n  - BH-D110 gives 09:00\u201309:50, which is 50 min.\n  - BH-D111 gives 09:10\u201309:50, which is 40 min.\n- Because of this, the week's minutes are carried as a range of 145\u2013155, which falls on both sides of the 150-minute goal. The therapy-day part of the goal (3 days) is met.\n- Only 2026-01-26 to 2026-01-30 is inside the period you asked about (5 of 7 days). Any therapy later that week is not counted here.\n- To settle it, someone would need to reconcile the HG-E115 contact time.\n\n**How the records were handled**\n- **HG-E101:** This session started before the plan was signed (2026-01-05T13:05), on the plan's first effective day. It was counted because the plan takes effect by date.\n- **HG-E110:** The departure time was changed from 11:30 to 11:15 based on an explicit correction (BH-D103). BH-D104 is a retransmitted copy, so it was not used as independent evidence.\n- **HG-E116 (2026-01-27, group):** Counted as a no-show. BH-D112 says the patient \"attended_full,\" but that document is a draft/template and a billing row, so it was excluded as attendance evidence.\n\n**Encounters left out of the totals**\n- **Not attended:**\n  - HG-E103 on 01-08 (no-show)\n  - HG-E108 on 01-15 (clinic cancelled)\n  - HG-E116 on 01-27 (no-show)\n  - HG-E117 on 01-28 (patient cancelled)\n- **Not psychotherapy services:**\n  - Medication management: HG-E106 (01-13) and HG-E120 (01-30)\n  - Family collateral contact: HG-E109 (01-16)\n  - Care coordination: HG-E114 (01-23)\n  - Outreach calls on 01-08, 01-15 and 01-27\n  - Administrative and other entries on 01-15 and 01-16\n\nThis review only compares delivered therapy against the plan's participation goal. It does not assess clinical progress or outcomes.",
   "unresolved": [
-    "HG-E115 (week of Jan 26): BH-D110 gives 09:00\u201309:50 (50 min) and BH-D111 gives 09:10\u201309:50 (40 min). Neither corrects the other, so the week's minutes are 145\u2013155 against a goal of at least 150. Status cannot be determined.",
-    "Week of Jan 26 was only evaluated through Jan 30. Jan 31\u2013Feb 1 fall outside the requested period."
+    "Week of 2026-01-26: patient-present minutes are 145\u2013155 against the \u2265150 goal because the HG-E115 contact interval is disputed (BH-D110: 09:00\u201309:50, 50 min; BH-D111: 09:10\u201309:50, 40 min)."
   ],
   "caveats": [
-    "HG-E101 began before the plan was signed on Jan 5. It was counted because the plan takes effect by date.",
-    "Only patient-present individual, group and family therapy count toward the goal. Collateral, medication-management, outreach, care-coordination and administrative contacts were excluded.",
-    "Line numbers are only available for the plan document (BH-D003). Other documents are cited by ID only."
+    "The week of 2026-01-26 was only partly evaluated (2026-01-26..2026-01-30, 5 of 7 days). Any services later that week are not included.",
+    "HG-E101 started before the plan was signed on the plan's first effective day. It was counted because the plan takes effect by date."
   ],
   "postcheck": {
     "numbers_not_in_results": [],
     "unknown_documents": [],
     "documents_not_in_results": [],
     "line_refs_outside_evidence": [],
+    "ambiguous_citations": [],
+    "dates_not_in_results": [],
     "ok": true
   },
+  "postcheck_attempts": 1,
+  "postcheck_first_attempt": null,
   "timings_ms": {
-    "plan_llm": 2775,
-    "execute": 7.58,
-    "narrate_llm": 26319,
-    "total": 29101
+    "plan_llm": 3895,
+    "execute": 1.5,
+    "narrate_llm": 15588,
+    "total": 19484
   },
   "llm": {
     "calls": 2,
-    "input_tokens": 13196,
-    "output_tokens": 3663,
-    "cost_usd": 0.0811404
+    "input_tokens": 13560,
+    "output_tokens": 1858,
+    "cost_usd": 0.11252859999999999
   },
   "cached": false,
-  "fingerprint": "3e97b404db0fe365081410857557aebca58a25f79c58016ea57e1eca65c10d7c",
-  "created_at": "2026-11-12T11:57:55"
+  "fingerprint": "9c48bc2924ff8d1a5bdbfeda02aea2145da64a3f6d3dbade18604faa0fc7879d",
+  "created_at": "2026-11-12T20:31:06"
 }

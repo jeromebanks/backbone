@@ -15,6 +15,7 @@ QueryPlan: What was Rowan's blood pressure trend during the episode?
 
 - numbers in the answer not found in computed results: none
 - cited documents not in the corpus: none
+- cited documents not in the computed results: none
 - line references outside the evidence passages: none
 
 
