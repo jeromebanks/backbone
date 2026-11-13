@@ -51,7 +51,7 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
 12. **Expected answers live only in tests.** They were derived by hand before coding and protect against
     overfitting the production code to `questions.json`.
 
-13. **No graph DB or RDF store as the system of record.**
+13. **At production scale too, no graph DB or RDF store as the system of record** (extends 1 from SQLite to Postgres).
     - **Why:** queries are shallow, temporal and aggregation-heavy; Postgres plus `WITH RECURSIVE` covers lineage.
     - **Graph DB later:** only as a CDC-fed projection, for identity resolution or provider-network analytics.
     - **RDF:** replaced by standard codes plus a FHIR export (`Provenance` ↔ claims).
@@ -189,6 +189,39 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
       the patient report is dropped today. It awaits sign-off.
 34. **Modality is reconciled like the other encounter fields (#81).** The first tier that states one decides it;
     disagreement in that tier is `disputed` plus a conflict.
+
+35. **Unattributable documents are quarantined, never pooled (#1, #41–#43, #53–#55).** A document without an MRN
+    must match exactly one known patient by name (+ DOB); a document whose text names several patients, or whose
+    extracted MRN contradicts the printed one, is quarantined. Its claims stay as evidence with no patient. The old
+    `UNRESOLVED` bucket merged unrelated patients. Rejected: a provisional patient per (name, DOB), because it still
+    invents an identity and splits the record when the real MRN arrives.
+36. **The answer cache is keyed by the abstraction's content, not by document hashes (#4).** The fingerprint hashes
+    documents, committed extractions, claims and every derived table (minus row ids, timestamps and LLM timing),
+    plus the code versions. A retried extraction or a changed derived row invalidates cached answers; an identical
+    rebuild does not.
+37. **Reproducibility checks are read-only (#26, #45).** `verify-answers` and every reporting command open the DB
+    read-only and write nothing; `verify-answers --rewrite` refreshes only the stored post-check and Markdown, and
+    the command exits 1 on any difference, any failed post-check, or nothing to verify.
+38. **The post-check is a gate, not a log (#35).** A failing narration is regenerated once on the same results, with
+    the failures fed back; if it still fails it is returned with a banner and never cached. A cached answer is
+    post-checked again before it is served (#44).
+39. **The post-check admits only what the results state (#16, #37, #44, #59, #69, #70).** Numbers come from stated
+    quantities (JSON numbers and free-standing numbers in readable strings), never from ids, keys, hashes, file
+    names, dates, the question, the plan, step parameters or SQL; hyphenated compounds are checked; dates must be
+    stated in the results, be a scope bound, or end a reported week; every line of a cited range must be in
+    evidence; a shared label must be cited as `LABEL [sha12]`. It is set membership: it cannot tell a right number
+    from the right number of the wrong week, and it does not check prose.
+40. **Value grounding: fatal where it feeds arithmetic or dating, a flag elsewhere (#36, #52).** Every payload value
+    is checked against the claim's own quotes. A session's clock times or stated minutes not in its own quotes, or a
+    date stated nowhere in the document, make the claim unverified (R0). A value stated only elsewhere in the
+    document (165 corpus claims take their date from the header) is recorded as a flag.
+41. **Fuzzy quote matching never forgives a digit (#15).** Typos in prose are tolerated; any token containing a
+    digit must match exactly and in order, and exact matches may not start or end inside a word or number.
+42. **Draft treatment plans are not operative (#8).** Their requirements are kept as evidence with an R2
+    `plan_not_operative` decision. Whether unsigned or unknown-finality plans should count is open (#51).
+43. **`==` goals are judged over the whole interval (#18).** MET only when low = high = threshold, NOT_MET when the
+    threshold is outside [low, high], otherwise UNDETERMINED: equality is not monotone, so the endpoints alone
+    cannot decide it.
 
 ## Open questions / likely next decisions
 
