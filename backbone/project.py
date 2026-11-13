@@ -408,9 +408,8 @@ def weekly_compliance(conn, mrn: str, start: date, end: date, log: SqlLog, scope
                 # rows would otherwise make the shown total unbounded. Requirements above use their own totals.
                 therapy_rows = [e for e in encs if e["service_type"] in THERAPY_TYPES]
                 shown = totals
-                if other:
-                    psy = aggregate(therapy_rows)
-                    shown = {**totals, "minutes": psy["minutes"], "hours": psy["hours"]}
+                if other:                       # days, sessions and minutes shown alike: psychotherapy only
+                    shown = aggregate(therapy_rows)
                 ev = {"plan_days": f"{ev_lo}..{ev_hi}", "plan_documents": sorted({r['doc_label'] for r in s}),
                       "counted_service_types": counted, "totals": shown, "requirements": evals,
                       "status": st, "encounters": [e["encounter_key"] for e in encs], "_rows": therapy_rows}

@@ -94,6 +94,9 @@ def build_abstraction(conn, mrn: str) -> dict:
         for ev in w["evaluations"]:
             ev.pop("_rows", None)
             ev["encounters"] = [k.split("|", 1)[1] for k in ev["encounters"]]
+            for r in ev.get("requirements", []):
+                for c in r.get("counted_non_psychotherapy", []):
+                    c["encounter"] = c["encounter"].split("|", 1)[-1]
     assessments = []
     for r in conn.execute("SELECT * FROM assessments WHERE mrn=? ORDER BY completed_date", (mrn,)):
         a = dict(r)
