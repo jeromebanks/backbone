@@ -873,19 +873,34 @@ def _add_identity_alternatives(encs: list[dict], res: Result) -> list[dict]:
     return out
 
 
-def _overlap_checks(encs: list[dict], res: Result) -> None:
+def _overlap_checks(encs: list[dict], res: Result, labels: dict[str, str] | None = None) -> None:
+    labels = labels or {}
     by_date = defaultdict(list)
+    src: dict[str, set] = defaultdict(set)              # encounter identity -> records with a presence account in it
     for e in encs:
         by_date[e["service_date"]].append(e)
+        for cs in e.get("_present_src") or ():
+            src[e["_identity"]] |= cs
+    ambiguous: dict[str, set] = defaultdict(set)        # record placed in several encounters -> those encounters
     for d, es in by_date.items():
         for i, a in enumerate(es):
             for b in es[i + 1:]:
                 if a["_identity"] == b["_identity"]:      # alternative rows of one encounter (#12), not two contacts
                     continue
+                # #89: a record that R1 made an account of both encounters (#78) is one of them, not a further
+                # contact. Its account in one is not compared with itself or with the other's own times: that
+                # overlap is why R1 placed it in both, so a flag would only repeat the ambiguity. One note says so.
+                # A presence account is skipped only when it is that record's alone: one that another record of the
+                # encounter also states (R6 merges equal times) is still that record's account, and compared.
+                shared = src[a["_identity"]] & src[b["_identity"]]
                 for sa, ca in zip(a["_present_sets"], a.get("_present_src") or itertools.repeat(set())):
                     for sb, cb in zip(b["_present_sets"], b.get("_present_src") or itertools.repeat(set())):
-                        # one record that R1 made an account of both encounters (#78) is not two contacts at once
-                        if overlaps(sa, sb) and not (ca & cb):
+                        if (ca & cb) or (ca and ca <= shared) or (cb and cb <= shared):
+                            if overlaps(sa, sb):
+                                for cid in (ca | cb) & shared:
+                                    ambiguous[cid] |= {a["_identity"], b["_identity"]}
+                            continue
+                        if overlaps(sa, sb):
                             msg = f"patient-present intervals overlap: {a['encounter_key']} {fmt_set(sa)} vs {b['encounter_key']} {fmt_set(sb)}"
                             a["flags"].append(msg); b["flags"].append(msg)
                             res.decide(a["encounter_key"], "R7", "overlap", msg, [])
@@ -896,6 +911,12 @@ def _overlap_checks(encs: list[dict], res: Result) -> None:
                                 res.decide(x["encounter_key"], "R7", "correction_consistent",
                                            f"the superseded value in {label} ({fmt_set([iv])}) would overlap "
                                            f"{y['encounter_key']} {fmt_set(sy)}; the corrected value does not", [])
+    for cid, keys in sorted(ambiguous.items()):
+        ks = sorted(keys)
+        res.decide(ks[0], "R7", "ambiguous_account",
+                   f"{labels.get(cid, cid)} is an account of each of {' and '.join(ks)} (R1: it may be any one of them, "
+                   "not a further contact), so its times are not checked for overlap against theirs",
+                   [cid])
 
 
 # --------------------------------------------------------------------------------------------- other subjects
@@ -993,50 +1014,132 @@ def _goals_not_restated(res: Result) -> None:
             break
 
 
-def _assessments(acl: list[Claim], copy_docs: dict[str, list], res: Result) -> None:
-    groups: dict[tuple, list[Claim]] = defaultdict(list)
+def _item_key(s) -> tuple[str, str] | None:
+    """An item score as stated ('Item 9: 0') as (normalised item, normalised value); None if it names no item."""
+    if not isinstance(s, str) or ":" not in s:
+        return None
+    label, value = s.split(":", 1)
+    return " ".join(label.lower().split()), " ".join(value.lower().split())
+
+
+def _item_scores(prim: list[Claim]) -> tuple[list[str], list[list[dict]]]:
+    """#87: item scores are reconciled per item over the primary records, as the total is (#80). A record that does
+    not state an item is silent; one stated value is kept as stated; different values give '<item>: disputed' (no
+    definite value) plus one candidate list per item for its conflict. A string that names no item passes through."""
+    out, per = set(), defaultdict(list)
+    for c in prim:
+        for s in c.payload.get("item_scores") or []:
+            k = _item_key(s)
+            if k is None:
+                out.add(s)
+            else:
+                per[k[0]].append((s, k[1], c))
+    disputes = []
+    for _, xs in sorted(per.items()):
+        values = sorted({v for _, v, _ in xs})
+        if len(values) == 1:
+            out.add(sorted({s for s, _, _ in xs})[0])
+            continue
+        out.add(f"{sorted({s.split(':', 1)[0].strip() for s, _, _ in xs})[0]}: disputed")
+        disputes.append([{"value": sorted({s for s, w, _ in xs if w == v})[0],
+                          "claim_ids": sorted({c.claim_id for _, w, c in xs if w == v})} for v in values])
+    return sorted(out), disputes
+
+
+def _assessment_groups(acl: list[Claim]) -> list[tuple[str, str | None, list[Claim]]]:
+    """R8 identity: (normalised instrument, form ID as stated, records). A form ID names one administration, so its
+    records are one assessment whatever dates they state (#88: different dates are a `completed_date` dispute, not
+    two assessments). A record without a form ID joins every form of its instrument that a record states on its date
+    (it may be any of them), and is otherwise grouped by (instrument, date)."""
+    def inst(c):
+        return c.payload["instrument"].upper().replace(" ", "")
+
+    forms: dict[tuple, list[Claim]] = defaultdict(list)
     for c in acl:
-        p = c.payload
-        groups[(p["instrument"].upper().replace(" ", ""), p.get("completed_date"))].append(c)
-    for (inst, d), cs in sorted(groups.items(), key=lambda kv: (str(kv[0][1]), kv[0][0])):
-        forms = sorted({c.payload.get("form_id") for c in cs if c.payload.get("form_id")})
-        buckets = {f: [c for c in cs if c.payload.get("form_id") in (f, None)] for f in forms} if len(forms) > 1 else {forms[0] if forms else None: cs}
-        for form, bcs in buckets.items():
-            copies = [c for c in bcs if c.payload.get("is_copy_of_earlier") or _covered(
-                copy_docs.get(c.sha256, ()), _norm_id(c.payload.get("form_id")), c.payload.get("completed_date"))]
-            prim = [c for c in bcs if c not in copies] or copies
-            # #80: the score is reconciled over the primary records, not taken from the first one. A record that
-            # states no total is silent. One stated value is the score; different values are a dispute with no
-            # definite score (the conflict carries every value). A copy carries no weight of its own (R3), so a copy
-            # that differs is named in the R8 decision instead of changing the score.
-            scores = sorted({c.payload.get("total_score") for c in prim} - {None})
-            key = f"{res.mrn}|{inst}|{d}|{form or '-'}"
-            status = "disputed" if len(scores) > 1 else "distinct"
-            items = sorted({i for c in bcs for i in c.payload.get("item_scores") or []})
-            res.assessments.append({
-                "assessment_key": key, "mrn": res.mrn,
-                # the group key is the normalised name, so records differ at most in spelling: one, independent of order
-                "instrument": sorted({c.payload["instrument"] for c in prim})[0],
-                "total_score": scores[0] if len(scores) == 1 else None, "item_scores": items, "completed_date": d,
-                "form_id": form, "status": status, "claim_ids": sorted(c.claim_id for c in prim),
-                "copy_claim_ids": sorted(c.claim_id for c in copies if c not in prim)})
-            if copies and prim is not copies:
-                differ = sorted({c.payload.get("total_score") for c in copies} - {None} - set(scores))
-                res.decide(key, "R8", "copy_not_distinct",
-                           f"{', '.join(sorted({c.doc_label for c in copies}))} restate(s) the {inst} completed {d}"
-                           + (f" (form {form})" if form else "") + f" recorded in {', '.join(sorted({c.doc_label for c in prim}))}; "
-                           "not counted as a separate assessment"
-                           + (f"; the copy states total score {', '.join(f'{s:g}' for s in differ)}, which does not "
-                              "change the primary record's score" if differ else ""), [c.claim_id for c in bcs])
-            if status == "disputed":
-                res.conflicts.append({"subject_key": key, "field": "total_score", "resolution": "disputed",
-                                      "candidates": [{"value": s, "claim_ids": sorted(
-                                          c.claim_id for c in prim if c.payload.get("total_score") == s)}
-                                          for s in scores]})
-                res.decide(key, "R8", "score_disputed",
-                           f"records of the {inst} completed {d}" + (f" (form {form})" if form else "")
-                           + f" state different total scores ({' vs '.join(f'{s:g}' for s in scores)}) and none "
-                           "corrects or copies another; no score is picked", [c.claim_id for c in prim])
+        if _norm_id(c.payload.get("form_id")):
+            forms[(inst(c), _norm_id(c.payload["form_id"]))].append(c)
+    form_dates = {k: {c.payload.get("completed_date") for c in cs} for k, cs in forms.items()}
+    dated: dict[tuple, list[Claim]] = defaultdict(list)
+    for c in acl:
+        if _norm_id(c.payload.get("form_id")):
+            continue
+        d = c.payload.get("completed_date")
+        joined = [k for k in forms if k[0] == inst(c) and d in form_dates[k]]
+        for k in joined:
+            forms[k].append(c)
+        if not joined:
+            dated[(inst(c), d)].append(c)
+    return ([(i, sorted({c.payload["form_id"] for c in cs if _norm_id(c.payload.get("form_id"))})[0], cs)
+             for (i, _), cs in forms.items()] + [(i, None, cs) for (i, _), cs in dated.items()])
+
+
+def _assessments(acl: list[Claim], copy_docs: dict[str, list], res: Result) -> None:
+    rows = []
+    for inst, form, bcs in _assessment_groups(acl):
+        copies = [c for c in bcs if c.payload.get("is_copy_of_earlier") or _covered(
+            copy_docs.get(c.sha256, ()), _norm_id(c.payload.get("form_id")), c.payload.get("completed_date"))]
+        prim = [c for c in bcs if c not in copies] or copies
+        # #88: the completion date is reconciled over the primary records like the score. A record that states none
+        # is silent; several dates are a dispute. The row is listed under the earliest stated date, so a date-scoped
+        # query still finds it, and it is marked disputed with a conflict carrying every date.
+        dates = sorted({c.payload.get("completed_date") for c in prim} - {None})
+        d = dates[0] if dates else (sorted({c.payload.get("completed_date") for c in bcs} - {None}) or [None])[0]
+        rows.append(((str(d), inst, form or ""), inst, d, form, bcs, copies, prim, dates))
+    for _, inst, d, form, bcs, copies, prim, dates in sorted(rows, key=lambda r: r[0]):
+        # #80: the score is reconciled over the primary records, not taken from the first one. A record that
+        # states no total is silent. One stated value is the score; different values are a dispute with no
+        # definite score (the conflict carries every value). A copy carries no weight of its own (R3), so a copy
+        # that differs is named in the R8 decision instead of changing the score. Item scores likewise (#87).
+        scores = sorted({c.payload.get("total_score") for c in prim} - {None})
+        items, item_disputes = _item_scores(prim)
+        key = f"{res.mrn}|{inst}|{d}|{form or '-'}"
+        status = "disputed" if len(scores) > 1 or len(dates) > 1 else "distinct"
+        of = f"the {inst} completed {d}" + (f" (form {form})" if form else "")
+        res.assessments.append({
+            "assessment_key": key, "mrn": res.mrn,
+            # the group key is the normalised name, so records differ at most in spelling: one, independent of order
+            "instrument": sorted({c.payload["instrument"] for c in prim})[0],
+            "total_score": scores[0] if len(scores) == 1 else None, "item_scores": items, "completed_date": d,
+            "form_id": form, "status": status, "claim_ids": sorted(c.claim_id for c in prim),
+            "copy_claim_ids": sorted(c.claim_id for c in copies if c not in prim)})
+        if copies and prim is not copies:
+            differ = sorted({c.payload.get("total_score") for c in copies} - {None} - set(scores))
+            other_dates = sorted({c.payload.get("completed_date") for c in copies} - {None} - set(dates))
+            other_items = sorted({i for c in copies for i in c.payload.get("item_scores") or []} - set(items))
+            res.decide(key, "R8", "copy_not_distinct",
+                       f"{', '.join(sorted({c.doc_label for c in copies}))} restate(s) {of}"
+                       f" recorded in {', '.join(sorted({c.doc_label for c in prim}))}; "
+                       "not counted as a separate assessment"
+                       + (f"; the copy states total score {', '.join(f'{s:g}' for s in differ)}, which does not "
+                          "change the primary record's score" if differ else "")
+                       + (f"; the copy states completed date {', '.join(other_dates)}, which does not change the "
+                          "primary record's date" if other_dates else "")
+                       + (f"; the copy states item score(s) {', '.join(other_items)}, which do not change the "
+                          "primary record's items" if other_items else ""), [c.claim_id for c in bcs])
+        if len(dates) > 1:
+            res.conflicts.append({"subject_key": key, "field": "completed_date", "resolution": "disputed",
+                                  "candidates": [{"value": x, "claim_ids": sorted(
+                                      c.claim_id for c in prim if c.payload.get("completed_date") == x)}
+                                      for x in dates]})
+            res.decide(key, "R8", "date_disputed",
+                       f"records of form {form} ({inst}) state different completion dates ({' vs '.join(dates)}); "
+                       f"one form is one administration, so it is one assessment, listed under {d} with the date "
+                       "disputed; no date is picked", [c.claim_id for c in prim])
+        if len(scores) > 1:
+            res.conflicts.append({"subject_key": key, "field": "total_score", "resolution": "disputed",
+                                  "candidates": [{"value": s, "claim_ids": sorted(
+                                      c.claim_id for c in prim if c.payload.get("total_score") == s)}
+                                      for s in scores]})
+            res.decide(key, "R8", "score_disputed",
+                       f"records of {of}"
+                       + f" state different total scores ({' vs '.join(f'{s:g}' for s in scores)}) and none "
+                       "corrects or copies another; no score is picked", [c.claim_id for c in prim])
+        for cands in item_disputes:
+            res.conflicts.append({"subject_key": key, "field": "item_scores", "resolution": "disputed",
+                                  "candidates": cands})
+            res.decide(key, "R8", "item_disputed",
+                       f"records of {of} state different item scores ({' vs '.join(x['value'] for x in cands)}); "
+                       "no item value is picked", sorted({x for c in cands for x in c["claim_ids"]}))
     # #80: one form ID under two instruments is one form whose instrument the record disputes. Each instrument's
     # row is kept, marked disputed, with an instrument conflict (two instruments on one day without a shared form
     # ID are ordinary practice and stay distinct).
@@ -1177,7 +1280,7 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
                        f"{r.doc_label} corrects {r.payload.get('field')} of an encounter that has no service record",
                        [r.claim_id])
     encs = _add_identity_alternatives(encs, res)
-    _overlap_checks(encs, res)
+    _overlap_checks(encs, res, {c.claim_id: c.doc_label for c in events})
     res.encounters = encs
     _plans([c for c in claims if c.kind == "plan_requirement"], res)
     # R9 note: care on a plan's first effective day that precedes its signature (once per encounter and signature,

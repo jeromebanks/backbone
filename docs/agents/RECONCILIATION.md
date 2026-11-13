@@ -41,7 +41,8 @@ ids, so the export and operators show why the document belongs to the patient. A
    (#74). Actual contact times are contact intervals or arrival–departure; a schedule alone never merges. The patient
    cannot attend two sessions at once. If it overlaps several such contacts, it joins **each** of them as an account
    with the type disputed (#78): it is one of them, never a further session, and the record does not say which.
-   R7 does not compare that one record's account in one encounter with itself in the other. Otherwise
+   R7 does not compare that record's account in one encounter with itself or with the other's own times (#89).
+   Otherwise
    they form a separate `U-` contact (an "unidentified contact" decision). A `U-` contact made because several
    same-type encounters were candidates ("ambiguous") counts within bounds only: an R5 `yes` becomes `uncertain`
    (#78). The intervals are every time a record
@@ -112,7 +113,11 @@ ids, so the export and operators show why the document belongs to the patient. A
      - Stated minutes outside the bounds produce a flag (cross-check only).
 6. **R7** `_overlap_checks`: patient-present sets that overlap across a patient's encounters on one day are flagged.
    A *superseded* pre-correction value that would overlap another encounter is logged as
-   `correction_consistent`.
+   `correction_consistent`. A pair is skipped when either side is the account of a record that R1 placed in both
+   encounters (#78) and of no other record: that overlap is why it is in both, so a flag would only repeat the
+   ambiguity (#89). An account that another record of the encounter states too (equal times) is still compared. Instead,
+   one R7 `ambiguous_account` decision per such record names the encounters it is an account of (subject: the first
+   of them). Overlaps between the encounters' other records are still flagged.
 7. `_plans`: one row per (source document sha256, full requirement identity: metric, comparator, threshold, period,
    dates, counted types, patient presence).
    - Requirements from a `draft` document are not operative: an R2 `plan_not_operative` decision, claims kept as evidence.
@@ -127,7 +132,9 @@ ids, so the export and operators show why the document belongs to the patient. A
      decision per goal, at the first revision that omits it. The projection evaluates the goal both ways.
 8. **R9 note:** an eligible session on a plan's first effective day that started before the plan signature is
    counted and logged (effectivity is by date).
-9. **R8** `_assessments`: grouped by (instrument, completed date), split by distinct form IDs. Copies
+9. **R8** `_assessments`: grouped by (instrument, form ID) when a form ID is stated (#88): a form is one
+   administration, whatever dates its records state. A record without a form ID joins every form of its instrument
+   that a record states on its date, and is otherwise grouped by (instrument, completed date). Copies
    (`is_copy_of_earlier`, or a document with a `copies_measurement` relation) are listed in `copy_claim_ids`, not
    as new assessments. The score is reconciled over the primary records (#80): a record that states no total is
    silent; one stated value is the score; different values give `disputed`, `total_score` NULL (no definite score),
@@ -136,6 +143,14 @@ ids, so the export and operators show why the document belongs to the patient. A
    instrument spelling is the sorted first of the primaries' (the group key is the normalised name). One form ID
    under two instruments makes each instrument's row `disputed`, with an `instrument` conflict and an R8
    `instrument_disputed` decision. Two instruments on one day without a shared form ID stay distinct.
+   - The completion date is reconciled over the primaries the same way (#88). Different dates make the row
+     `disputed`, listed under the earliest date (key and `completed_date`, so a date-scoped query still finds it),
+     with a `completed_date` conflict carrying every date and an R8 `date_disputed` decision.
+   - Item scores are reconciled per item over the primaries (#87), matched on the text before the first `:`
+     (case and spacing ignored). An agreed item keeps its stated string. Different values give `"<item>: disputed"`,
+     one `item_scores` conflict per item and an R8 `item_disputed` decision. The row's `status` and total score are
+     unchanged. A string without a `:` passes through.
+   - A copy's different date or items are named in its `copy_not_distinct` reason, like a different score.
 10. `_observations`: deduplicated by (date, domain, document label, normalised quote). Known gap (#80, held back):
     when one quote carries two statements (a clinician observation and a patient report), the row keeps the first
     claim's source and statement only. The fix changes two corpus rows (BH-D101 and BH-D104, 2026-01-19) and awaits

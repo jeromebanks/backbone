@@ -223,6 +223,23 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     threshold is outside [low, high], otherwise UNDETERMINED: equality is not monotone, so the endpoints alone
     cannot decide it.
 
+44. **Assessment item scores are reconciled per item, like the total (#87).** Silence is not disagreement; agreed
+    items keep their stated string; a disagreement gives `"<item>: disputed"` and an `item_scores` conflict per item.
+    Copies carry no weight.
+    - The row's `status` stays `distinct` for an item-only dispute. `status = disputed` with no total reads as a
+      disputed total in the summary readout (#80), and the conflict already carries the item dispute.
+    - **Rejected:** dropping the disputed item from the list. Its absence would read as "not stated".
+45. **One form ID is one assessment; different dates are a date dispute (#88).** The row is listed under the
+    earliest stated date, marked `disputed`, with a `completed_date` conflict carrying every date.
+    - **Why:** splitting the form double-counts its score in a symptom course.
+    - **Rejected:** `completed_date` NULL (no definite date, as for a disputed total). Date-scoped queries select on
+      `completed_date`, so the assessment would vanish from every timeline. The earliest date is a placement, not a
+      pick: the status and the conflict say the date is disputed.
+    - **Trade-off:** a query scoped to the later date only does not find it.
+46. **R7 skips the redundant overlaps of a record placed in several contacts (#89).** Its account in one contact
+    overlapping the other contact's own times is why R1 placed it in both (#78). One R7 `ambiguous_account` note per
+    record replaces those flags. Overlaps between the contacts' other records are still flagged.
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K
