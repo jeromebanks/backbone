@@ -348,7 +348,7 @@ def compliance(conn, step: ComplianceStep, *, cache: dict | None = None) -> dict
                 t = ev["totals"]
                 ev_lines.append(f"{ev['plan_days']}: days {_fmt_bound(t['therapy_days'])}, minutes "
                                 f"{_fmt_bound(t['minutes'])} -> " + "; ".join(
-                                    f"{r['metric']} {r['status']}" + (f" ({_fmt_bound(r['value'])} over {r['counted_service_types']})"
+                                    f"{r.get('metric', r.get('requirement'))} {r['status']}" + (f" ({_fmt_bound(r['value'])} over {r['counted_service_types']})"
                                                                       if "counted_service_types" in r else "")
                                     for r in ev["requirements"]))
             calc.append(f"{p['mrn']} week {w['week_start']}: " + (" | ".join(ev_lines) or "no plan in effect")

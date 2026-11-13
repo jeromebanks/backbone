@@ -42,7 +42,8 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
             if r["op"] == "compliance":
                 ev = (g.get("evaluations") or [{}])[0]
                 tt = ev.get("totals", {})
-                reqs = "; ".join(f"{q['metric']} {q['goal']} → {q['status']}" for q in ev.get("requirements", []))
+                reqs = "; ".join(f"{q.get('metric', q.get('requirement'))} {q.get('goal', '')} → {q['status']}"
+                                 for q in ev.get("requirements", []))
                 out.append(f"WEEK {g['week_start']} [{g['status']}] days={_b(tt.get('therapy_days', {}))} "
                            f"minutes={_b(tt.get('minutes', {}))} ({ev.get('minutes_calculation', '')}) | {reqs}"
                            + (f" | notes: {'; '.join(g['notes'])}" if g.get("notes") else ""))
@@ -67,7 +68,9 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
             elif k == "document":
                 a = "; ".join(f"{x['encounter']} {x['record_type']} disp={x['disposition']} arr={x['arrival']} "
                               f"dep={x['departure']} contact={x['contact_intervals']} nontherapeutic={x['nontherapeutic']} "
-                              f"stated={x['stated_minutes']}" for x in f["assertions"])
+                              f"stated={x['stated_minutes']}"
+                              + (f" alternatives={x['identity_alternatives']}" if x.get("identity_alternatives") else "")
+                              for x in f["assertions"])
                 rel = f" relations={f['relations']}" if f.get("relations") else ""
                 out.append(f"DOC {f['doc_id']} ({_clip(f.get('title') or '', 70)}; signed {f.get('signed_at')}; "
                            f"received {f.get('received_at')}; {f.get('finality')}): {a}{rel}")
@@ -75,6 +78,7 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
                 m = f.get("patient_present_minutes")
                 out.append(f"ENCOUNTER {f['encounter']} {f['date']} {f['service_type']} {f['disposition']} "
                            f"counts={f['counts_as_therapy_session']} minutes={_b(m) if m else '-'}"
+                           + (f" counted={_b(f['counted_minutes'])}" if f.get("counted_minutes") else "")
                            + (f" reason={f['exclusion_reason']}" if f.get("exclusion_reason") else "")
                            + f" records={f['records']}" + (f" flags={f['flags']}" if f.get("flags") else ""))
             elif "status" in f and "patient" in f:
@@ -82,6 +86,12 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
         if len(facts) > max_rows:
             out.append(f"… {len(facts) - max_rows} more facts")
         for x in r.get("exclusions", [])[:max_rows]:
+            if x.get("undated") or x.get("encounter") is None:
+                what = f"{x.get('record_kind') or 'record'} {x.get('claim_id') or ''}".strip()
+                head = ("EXCLUDED (undated" + (f"; unstated: {', '.join(x['unstated_dates'])}" if x.get("unstated_dates")
+                                              else "") + f") {what}") if x.get("undated") else f"EXCLUDED {what} {x['date']}"
+                out.append(f"{head}: {x['reason']}" + (f" records={x['records']}" if x.get("records") else ""))
+                continue
             out.append(f"EXCLUDED {x['encounter']} {x['date']} {x['service_type']}: {x['reason']}"
                        + (f" records={x['records']}" if x.get("records") else ""))
         for c in r.get("conflicts", []):
