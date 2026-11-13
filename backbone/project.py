@@ -91,10 +91,17 @@ def aggregate(encs: list[dict]) -> dict:
     s_lo = s_hi = m_lo = m_hi = 0.0
     days_lo, days_hi = set(), set()
     uncertain = []
+    # Rows sharing (mrn, encounter_id) are alternative accounts of ONE encounter whose date or type is disputed
+    # (reconcile._add_identity_alternatives; each is 'uncertain'). At most one of them happened, so together they
+    # contribute the largest of their bounds, not the sum (#12). Every other row is its own group.
+    groups: dict[tuple, list[dict]] = {}
     for e in encs:
-        c = contribution(e)
-        s_lo += c["sessions"][0]; s_hi += c["sessions"][1]
-        m_lo += c["minutes"][0]; m_hi += c["minutes"][1]
+        groups.setdefault((e["mrn"], e.get("encounter_id")) if e.get("encounter_id") else (e["encounter_key"],), []).append(e)
+    for g in groups.values():
+        cs = [contribution(e) for e in g]
+        s_lo += max(c["sessions"][0] for c in cs); s_hi += max(c["sessions"][1] for c in cs)
+        m_lo += max(c["minutes"][0] for c in cs); m_hi += max(c["minutes"][1] for c in cs)
+    for e in encs:
         day = (e["mrn"], e["service_date"])          # a therapy day belongs to a patient
         if e["eligible"] == "yes":
             days_lo.add(day); days_hi.add(day)

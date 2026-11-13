@@ -18,7 +18,9 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
    `correction_not_applied` decision.
 4. **R1** `_group_events`: events with an encounter ID form groups. Events without one match a group with the same
    date and service type (and overlapping intervals if both are known) when exactly one candidate exists. Otherwise
-   they form a separate `U-` contact (an "unidentified contact" decision).
+   they form a separate `U-` contact (an "unidentified contact" decision). The intervals are every time a record
+   states (contact intervals, schedule, arrival–departure when both ends are known), unioned over the group's
+   records, so two ID-less sessions known only by disjoint arrival/departure times stay two contacts (#11).
 5. For each group, `_reconcile_encounter`:
    - `_classify` (R2/R3 evidence tiers): `draft_template`, `billing`, `retransmitted_copy` and documents with
      finality `draft` are excluded with a reason. `clinical_note`, `attendance_record`, `attendance_correction` and
@@ -35,16 +37,32 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
        is an R3 `correction_not_applied` decision plus an encounter flag, never silently dropped (#10).
      - An applied correction joins the encounter's `claim_ids`, so its passage reaches `evidence` and can be cited,
        unless another claim of the same document in the encounter already cites those lines (#23).
-   - Service type and date: tier-1 majority (conflicts recorded).
+   - Service type and date come from the deciding tier (tier 1, else tier 2), over every `_variants` value, so
+     competing service-type corrections count as a disagreement too. A disagreement is never resolved by
+     majority or lexical order (#12). It is a `disputed` conflict, and eligibility becomes `uncertain`. Each further
+     psychotherapy (date, type) account becomes an alternative row `<key>~<date>-<type>`
+     (`_add_identity_alternatives`, R1 `identity_alternative`), so the dispute reaches every week and per-type goal it
+     could belong to. The rows share `encounter_id`. `project.aggregate` counts them as at most one session, with
+     the largest of their minutes. R7 does not compare them with each other. A non-psychotherapy account adds no
+     row, since it would contribute nothing.
    - Attendance (R4): the first tier with a known yes/no decides. Yes and no in the same tier gives `disputed`.
    - Presence: tier-1 `patient_present` votes; not attended implies not present.
    - Eligibility (R5): `yes` if psychotherapy (`THERAPY_TYPES`), attended and present. `no` with a reason. Otherwise
      `uncertain`.
    - Minutes (R6): candidate patient-present interval sets come from each tier-1 record's explicit contact
      intervals, or else its (corrected) arrival–departure. If there are none, an `attended_full` scheduled
-     interval is used. Each candidate minus the union of non-therapeutic intervals gives minutes. One distinct
-     candidate is `established`; several are `disputed` with `[min, max]` bounds and a conflict. None is `unknown`
-     with `[0, scheduled − exclusions]`. Stated minutes outside the bounds produce a flag (cross-check only).
+     interval is used.
+     - Non-therapeutic intervals are reconciled per kind (#13). A record that states none of a kind is silent, not
+       a "no break" account; this is why a note's break subtracts from a register's arrival–departure. The first
+       tier that states a kind decides it (R4 `exclusion_tier`). Different sets of one kind from records of that
+       tier are alternative accounts, never unioned (R6 `exclusions_disputed`). Different kinds all apply.
+     - Each candidate minus each exclusion account gives minutes. One candidate and one account is `established`.
+       Otherwise the result is `disputed`, with `[min, max]` bounds and a conflict. No candidate is `unknown`, with
+       `[0, scheduled − least exclusions]`.
+     - A scheduled, contact or arrival–departure interval that is inverted, overnight or incomplete is never
+       dropped silently (#17). It gives `unknown` with a flag, and no upper bound unless a valid schedule gives one.
+       An invalid exclusion gives `unknown` with a low bound of 0.
+     - Stated minutes outside the bounds produce a flag (cross-check only).
 6. **R7** `_overlap_checks`: patient-present sets that overlap across a patient's encounters on one day are flagged.
    A *superseded* pre-correction value that would overlap another encounter is logged as
    `correction_consistent`.

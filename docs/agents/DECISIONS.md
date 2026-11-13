@@ -89,6 +89,29 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     - **Rejected:** a separate decision-claims query in each operator. It adds SQL to every envelope, which would
       change all saved results, and it would have to be repeated in each operator.
 
+21. **A disputed service date or type becomes alternative encounter rows, not a majority pick (#12).**
+    - **Decision:** each psychotherapy (date, type) account of the deciding tier gets its own `uncertain` row
+      (`<key>~<date>-<type>`). The rows share `encounter_id`, and `project.aggregate` counts them as at most one
+      session.
+    - **Why:** one row has one date and one type. The SQL filters by date and type, so a single row can't reach the
+      other week or a per-type goal. A majority or alphabetical pick turned a disagreement into a definite session.
+    - **Trade-off:** the bounds are sound but not tight. Over a range that holds every alternative, the low bound is
+      0, not 1, because the projection can't see that all the alternatives are in range.
+    - **Rejected:**
+      - majority / lexical tie-break (same reason as decision 6);
+      - an alternatives column (needs a schema migration and a change to the logged SQL);
+      - one `uncertain` row only (unsound for the other week).
+22. **Non-therapeutic intervals are reconciled per kind, with silence not counted as disagreement (#13).**
+    - **Decision:** different stated sets of one kind are alternative accounts, combined with every presence
+      candidate. They are never unioned.
+    - **Why:** unioning two notes' accounts of the only break subtracted both.
+    - **Rejected:** treating a record that states no break as a "zero breaks" account. A register's arrival–departure
+      would then dispute every note's group break (E102, E105, E110, E113, E118).
+23. **Intervals that a same-day algebra can't represent are unknown, not dropped (#17).** This covers inverted,
+    overnight and incomplete intervals.
+    - **Rejected:** reading `end < start` as crossing midnight. It can't be told apart from a typo, and minutes and
+      R7 work on one service date.
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K

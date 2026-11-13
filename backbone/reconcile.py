@@ -7,7 +7,8 @@ reviewer can see why a session counted or not and which records contributed.
 Rules (RULESET_VERSION in __init__):
   R0  claims whose quotes cannot be located in the source text are excluded.
   R1  encounter identity: group by encounter ID; otherwise match on same date + service type (and overlapping
-      times if both known); otherwise keep as a separate unidentified contact.
+      times if both known, arrival–departure included); otherwise keep as a separate unidentified contact. A
+      disputed date/type yields alternative 'uncertain' rows of the one encounter (never a majority pick).
   R2  draft/template text, billing rows and unsigned drafts are not attendance evidence.
   R3  explicit field corrections replace the corrected value only for that field; retransmitted/copied records
       are linked to their original and carry no independent weight. Precedence never follows document date.
@@ -17,7 +18,9 @@ Rules (RULESET_VERSION in __init__):
   R5  a therapy session counts if the service is psychotherapy (individual/group/family), it was attended, and
       the patient was present. Unknown attendance is 'uncertain' (bounds), never silently 0 or 1.
   R6  minutes = |patient-present intervals - non-therapeutic intervals| (breaks, disconnections, patient-absent
-      portions). Stated minute totals are cross-checks only.
+      portions), exclusions reconciled per kind (conflicting accounts are alternatives, never unioned); intervals
+      the same-day algebra cannot represent (overnight, inverted) give unknown minutes. Stated minute totals are
+      cross-checks only.
   R7  one patient cannot be present in two encounters at once; overlaps are flagged.
   R8  assessments are identified by (instrument, completion date, form id); copies/imports are not new assessments.
   R9  treatment-plan requirements apply by effective date (evaluated in project.py); same-day pre-signature care noted.
@@ -115,10 +118,13 @@ def _group_events(events: list[Claim], res: Result) -> dict[str, list[Claim]]:
     mrn = res.mrn
 
     def ivs(c: Claim):
+        """Every time the record states for the contact: contact intervals, schedule, and actual arrival–departure
+        when both ends are known (#11: two ID-less sessions known only by arrival/departure must not merge)."""
         p = c.payload
         out = [(to_min(i["start"]), to_min(i["end"])) for i in p.get("patient_contact_intervals") or []]
         if p.get("scheduled"):
             out.append((to_min(p["scheduled"]["start"]), to_min(p["scheduled"]["end"])))
+        out.append((to_min(p.get("patient_arrival")), to_min(p.get("patient_departure"))))
         return normalize(out)
 
     ided = [c for c in events if _norm_id(c.payload.get("encounter_id"))]
@@ -126,14 +132,16 @@ def _group_events(events: list[Claim], res: Result) -> dict[str, list[Claim]]:
     for c in ided:
         key = f"{mrn}|{_norm_id(c.payload['encounter_id'])}"
         groups[key].append(c)
-        if key not in meta:
-            meta[key] = (c.payload["service_date"], c.payload["service_type"], ivs(c))
+        md, mt, miv = meta.get(key, (c.payload["service_date"], c.payload["service_type"], []))
+        meta[key] = (md, mt, normalize(miv + ivs(c)))          # times of every record of the encounter
     for c in sorted(unided, key=lambda c: c.claim_id):
         d, t, iv = c.payload["service_date"], c.payload["service_type"], ivs(c)
         cands = [k for k, (md, mt, miv) in meta.items()
                  if md == d and mt == t and (not iv or not miv or overlaps(iv, miv))]
         if len(cands) == 1:
             groups[cands[0]].append(c)
+            md, mt, miv = meta[cands[0]]
+            meta[cands[0]] = (md, mt, normalize(miv + iv))
             res.decide(cands[0], "R1", "matched_without_id",
                        f"{c.doc_label} names no encounter ID; matched on date {d} + service type {t}", [c.claim_id])
             continue
@@ -380,18 +388,25 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     usable = t1 + t2
     ids = [c.claim_id for c in group]
 
-    # service type (R4): tier 1 majority, then tier 2, then anything
+    # service type and date (R4): the deciding tier (tier 1, then tier 2, then anything). A disagreement is not
+    # resolved by majority or lexical order (#12): each therapy (date, type) account becomes an alternative row
+    # (see _add_identity_alternatives) and eligibility becomes 'uncertain', so the dispute reaches the bounds.
     pool = t1 or t2 or group
     types = Counter(v["service_type"] for c in pool for v in _variants(c))
     stype = sorted(types.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
-    if len(types) > 1:
-        flags.append(f"service type disagreement: {dict(types)}")
-        res.conflicts.append({"subject_key": key, "field": "service_type", "resolution": f"majority:{stype}",
-                              "candidates": [{"value": t, "claim_ids": [c.claim_id for c in pool if any(v['service_type'] == t for v in _variants(c))]} for t in types]})
     dates = Counter(c.payload["service_date"] for c in pool)
     sdate = sorted(dates.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
-    if len(dates) > 1:
-        flags.append(f"service date disagreement: {dict(dates)}")
+    accounts = sorted({(c.payload["service_date"], v["service_type"]) for c in pool for v in _variants(c)})
+    therapy_accounts = [a for a in accounts if a[1] in THERAPY_TYPES]
+    if therapy_accounts and len(accounts) > 1:
+        sdate, stype = therapy_accounts[0]                 # a representative; the alternatives keep the others
+    for fld, counts in (("service_type", types), ("service_date", dates)):
+        if len(counts) > 1:
+            flags.append(f"{fld.replace('_', ' ')} disagreement: {dict(counts)}")
+            res.conflicts.append({"subject_key": key, "field": fld, "resolution": "disputed", "candidates": [
+                {"value": x, "claim_ids": [c.claim_id for c in pool if any(
+                    (v["service_type"] if fld == "service_type" else c.payload[fld]) == x for v in _variants(c))]}
+                for x in counts]})
     modality = next((c.payload["modality"] for c in t1 if c.payload.get("modality") not in (None, "unknown")),
                     next((c.payload["modality"] for c in usable if c.payload.get("modality") not in (None, "unknown")), "unknown"))
     eid = _norm_id(next((c.payload.get("encounter_id") for c in group if c.payload.get("encounter_id")), None))
@@ -449,17 +464,55 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         eligible = "yes"
     else:
         eligible, reason = "uncertain", f"attendance {attended}, presence {present}"
+    alternatives: list[tuple[str, str]] = []
+    if is_therapy and eligible != "no" and len(accounts) > 1:
+        disputed = " and ".join(f for f, n in (("service type", len(types)), ("service date", len(dates))) if n > 1)
+        eligible = "uncertain"
+        reason = (f"{disputed} disputed between equal-precedence records ("
+                  + "; ".join(f"{d} {t}" for d, t in accounts) + "); "
+                  + (f"{reason}; " if reason else "") + "counted only within bounds")
+        alternatives = therapy_accounts[1:]
     res.decide(key, "R5", f"eligible={eligible}", reason or f"{stype}, attended, patient present", ids)
 
     # minutes (R6)
     rows: list[dict] = []
-    excl: list[tuple[int, int, str, str]] = []
+    # Exclusions are reconciled per kind, like any other field (#13). A record that states no exclusion of a kind
+    # is silent about it (an attendance register rarely records the group break), not a "no break" account. The
+    # first tier that states a kind decides it. Different sets of one kind stated by records of that tier are
+    # alternative accounts, combined with every presence candidate: they are never unioned into one cumulative
+    # subtraction. Different kinds (a break in the note, a disconnection in the platform log) all apply.
+    stated: dict[str, dict[int, list[tuple[Claim, list]]]] = defaultdict(lambda: defaultdict(list))
     for c in usable:
+        per_kind: dict[str, list] = defaultdict(list)
         for n in c.payload.get("nontherapeutic_intervals") or []:
-            s, e = to_min(n["start"]), to_min(n["end"])
-            if s is not None and e is not None and e > s:
-                excl.append((s, e, n["kind"], c.claim_id))
-    excl_ivs = normalize([(s, e) for s, e, _, _ in excl])
+            per_kind[n["kind"]].append((n["start"], n["end"]))
+        for kind, raw in per_kind.items():
+            stated[kind][c.tier].append((c, raw))
+    excl: list[tuple[int, int, str, str]] = []
+    bad_excl: list[str] = []
+    kind_alts: list[tuple[str, list[tuple[tuple, list[Claim]]]]] = []
+    for kind in sorted(stated):
+        tier = min(stated[kind])
+        alts: dict[tuple, list[Claim]] = defaultdict(list)
+        for c, raw in stated[kind][tier]:
+            valid = []
+            for rs, re_ in raw:
+                s, e = to_min(rs), to_min(re_)
+                if s is not None and e is not None and e > s:
+                    valid.append((s, e)); excl.append((s, e, kind, c.claim_id))
+                else:
+                    bad_excl.append(f"{c.doc_label} states a {kind} {rs}–{re_} that is not a valid same-day interval "
+                                    "(overnight, inverted or incomplete); its length is unknown")
+            alts[tuple(normalize(valid))].append(c)
+        kind_alts.append((kind, list(alts.items())))
+        for other in sorted(t for t in stated[kind] if t != tier):
+            res.decide(key, "R4", "exclusion_tier",
+                       f"{', '.join(sorted({c.doc_label for c, _ in stated[kind][other]}))} (tier {other}) also state(s) "
+                       f"a {kind}; the tier-{tier} records decide it", [c.claim_id for c, _ in stated[kind][other]])
+    accts: list[tuple[tuple, list[Claim]]] = [((), [])]    # (exclusion intervals (s, e, kind), stating records)
+    for kind, alts_k in kind_alts:
+        accts = [(items + tuple((s, e, kind) for s, e in ivs_k), cl + cs) for items, cl in accts for ivs_k, cs in alts_k]
+    acct_ivs = [normalize([(s, e) for s, e, _ in items]) for items, _ in accts]
     for s, e, kind, cid in sorted(set(excl)):
         rows.append({"encounter_key": key, "kind": "excluded", "start_min": s, "end_min": e, "label": kind,
                      "claim_ids": [cid]})
@@ -468,20 +521,45 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     if sched and None not in sched:
         rows.append({"encounter_key": key, "kind": "scheduled", "start_min": sched[0], "end_min": sched[1],
                      "label": "scheduled", "claim_ids": [c.claim_id for c in usable if c.payload.get("scheduled")]})
+    sched_ok = bool(sched) and None not in sched and sched[1] > sched[0]
+    # Same-day interval algebra cannot represent an interval that crosses midnight or is inverted (#17). Such an
+    # interval is never silently dropped (that turned an overnight session into an established 0): the minutes
+    # become unknown, with no upper bound unless a valid schedule gives one, and the interval is flagged.
+    bad_presence: list[str] = []
+    bad_sched = (f"scheduled {fmt_set([sched])} is not a valid same-day interval (overnight or inverted)"
+                 if sched and None not in sched and not sched_ok else None)
 
     cands: dict[tuple, list[Claim]] = defaultdict(list)
     basis: dict[tuple, str] = {}
     for c, v in ((c, v) for c in t1 for v in _variants(c)):
-        ci = normalize([(to_min(i["start"]), to_min(i["end"])) for i in v.get("patient_contact_intervals") or []])
+        raw = [(i["start"], i["end"]) for i in v.get("patient_contact_intervals") or []]
+        raw_min = [(to_min(s), to_min(e)) for s, e in raw]
+        bad = [f"{s}–{e}" for (s, e), (ms, me) in zip(raw, raw_min) if ms is None or me is None or me <= ms]
+        if bad:
+            msg = (f"{c.doc_label} states contact interval(s) {', '.join(bad)} that are not valid same-day intervals "
+                   "(overnight, inverted or incomplete)")
+            if msg not in bad_presence:
+                bad_presence.append(msg)
+            continue
+        ci = normalize(raw_min)
         if ci:
             _add_cand(cands, tuple(ci), c); basis.setdefault(tuple(ci), "stated contact intervals")
             continue
         a, d = to_min(v.get("patient_arrival")), to_min(v.get("patient_departure"))
         if a is not None and d is not None and d > a:
             _add_cand(cands, ((a, d),), c); basis.setdefault(((a, d),), "arrival–departure")
-    if not cands and sched and None not in sched and any(c.eff.get("disposition") == "attended_full" for c in t1):
-        cands[(sched,)] = [c for c in t1 if c.eff.get("disposition") == "attended_full"]
+        elif a is not None and d is not None:
+            msg = (f"{c.doc_label} arrival {v.get('patient_arrival')} is not before departure "
+                   f"{v.get('patient_departure')} (overnight or inverted)")
+            if msg not in bad_presence:
+                bad_presence.append(msg)
+    full = [c for c in t1 if c.eff.get("disposition") == "attended_full"]
+    if not cands and not bad_presence and full and bad_sched:
+        bad_presence.append(bad_sched)                     # the schedule would have been the presence account
+    elif not cands and sched_ok and full:
+        cands[(sched,)] = full
         basis[(sched,)] = "attended full scheduled session"
+    flags += ([bad_sched] if bad_sched and bad_sched not in bad_presence else []) + bad_presence + bad_excl
 
     m_low = m_high = None
     calc = None
@@ -489,31 +567,48 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         status = "not_applicable"
     elif eligible == "no":
         status, m_low, m_high = "not_applicable", 0, 0
-    elif cands:
-        mins = {}
+    elif cands and not bad_presence:
+        mins: dict[tuple, int] = {}                        # (presence candidate, exclusion account) -> minutes
         for iv, cs in cands.items():
-            eff = subtract(list(iv), excl_ivs)
-            mins[iv] = total(eff)
+            for ai, a_ivs in enumerate(acct_ivs):
+                mins[(iv, ai)] = total(subtract(list(iv), a_ivs))
             rows.append({"encounter_key": key, "kind": "present", "start_min": iv[0][0], "end_min": iv[-1][1],
                          "label": f"{basis[iv]}: {fmt_set(list(iv))} per {', '.join(sorted({x.doc_label for x in cs}))}",
                          "claim_ids": [x.claim_id for x in cs]})
         m_low, m_high = min(mins.values()), max(mins.values())
         parts = []
-        for iv, cs in sorted(cands.items(), key=lambda kv: mins[kv[0]]):
-            ex = [f"{k} {fmt_set([(s, e)])}" for s, e, k, _ in sorted(set((s, e, k, '') for s, e, k, _ in excl))]
+        for (iv, ai), m in sorted(mins.items(), key=lambda kv: kv[1]):
+            cs = cands[iv]
+            ex = [f"{k} {fmt_set([(s, e)])}" for s, e, k in sorted(set(accts[ai][0]))]
+            src = (f" [exclusions per {', '.join(sorted({x.doc_label for x in accts[ai][1]})) or 'no record'}]"
+                   if len(accts) > 1 else "")
             parts.append(f"{fmt_set(list(iv))} ({basis[iv]}; {', '.join(sorted({x.doc_label for x in cs}))})"
-                         + (f" − {' − '.join(ex)}" if ex and total(list(iv)) != mins[iv] else "") + f" = {mins[iv]} min")
+                         + (f" − {' − '.join(ex)}" if ex and total(list(iv)) != m else "") + src + f" = {m} min")
         calc = " | ".join(parts)
         if len(cands) > 1:
-            status = "disputed"
             res.conflicts.append({"subject_key": key, "field": "patient_present_interval", "resolution": "disputed",
-                                  "candidates": [{"value": fmt_set(list(iv)), "minutes": mins[iv],
+                                  "candidates": [{"value": fmt_set(list(iv)),
+                                                  "minutes": mins[(iv, 0)] if len(accts) == 1
+                                                  else sorted({mins[(iv, ai)] for ai in range(len(accts))}),
                                                   "claim_ids": [x.claim_id for x in cs]} for iv, cs in cands.items()]})
             res.decide(key, "R4", "minutes_disputed",
                        "tier-1 records give different patient-contact intervals and none corrects the other: " + calc
                        + f"; carried as bounds [{m_low}, {m_high}]", [x.claim_id for cs in cands.values() for x in cs])
-        else:
-            status = "established"
+        if len(accts) > 1:
+            split = [(k, a) for k, a in kind_alts if len(a) > 1]
+            res.conflicts.append({"subject_key": key, "field": "nontherapeutic_intervals", "resolution": "disputed",
+                                  "candidates": [{"kind": k, "value": fmt_set(list(ivs_k)),
+                                                  "claim_ids": [x.claim_id for x in cs]}
+                                                 for k, a in split for ivs_k, cs in a]})
+            res.decide(key, "R6", "exclusions_disputed",
+                       f"records state different {'/'.join(k for k, _ in split)} intervals and none corrects the "
+                       "other; each account is applied on its own, never summed: " + calc
+                       + f"; carried as bounds [{m_low}, {m_high}]", [x.claim_id for _, a in split for _, cs in a for x in cs])
+        status = "disputed" if len(cands) > 1 or len(accts) > 1 else "established"
+        if bad_excl:
+            status, m_low = "unknown", 0
+            calc += f"; lower bound 0 because {'; '.join(bad_excl)}"
+            res.decide(key, "R6", "minutes_unknown", calc, ids)
         # stated-minute cross-check (R6)
         for c in t1:
             sm = c.payload.get("stated_minutes")
@@ -523,9 +618,12 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     else:
         status = "unknown"
         m_low = 0
-        m_high = total(subtract([sched], excl_ivs)) if sched and None not in sched else None
-        calc = ("no patient arrival/departure or contact interval documented; bounds 0.."
-                + (f"{m_high} (scheduled {fmt_set([sched])} minus exclusions)" if m_high is not None else "unbounded"))
+        m_high = max(total(subtract([sched], a)) for a in acct_ivs) if sched_ok else None   # least subtraction
+        if m_high is not None and cands:                   # valid accounts beside an invalid one (#17)
+            m_high = max([m_high] + [total(subtract(list(iv), a)) for iv in cands for a in acct_ivs])
+        calc = ("no patient arrival/departure or contact interval documented; bounds 0.." if not bad_presence else
+                f"patient-present time cannot be computed ({'; '.join(bad_presence)}); bounds 0..")
+        calc += f"{m_high} (scheduled {fmt_set([sched])} minus exclusions)" if m_high is not None else "unbounded"
         res.decide(key, "R6", "minutes_unknown", calc, ids)
     if calc and status == "established":
         res.decide(key, "R6", f"minutes={m_low}", calc, [x.claim_id for cs in cands.values() for x in cs]
@@ -538,7 +636,7 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         "minutes_low": m_low, "minutes_high": m_high, "minutes_status": status, "calculation": calc,
         "claim_ids": sorted(ids + _cited_corrections(group, applied)), "flags": flags, "ruleset_version": RULESET_VERSION,
         "_present_sets": [list(iv) for iv in cands] if eligible != "no" else [],
-        "_superseded": [],
+        "_superseded": [], "_identity": key, "_alternatives": alternatives,
     }
     # remember pre-correction presence for the overlap rationale
     for c in t1:
@@ -554,6 +652,31 @@ def _add_cand(cands: dict, k: tuple, c: Claim) -> None:
         cands[k].append(c)
 
 
+def _add_identity_alternatives(encs: list[dict], res: Result) -> list[dict]:
+    """Alternative rows of encounters whose service date or type is disputed between equal-precedence records
+    (#12). One row carries one date and one type, so each further psychotherapy (date, type) account becomes its own
+    'uncertain' row (key `<encounter key>~<date>-<type>`, same intervals), and the dispute reaches the bounds of
+    every week and every per-type goal it could belong to. The rows share `encounter_id`; `project.aggregate` counts
+    them as at most one session (and the larger of their minutes), so they never add up to more than the single
+    encounter they are. R7 does not compare them with each other (same `_identity`)."""
+    out = []
+    for enc in encs:
+        out.append(enc)
+        rows = [r for r in res.intervals if r["encounter_key"] == enc["encounter_key"]] if enc["_alternatives"] else []
+        for d, t in enc["_alternatives"]:
+            k = f"{enc['encounter_key']}~{d}-{t}"
+            out.append({**enc, "encounter_key": k, "service_date": d, "service_type": t,
+                        "flags": enc["flags"] + [f"alternative identity of {enc['encounter_key']} ({enc['service_date']} "
+                                                 f"{enc['service_type']}): service date/type disputed"],
+                        "_superseded": [], "_alternatives": []})
+            res.intervals.extend({**r, "encounter_key": k} for r in rows)
+            res.decide(k, "R1", "identity_alternative",
+                       f"records of {enc['encounter_key']} disagree on its service date/type; this row is the {d} {t} "
+                       "account and counts within bounds only (at most one session with its alternatives)",
+                       enc["claim_ids"])
+    return out
+
+
 def _overlap_checks(encs: list[dict], res: Result) -> None:
     by_date = defaultdict(list)
     for e in encs:
@@ -561,6 +684,8 @@ def _overlap_checks(encs: list[dict], res: Result) -> None:
     for d, es in by_date.items():
         for i, a in enumerate(es):
             for b in es[i + 1:]:
+                if a["_identity"] == b["_identity"]:      # alternative rows of one encounter (#12), not two contacts
+                    continue
                 for sa in a["_present_sets"]:
                     for sb in b["_present_sets"]:
                         if overlaps(sa, sb):
@@ -732,6 +857,7 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
             res.decide(key, "R3", "correction_not_applied",
                        f"{r.doc_label} corrects {r.payload.get('field')} of an encounter that has no service record",
                        [r.claim_id])
+    encs = _add_identity_alternatives(encs, res)
     _overlap_checks(encs, res)
     res.encounters = encs
     _plans([c for c in claims if c.kind == "plan_requirement"], res)
