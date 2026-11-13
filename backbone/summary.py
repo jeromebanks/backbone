@@ -13,6 +13,11 @@ def _b(x) -> str:
     return str(x)
 
 
+def _doc(x: dict) -> str:
+    """A document as it must be cited: "LABEL [sha12]" when its label is shared by several documents (#59, #84)."""
+    return f"{x['doc_id']} [{x['doc_sha']}]" if x.get("doc_sha") else x["doc_id"]
+
+
 def _clip(s: str, n: int = 160) -> str:
     s = " ".join(str(s).split())
     return s if len(s) <= n else s[: n - 1] + "…"
@@ -72,7 +77,7 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
                               + (f" alternatives={x['identity_alternatives']}" if x.get("identity_alternatives") else "")
                               for x in f["assertions"])
                 rel = f" relations={f['relations']}" if f.get("relations") else ""
-                out.append(f"DOC {f['doc_id']} ({_clip(f.get('title') or '', 70)}; signed {f.get('signed_at')}; "
+                out.append(f"DOC {_doc(f)} ({_clip(f.get('title') or '', 70)}; signed {f.get('signed_at')}; "
                            f"received {f.get('received_at')}; {f.get('finality')}): {a}{rel}")
             elif "encounter" in f:
                 m = f.get("patient_present_minutes")
@@ -106,7 +111,7 @@ def summarize(res: dict, *, max_rows: int = 40, max_evidence: int = 60) -> str:
         ev = r.get("evidence", [])
         for e in ev[:max_evidence]:
             for p in e["passages"]:
-                out.append(f"EVIDENCE ({e['doc_id']} L{p['lines']}) [{e['record_type']}] \"{_clip(p['quote'], 180)}\"")
+                out.append(f"EVIDENCE ({_doc(e)} L{p['lines']}) [{e['record_type']}] \"{_clip(p['quote'], 180)}\"")
         if len(ev) > max_evidence:
             out.append(f"… {len(ev) - max_evidence} more evidence records (see --out JSON)")
         out.append("")

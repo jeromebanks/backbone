@@ -404,9 +404,11 @@ def _narration_prompt(question: str, results: dict) -> str:
 def _retry_feedback(answer_md: str, pc: dict) -> str:
     failures = {k: v for k, v in pc.items() if k != "ok" and v}
     return ("\n\nYour previous answer (below) failed the automatic post-check. Rewrite it so that it passes: state "
-            "only numbers that appear in the computed results, cite only documents that appear in them, and cite only "
-            "line numbers listed in that document's evidence passages (list non-adjacent lines separately, never as "
-            "one range).\n\nPost-check failures (JSON):\n" + json.dumps(failures, indent=1)
+            "only numbers that appear in the computed results (no derived durations such as a '10-minute' gap), state only "
+            "dates that appear in them or the period asked about (never derive a date), cite only documents that "
+            "appear in them, cite a document the results name as \"LABEL [sha12]\" the same way, and cite only line "
+            "numbers listed in that document's evidence passages (list non-adjacent lines separately, never as one "
+            "range).\n\nPost-check failures (JSON):\n" + json.dumps(failures, indent=1)
             + "\n\nPrevious answer:\n" + answer_md)
 
 
@@ -484,6 +486,10 @@ POSTCHECK_FAILED_BANNER = ("> **Post-check failed:** this answer states numbers 
                            "do not back. Read the post-check section before relying on it.")
 
 
+_POSTCHECK_LABELS = {"ambiguous_citations": "cited labels shared by several documents, without [sha]",
+                     "dates_not_in_results": "dates in the answer not found in computed results"}
+
+
 def render_markdown(res: dict) -> str:
     lines = [f"# {res.get('id') or 'Answer'}", "", f"> {res['question']}", ""]
     if not res["postcheck"].get("ok", True):
@@ -500,8 +506,12 @@ def render_markdown(res: dict) -> str:
               f"- cited documents not in the corpus: {pc['unknown_documents'] or 'none'}",
               f"- cited documents not in the computed results: {pc.get('documents_not_in_results') or 'none'}",
               f"- line references outside the evidence passages: {pc['line_refs_outside_evidence'] or 'none'}"]
-    if pc.get("ambiguous_citations"):     # only printed when present, so existing saved Markdown is unchanged
-        lines.append(f"- cited labels shared by several documents, without [sha]: {pc['ambiguous_citations']}")
+    # Every other check is printed when it failed (generated from the post-check's own keys, so a new check cannot be
+    # left out of the page, #83); passing ones stay off the page, so existing saved Markdown is unchanged.
+    always = {"ok", "numbers_not_in_results", "unknown_documents", "documents_not_in_results", "line_refs_outside_evidence"}
+    for k, v in pc.items():
+        if k not in always and v:
+            lines.append(f"- {_POSTCHECK_LABELS.get(k, k.replace('_', ' '))}: {v}")
     lines += [""]
     ev = {}
     for r in res["results"].get("results", []):

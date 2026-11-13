@@ -38,3 +38,13 @@ def test_summary_survives_requirement_without_metric():
          "evaluations": [{"totals": {}, "minutes_calculation": "", "requirements": [
              {"requirement": "P1|plan|D1|other|2026-01-05", "status": "UNDETERMINED", "reason": "unsupported metric other"}]}]}
     assert "UNDETERMINED" in summarize(_res(op="compliance", groups=[g]))
+
+
+def test_summary_cites_shared_label_documents_with_their_sha():
+    # #84: a shared label must be cited as "LABEL [sha12]"; the summary must show it.
+    ev = {"doc_id": "NOTE", "doc_sha": "0a1b2c3d4e5f", "file": "n.txt", "record_type": "clinical_note",
+          "passages": [{"lines": "4", "quote": "q"}]}
+    d = {"kind": "document", "doc_id": "NOTE", "doc_sha": "0a1b2c3d4e5f", "title": "t", "signed_at": None,
+         "received_at": None, "finality": "final", "assertions": []}
+    out = summarize(_res(evidence=[ev], facts=[d]))
+    assert "EVIDENCE (NOTE [0a1b2c3d4e5f] L4)" in out and "DOC NOTE [0a1b2c3d4e5f] (" in out

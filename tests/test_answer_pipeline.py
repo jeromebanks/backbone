@@ -326,3 +326,30 @@ def test_fingerprint_tolerates_missing_optional_tables(tmp_path):
     conn = _db(tmp_path)
     conn.execute("DROP TABLE quarantine")
     assert len(A.fingerprint(conn)) == 64
+
+
+def test_rendered_postcheck_shows_every_failing_check_and_retry_names_the_date_rule():
+    # #83: a failure that only the date check catches must be visible on the page and in the retry prompt.
+    from backbone.answer import _retry_feedback, render_markdown
+    pc = {"numbers_not_in_results": [], "unknown_documents": [], "documents_not_in_results": [],
+          "line_refs_outside_evidence": [], "ambiguous_citations": [], "dates_not_in_results": ["01-31"], "ok": False}
+    res = {"id": "T", "question": "q", "answer_markdown": "a", "unresolved": [], "plan_explain": "p",
+           "results": {"results": []}, "postcheck": pc, "timings_ms": {}, "llm": {}, "cached": False}
+    md = render_markdown(res)
+    assert "dates in the answer not found in computed results: ['01-31']" in md
+    assert "Post-check failed" in md
+    fb = _retry_feedback("a", pc)
+    assert "never derive a date" in fb and "LABEL [sha12]" in fb
+
+
+def test_benchmark_cached_repeat_never_calls_the_llm_or_writes_the_db(tmp_path):
+    # #82: with an empty answer cache the step is skipped, the LLM is never called, and the DB file is unchanged.
+    import hashlib
+    from backbone.bench import cached_repeat
+    from backbone.db import connect
+    db = tmp_path / "b.db"
+    connect(db).close()
+    before = hashlib.sha256(db.read_bytes()).hexdigest()
+    out = cached_repeat(db, "How many sessions?", n=2)
+    assert "skipped" in out
+    assert hashlib.sha256(db.read_bytes()).hexdigest() == before

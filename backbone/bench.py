@@ -82,6 +82,31 @@ def _clone(src_db: Path, dst_db: Path, n: int) -> None:
                             [list({**r, "mrn": m, "requirement_key": r["requirement_key"].replace("HG-M042", m)}.values()) for r in reqs])
 
 
+def cached_repeat(db_path, question: str, n: int = 5) -> dict:
+    """Latency of answering a question whose answer is already cached (#82). Runs on a temporary copy of the DB with
+    LLM calls blocked: if no valid cached answer exists for the current abstraction (any version or fingerprint
+    change empties the cache, and failing answers are never cached), the step is skipped instead of calling the LLM
+    or writing the tracked database."""
+    import shutil
+    from . import answer as A
+    with tempfile.TemporaryDirectory() as td:
+        copy = Path(td) / "bench.db"
+        shutil.copyfile(db_path, copy)
+        real = A.complete_json
+
+        def blocked(*a, **k):
+            raise RuntimeError("benchmark must not call the LLM")
+        A.complete_json = blocked
+        try:
+            return _timeit(lambda: A.answer_question(question, db_path=copy), n=n)
+        except RuntimeError as e:
+            if "must not call the LLM" not in str(e):
+                raise
+            return {"skipped": "no valid cached answer for the current abstraction; measuring it would need LLM calls"}
+        finally:
+            A.complete_json = real
+
+
 def run_benchmarks(db_path, synthetic_patients: int = 10000) -> dict:
     res: dict = {"machine": f"{platform.system()} {platform.machine()} / Python {platform.python_version()}",
                  "measured_at": time.strftime("%Y-%m-%d %H:%M:%S")}
@@ -156,10 +181,9 @@ def run_benchmarks(db_path, synthetic_patients: int = 10000) -> dict:
         ans[a["id"]] = {"timings_ms": a.get("timings_ms_original") or a["timings_ms"], "llm": a.get("llm"),
                         "postcheck_ok": a["postcheck"]["ok"]}
     res["question_answering"] = ans
-    from .answer import answer_question
     if ans:
         q = json.loads((ROOT / "questions.json").read_text())[0]["question"]
-        res["question_answering_cached_repeat"] = _timeit(lambda: answer_question(q, db_path=db_path), n=5)
+        res["question_answering_cached_repeat"] = cached_repeat(db_path, q)
     OUT.mkdir(exist_ok=True)
     (OUT / "benchmarks.json").write_text(json.dumps(res, indent=2, default=str))
     print(json.dumps(res, indent=2, default=str))

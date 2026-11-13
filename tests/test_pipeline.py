@@ -1,7 +1,7 @@
 """End-to-end tests on the supplied documents, using the committed extraction cache (zero LLM calls).
 
-The golden values below were derived by hand from the source documents (see README "Expected results");
-they live only in tests, never in production code.
+The golden values below were derived by hand from the source documents before coding (summarised in
+docs/agents/VERIFICATION.md); they live only here, never in production code or prompts.
 """
 import json
 import shutil

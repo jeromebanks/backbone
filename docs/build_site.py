@@ -17,7 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from backbone.answer import fingerprint  # noqa: E402
-from backbone.db import connect  # noqa: E402
+from backbone.answer import postcheck  # noqa: E402
+from backbone.db import connect_readonly  # noqa: E402
 from backbone.export import build_abstraction  # noqa: E402
 from backbone.query import CareStep, ComplianceStep, QueryPlan, Scope, execute_plan  # noqa: E402
 
@@ -27,7 +28,7 @@ INGEST_TEMPLATE_PATH = ROOT / "docs" / "templates" / "ingestion.template.html"
 
 
 def collect() -> dict:
-    conn = connect()
+    conn = connect_readonly()          # the page only reads; never run DDL on the tracked DB (#85)
     plan = QueryPlan(question="site", steps=[
         CareStep(scope=Scope(patients=[MRN], start=START, end=END, include_evidence=False), group_by="week"),
         ComplianceStep(scope=Scope(patients=[MRN], start=START, end=END, include_evidence=False), consecutive_below=2)])
@@ -62,7 +63,8 @@ def collect() -> dict:
     for p in sorted((ROOT / "out" / "answers").glob("*.json")):
         a = json.loads(p.read_text())
         t = a.get("timings_ms_original") or a["timings_ms"]
-        answers.append({"id": a["id"], "q": a["question"], "ok": a["postcheck"]["ok"], "ms": t.get("total"),
+        # Re-run the current post-check rather than trusting the stored flag, which an older, looser check wrote (#85).
+        answers.append({"id": a["id"], "q": a["question"], "ok": postcheck(conn, a["answer_markdown"], a["results"])["ok"], "ms": t.get("total"),
                         "plan": a["plan_explain"].split("\n", 1)[1] if "\n" in a["plan_explain"] else a["plan_explain"]})
     t = care["totals"]
     return {
