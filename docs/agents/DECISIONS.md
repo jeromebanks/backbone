@@ -75,6 +75,19 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     passages cannot back any line reference. (Earlier, unbacked citations to such documents passed unchecked.)
     A range `L6–9` is backed only if every line 6..9 is inside some passage; checking only the endpoints let
     `L1–10` pass on passages L1 and L10 (#16).
+18. **Field corrections are a graph, not a sequence.**
+    - **Decision:** corrections are resolved by following old → new edges to their end, whatever order the claims
+      arrive in. Competing corrections of one value, or a cycle, keep every alternative as bounds plus a conflict.
+      A correction that cannot be applied is reported.
+    - **Rejected:** applying them in claim/hash order (first-match-wins made the result depend on sha256 order,
+      #9), and choosing between competing corrections by document date (decision 5).
+19. **Copy relations are scoped to the records they name** (an encounter or form ID, else a date). Only a relation
+    that names neither covers its whole document. A document can resend one record and add a new one (#22).
+20. **A correction that changed a number is part of the encounter's provenance.** Its relation claim joins the
+    encounter's `claim_ids` unless another claim of the same document there already cites the same lines. That keeps
+    the corpus's D103 evidence unchanged while making a relation-only correction citable (#23).
+    - **Rejected:** a separate decision-claims query in each operator. It adds SQL to every envelope, which would
+      change all saved results, and it would have to be repeated in each operator.
 
 ## Open questions / likely next decisions
 

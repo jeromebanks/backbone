@@ -360,6 +360,9 @@ def timeline(conn, step: TimelineStep) -> dict:
             d = per_doc.setdefault(r["sha256"], {"kind": "document", "doc_id": r["doc_label"], "title": dm.get("title"),
                                                      "signed_at": dm.get("signed_at"), "received_at": dm.get("received_at"),
                                                      "finality": dm.get("finality"), "assertions": []})
+            if "service_date" not in p:         # a correction relation (#23): it is listed under relations below
+                claim_ids.append(r["claim_id"])
+                continue
             d["assertions"].append({"encounter": _short(enc_of[r["claim_id"]]), "record_type": r["evidence_type"],
                                     "disposition": p.get("disposition"), "arrival": p.get("patient_arrival"),
                                     "departure": p.get("patient_departure"),

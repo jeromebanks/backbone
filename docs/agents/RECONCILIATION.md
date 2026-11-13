@@ -10,7 +10,12 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
 
 1. Attach each claim's document metadata (`signed`, `finality`, `signed_at`).
 2. **R0:** drop unverified claims, with a decision.
-3. Index relations: field corrections by encounter, plus the sets of retransmitted and copy documents.
+3. Index relations: field corrections by encounter, plus the scope of each retransmission and copy relation
+   (`_scopes`). A copy relation covers only the records it names (#22). A retransmission naming an encounter covers
+   that encounter's records; an ID-less event counts as the encounter R1 placed it in. A measurement copy naming a
+   form covers that form, plus an ID-less assessment on the form's date. A relation naming only a date covers that
+   date. Only a relation naming neither covers its whole document. A correction naming no encounter is an R3
+   `correction_not_applied` decision.
 4. **R1** `_group_events`: events with an encounter ID form groups. Events without one match a group with the same
    date and service type (and overlapping intervals if both are known) when exactly one candidate exists. Otherwise
    they form a separate `U-` contact (an "unidentified contact" decision).
@@ -20,6 +25,16 @@ claim_ids)`, and every unresolved disagreement appends to `res.conflicts`. The a
      `platform_log` are tier 1; `schedule_listing`, `administrative_notice` and `other` are tier 2.
    - `_apply_corrections` (R3): a `corrects_field` relation replaces `old_value` with `new_value` **in that field
      only**, on every record of that encounter, including later copies. It never touches the correcting document.
+     - Fields: arrival, departure, disposition, contact_interval (`HH:MM–HH:MM`) and service_type. Times compare by
+       value, codes by normalised spelling (#10).
+     - Corrections form a graph, resolved independently of claim order. A chain (a → b, then b → c) ends at c.
+       Competing corrections (a → b and a → c) or a cycle keep every alternative (`Claim.alts`, read through
+       `_variants`): minutes become `disputed` bounds and attendance may become `disputed`, with an R3
+       `correction_disputed` decision and a `correction:<field>` conflict. Nothing is picked (#9).
+     - A correction that cannot be applied (field `other`, a value not understood, no record holding the old value)
+       is an R3 `correction_not_applied` decision plus an encounter flag, never silently dropped (#10).
+     - An applied correction joins the encounter's `claim_ids`, so its passage reaches `evidence` and can be cited,
+       unless another claim of the same document in the encounter already cites those lines (#23).
    - Service type and date: tier-1 majority (conflicts recorded).
    - Attendance (R4): the first tier with a known yes/no decides. Yes and no in the same tier gives `disputed`.
    - Presence: tier-1 `patient_present` votes; not attended implies not present.

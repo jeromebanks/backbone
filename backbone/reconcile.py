@@ -11,6 +11,7 @@ Rules (RULESET_VERSION in __init__):
   R2  draft/template text, billing rows and unsigned drafts are not attendance evidence.
   R3  explicit field corrections replace the corrected value only for that field; retransmitted/copied records
       are linked to their original and carry no independent weight. Precedence never follows document date.
+      Correction chains resolve independently of claim order; competing corrections are kept as disputes.
   R4  evidence tiers: clinical notes, attendance registers/corrections, platform logs (tier 1) outrank schedule
       listings and notices (tier 2). Disagreement within the deciding tier -> disputed (kept as bounds).
   R5  a therapy session counts if the service is psychotherapy (individual/group/family), it was attended, and
@@ -24,14 +25,18 @@ Rules (RULESET_VERSION in __init__):
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
+import re
 import sqlite3
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import get_args
 
 from . import RULESET_VERSION
-from .intervals import fmt_set, normalize, overlaps, subtract, to_min, total
+from .intervals import fmt, fmt_set, normalize, overlaps, subtract, to_min, total
+from .schema import ServiceType
 
 THERAPY_TYPES = {"individual_therapy", "group_therapy", "family_therapy"}
 TIER1 = {"clinical_note", "attendance_record", "attendance_correction", "platform_log"}
@@ -42,7 +47,10 @@ NOT_EVIDENCE = {"draft_template": "draft/template text is not attendance evidenc
 ATTENDED = {"attended_full": "yes", "attended_partial": "yes", "attended": "yes",
             "no_show": "no", "patient_cancelled": "no", "clinic_cancelled": "no",
             "scheduled_only": "unknown", "unknown": "unknown"}
-FIELD_MAP = {"arrival": "patient_arrival", "departure": "patient_departure", "disposition": "disposition"}
+FIELD_MAP = {"arrival": "patient_arrival", "departure": "patient_departure", "disposition": "disposition",
+             "contact_interval": "patient_contact_intervals", "service_type": "service_type"}
+SERVICE_TYPES = set(get_args(ServiceType))
+_INTERVAL = re.compile(r"\s*(\d{1,2}:\d{2})\s*(?:-|–|—|to)\s*(\d{1,2}:\d{2})\s*")
 
 
 @dataclass
@@ -58,6 +66,7 @@ class Claim:
     verified: bool
     doc: dict = field(default_factory=dict)       # the document-level claim payload (signed, finality, ...)
     eff: dict = field(default_factory=dict)       # effective (corrected) field values
+    alts: dict = field(default_factory=dict)      # field -> alternative values when corrections compete (#9)
     tier: int | None = None
     excluded_reason: str | None = None
 
@@ -138,22 +147,204 @@ def _group_events(events: list[Claim], res: Result) -> dict[str, list[Claim]]:
     return groups
 
 
-def _apply_corrections(group: list[Claim], corrections: list[Claim], key: str, res: Result) -> None:
+def _corr_value(fname: str, v):
+    """Comparable form of a correction or record value for one field, or None if it cannot be understood.
+    Times compare by value (9:00 == 09:00), intervals by their minutes, codes by their normalised spelling."""
+    if v is None:
+        return None
+    if fname in ("arrival", "departure"):
+        return to_min(str(v))
+    if fname == "contact_interval":
+        if isinstance(v, dict):
+            s, e = to_min(v.get("start")), to_min(v.get("end"))
+        else:
+            m = _INTERVAL.fullmatch(str(v))
+            s, e = (to_min(m.group(1)), to_min(m.group(2))) if m else (None, None)
+        return (s, e) if s is not None and e is not None and e > s else None
+    code = re.sub(r"[\s-]+", "_", str(v).strip().lower())
+    return code if code in (ATTENDED if fname == "disposition" else SERVICE_TYPES) else None
+
+
+def _corr_display(fname: str, k):
+    """A comparable value back in the record's own form (HH:MM, {start, end} or a code)."""
+    if fname in ("arrival", "departure"):
+        return fmt(k)
+    if fname == "contact_interval":
+        return {"start": fmt(k[0]), "end": fmt(k[1])}
+    return k
+
+
+def _corr_label(fname: str, k) -> str:
+    return fmt_set([k]) if fname == "contact_interval" else str(_corr_display(fname, k))
+
+
+def _resolve(v0, edges: list[tuple]) -> dict:
+    """Follow corrections (old, new, claim) from v0 and return {terminal value: [paths]}, a path being the edges
+    taken. Every branch is explored, so a chain ends in the same place whatever order the claims arrive in, and
+    competing corrections or a cycle leave several terminals instead of first-match-wins (#9)."""
+    succ: dict = defaultdict(list)
+    for e in edges:
+        succ[e[0]].append(e)
+    out: dict = defaultdict(list)
+    stack = [(v0, [], (v0,))]
+    while stack:
+        v, path, seen = stack.pop()
+        nxt = sorted(succ.get(v, []), key=lambda e: e[2].claim_id)
+        if not nxt:
+            out[v].append(path)
+        for e in nxt:
+            if e[1] in seen:                       # a cycle: every value on it stays an alternative
+                for x in seen[seen.index(e[1]):]:
+                    out[x].append(path + [e])
+            else:
+                stack.append((e[1], path + [e], seen + (e[1],)))
+    return out
+
+
+def _apply_corrections(group: list[Claim], corrections: list[Claim], key: str,
+                       res: Result) -> tuple[list[str], list[Claim]]:
+    """R3 field corrections, applied to every record of the encounter except the correcting document's own.
+
+    - Chains (a -> b, then b -> c) are followed to their end, independent of claim order (#9).
+    - Corrections that disagree (a -> b and a -> c), or form a cycle, keep every alternative in `c.alts`. Minutes and
+      attendance then become disputed bounds, with a conflict. Nothing is picked.
+    - arrival, departure, disposition, contact_interval and service_type are supported. A correction that cannot be
+      applied (other field, value not understood, no record holds the old value) is a decision and a flag (#10).
+
+    Returns (encounter flags, the correction claims that changed at least one record)."""
     for c in group:
-        c.eff = {k: c.payload.get(k) for k in ("patient_arrival", "patient_departure", "disposition")}
-    for corr in corrections:
-        f = FIELD_MAP.get(corr.payload.get("field") or "")
-        if not f:
-            continue
-        old, new = corr.payload.get("old_value"), corr.payload.get("new_value")
-        for c in group:
-            if c.sha256 == corr.sha256 or c.eff.get(f) is None:
+        c.eff = {k: c.payload.get(k) for k in ("patient_arrival", "patient_departure", "disposition", "service_type",
+                                               "patient_contact_intervals")}
+        c.alts = {}
+    flags: list[str] = []
+    edges: dict[str, list[tuple]] = defaultdict(list)
+    for corr in sorted(corrections, key=lambda c: c.claim_id):
+        p = corr.payload
+        fname = p.get("field") or ""
+        old, new = _corr_value(fname, p.get("old_value")), _corr_value(fname, p.get("new_value"))
+        why = (f"field '{fname or 'unspecified'}' is not a correctable field" if fname not in FIELD_MAP
+               else "the original or corrected value is missing or not understood" if old is None or new is None
+               else "the original and corrected values are the same" if old == new else None)
+        if why:
+            _not_applied(key, corr, why, flags, res)
+        else:
+            edges[fname].append((old, new, corr))
+    used: dict[str, Claim] = {}
+    conflicts: dict[tuple, dict] = {}
+    for c in group:
+        for fname, fedges in sorted(edges.items()):
+            f = FIELD_MAP[fname]
+            if c.eff.get(f) is None:
                 continue
-            if old is not None and str(c.eff[f]).strip() == str(old).strip():
-                c.eff[f] = new
-                res.decide(key, "R3", "field_corrected",
-                           f"{c.doc_label} {corr.payload['field']} {old} replaced by {new} per explicit correction in "
-                           f"{corr.doc_label} (correction applies to this field only)", [c.claim_id, corr.claim_id])
+            mine = [e for e in fedges if e[2].sha256 != c.sha256]
+            per_value = []                         # per record value (one, or each contact interval): alternatives
+            for v in (c.eff[f] if fname == "contact_interval" else [c.eff[f]]):
+                k0 = _corr_value(fname, v)
+                found = _resolve(k0, mine) if k0 is not None else {}
+                if not found or (list(found) == [k0] and found[k0] == [[]]):
+                    per_value.append([v])
+                    continue
+                alts = sorted(found, key=str)
+                path_ids = {t: {e[2].claim_id for pth in found[t] for e in pth} for t in alts}
+                for t in alts:
+                    for pth in found[t]:
+                        for _, _, corr in pth:
+                            used[corr.claim_id] = corr
+                if len(alts) == 1:
+                    for pth in sorted(found[alts[0]], key=lambda pth: [e[2].claim_id for e in pth]):
+                        for _, _, corr in pth:
+                            res.decide(key, "R3", "field_corrected",
+                                       f"{c.doc_label} {fname} {corr.payload['old_value']} replaced by "
+                                       f"{corr.payload['new_value']} per explicit correction in {corr.doc_label} "
+                                       "(correction applies to this field only)", [c.claim_id, corr.claim_id])
+                else:
+                    labels = [_corr_label(fname, t) for t in alts]
+                    res.decide(key, "R3", "correction_disputed",
+                               f"{c.doc_label} {fname} {_corr_label(fname, k0)}: corrections disagree "
+                               f"({' vs '.join(labels)}) and none supersedes another; every alternative is kept",
+                               [c.claim_id] + [i for t in alts for i in path_ids[t]])
+                    entry = conflicts.setdefault((fname, tuple(labels)), {
+                        "subject_key": key, "field": f"correction:{fname}", "resolution": "disputed",
+                        "candidates": [{"value": x, "claim_ids": set()} for x in labels]})
+                    for cand, t in zip(entry["candidates"], alts):
+                        cand["claim_ids"] |= {c.claim_id} | path_ids[t]
+                per_value.append([_corr_display(fname, t) for t in alts])
+            combos = [list(x) for x in itertools.product(*per_value)]
+            c.eff[f] = combos[0] if fname == "contact_interval" else combos[0][0]
+            if len(combos) > 1:
+                c.alts[f] = combos if fname == "contact_interval" else [x[0] for x in combos]
+    for entry in conflicts.values():
+        for cand in entry["candidates"]:
+            cand["claim_ids"] = sorted(cand["claim_ids"])
+        res.conflicts.append(entry)
+        flags.append(f"competing corrections of {entry['field'].split(':', 1)[1]}: "
+                     + " vs ".join(x["value"] for x in entry["candidates"]))
+    for fname, fedges in sorted(edges.items()):
+        for _, _, corr in fedges:
+            if corr.claim_id not in used:
+                _not_applied(key, corr, f"no other record of this encounter has {fname} "
+                                        f"{corr.payload.get('old_value')}", flags, res)
+    return flags, [used[k] for k in sorted(used)]
+
+
+def _not_applied(key: str, corr: Claim, why: str, flags: list[str], res: Result) -> None:
+    p = corr.payload
+    flags.append(f"correction in {corr.doc_label} not applied: {why}")
+    res.decide(key, "R3", "correction_not_applied",
+               f"{corr.doc_label} corrects {p.get('field')} {p.get('old_value')} -> {p.get('new_value')}, but {why}",
+               [corr.claim_id])
+
+
+def _variants(c: Claim) -> list[dict]:
+    """The record's effective values: one dict per combination of competing corrections (usually just c.eff)."""
+    if not c.alts:
+        return [c.eff]
+    fs = sorted(c.alts)
+    return [dict(c.eff, **dict(zip(fs, combo))) for combo in itertools.product(*(c.alts[f] for f in fs))]
+
+
+def _covered(scopes, rid: str | None, rdate: str | None) -> bool:
+    """Is a record (its encounter or form ID, and date) inside a copy relation's scope (#22)?
+    - A relation naming an ID covers records with that ID, and records without an ID on one of its dates.
+    - One naming only a date covers that date. One naming neither covers its whole document."""
+    for sid, dates in scopes:
+        if sid and rid:
+            hit = sid == rid
+        elif sid:
+            hit = rdate in dates
+        else:
+            hit = not dates or rdate in dates
+        if hit:
+            return True
+    return False
+
+
+def _scopes(rels: list[Claim], id_field: str, records: list[Claim], rid_field: str, date_field: str) -> dict:
+    """sha256 -> [(ID, dates)] for copy relations. A relation without a date takes the dates of the records of its
+    own document that carry its ID, so an ID-less record of that date is covered too."""
+    out: dict[str, list] = defaultdict(list)
+    for r in rels:
+        sid, d = _norm_id(r.payload.get(id_field)), r.payload.get("original_date")
+        dates = {d} if d else {x.payload.get(date_field) for x in records
+                               if x.sha256 == r.sha256 and sid and _norm_id(x.payload.get(rid_field)) == sid}
+        out[r.sha256].append((sid, dates))
+    return out
+
+
+def _lines(spans) -> set[int]:
+    return {n for s in spans if s.get("line_start") for n in range(s["line_start"], (s.get("line_end") or s["line_start"]) + 1)}
+
+
+def _cited_corrections(group: list[Claim], applied: list[Claim]) -> list[str]:
+    """Applied correction relations that join the encounter's provenance, so the passage that changed a number is in
+    its evidence and can be cited (#23). A relation whose lines another claim of the same document in this encounter
+    already cites adds nothing and is left out."""
+    out = []
+    for corr in applied:
+        same = [c for c in group if c.sha256 == corr.sha256]
+        if not same or not _lines(corr.evidence) <= _lines(s for c in same for s in c.evidence):
+            out.append(corr.claim_id)
+    return out
 
 
 def _vote(values: list[str]) -> tuple[str, bool]:
@@ -167,12 +358,14 @@ def _vote(values: list[str]) -> tuple[str, bool]:
     return "unknown", False
 
 
-def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim], retransmitted: set[str],
+def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim], retransmitted: dict[str, list],
                          res: Result) -> tuple[dict, list[dict]]:
     flags: list[str] = []
+    group_eid = key.split("|", 1)[1]           # R1 already placed ID-less records: E1, or their own U- contact
     for c in group:
         _classify(c)
-        if c.tier is not None and c.sha256 in retransmitted:
+        rid = _norm_id(c.payload.get("encounter_id")) or group_eid
+        if c.tier is not None and _covered(retransmitted.get(c.sha256, ()), rid, c.payload.get("service_date")):
             c.tier, c.excluded_reason = None, NOT_EVIDENCE["retransmitted_copy"]
         if c.excluded_reason:
             is_copy = c.excluded_reason == NOT_EVIDENCE["retransmitted_copy"]
@@ -180,7 +373,8 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
                        "evidence_excluded", f"{c.doc_label} ({c.evidence_type}): {c.excluded_reason}"
                        + (f"; it states disposition '{c.payload['disposition']}'" if c.payload.get("disposition") not in (None, "unknown") else ""),
                        [c.claim_id])
-    _apply_corrections(group, corrections, key, res)
+    corr_flags, applied = _apply_corrections(group, corrections, key, res)
+    flags.extend(corr_flags)
     t1 = [c for c in group if c.tier == 1]
     t2 = [c for c in group if c.tier == 2]
     usable = t1 + t2
@@ -188,12 +382,12 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
 
     # service type (R4): tier 1 majority, then tier 2, then anything
     pool = t1 or t2 or group
-    types = Counter(c.payload["service_type"] for c in pool)
+    types = Counter(v["service_type"] for c in pool for v in _variants(c))
     stype = sorted(types.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
     if len(types) > 1:
         flags.append(f"service type disagreement: {dict(types)}")
         res.conflicts.append({"subject_key": key, "field": "service_type", "resolution": f"majority:{stype}",
-                              "candidates": [{"value": t, "claim_ids": [c.claim_id for c in pool if c.payload['service_type'] == t]} for t in types]})
+                              "candidates": [{"value": t, "claim_ids": [c.claim_id for c in pool if any(v['service_type'] == t for v in _variants(c))]} for t in types]})
     dates = Counter(c.payload["service_date"] for c in pool)
     sdate = sorted(dates.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
     if len(dates) > 1:
@@ -205,16 +399,16 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     # attendance (R4/R5)
     attended, deciding = "unknown", []
     for tier in (t1, t2):
-        vals = [ATTENDED.get(c.eff.get("disposition") or "unknown", "unknown") for c in tier]
+        vals = [ATTENDED.get(v.get("disposition") or "unknown", "unknown") for c in tier for v in _variants(c)]
         a, disputed = _vote(vals)
         if a != "unknown":
             attended, deciding = a, tier
             if disputed:
                 res.conflicts.append({"subject_key": key, "field": "attendance", "resolution": "disputed",
-                                      "candidates": [{"value": v, "claim_ids": [c.claim_id for c in tier if ATTENDED.get(c.eff.get('disposition') or 'unknown') == v]} for v in ("yes", "no")]})
+                                      "candidates": [{"value": v, "claim_ids": [c.claim_id for c in tier if any(ATTENDED.get(x.get('disposition') or 'unknown') == v for x in _variants(c))]} for v in ("yes", "no")]})
             break
-    dispositions = Counter(c.eff.get("disposition") for c in deciding
-                           if ATTENDED.get(c.eff.get("disposition") or "unknown") == attended)
+    dispositions = Counter(v.get("disposition") for c in deciding for v in _variants(c)
+                           if ATTENDED.get(v.get("disposition") or "unknown") == attended)
     disposition = "unknown"
     if dispositions:
         specific = sorted(d for d in dispositions if d not in ("attended", "unknown", "scheduled_only"))
@@ -277,14 +471,14 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
 
     cands: dict[tuple, list[Claim]] = defaultdict(list)
     basis: dict[tuple, str] = {}
-    for c in t1:
-        ci = normalize([(to_min(i["start"]), to_min(i["end"])) for i in c.payload.get("patient_contact_intervals") or []])
+    for c, v in ((c, v) for c in t1 for v in _variants(c)):
+        ci = normalize([(to_min(i["start"]), to_min(i["end"])) for i in v.get("patient_contact_intervals") or []])
         if ci:
-            cands[tuple(ci)].append(c); basis.setdefault(tuple(ci), "stated contact intervals")
+            _add_cand(cands, tuple(ci), c); basis.setdefault(tuple(ci), "stated contact intervals")
             continue
-        a, d = to_min(c.eff.get("patient_arrival")), to_min(c.eff.get("patient_departure"))
+        a, d = to_min(v.get("patient_arrival")), to_min(v.get("patient_departure"))
         if a is not None and d is not None and d > a:
-            cands[((a, d),)].append(c); basis.setdefault(((a, d),), "arrival–departure")
+            _add_cand(cands, ((a, d),), c); basis.setdefault(((a, d),), "arrival–departure")
     if not cands and sched and None not in sched and any(c.eff.get("disposition") == "attended_full" for c in t1):
         cands[(sched,)] = [c for c in t1 if c.eff.get("disposition") == "attended_full"]
         basis[(sched,)] = "attended full scheduled session"
@@ -342,7 +536,7 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
         "modality": modality, "disposition": disposition, "attended": attended, "patient_present": present,
         "is_therapy": int(is_therapy), "eligible": eligible, "exclusion_reason": reason,
         "minutes_low": m_low, "minutes_high": m_high, "minutes_status": status, "calculation": calc,
-        "claim_ids": sorted(ids), "flags": flags, "ruleset_version": RULESET_VERSION,
+        "claim_ids": sorted(ids + _cited_corrections(group, applied)), "flags": flags, "ruleset_version": RULESET_VERSION,
         "_present_sets": [list(iv) for iv in cands] if eligible != "no" else [],
         "_superseded": [],
     }
@@ -350,9 +544,14 @@ def _reconcile_encounter(key: str, group: list[Claim], corrections: list[Claim],
     for c in t1:
         a, d = to_min(c.payload.get("patient_arrival")), to_min(c.payload.get("patient_departure"))
         ea, ed = to_min(c.eff.get("patient_arrival")), to_min(c.eff.get("patient_departure"))
-        if (a, d) != (ea, ed) and a is not None and d is not None:
+        if (a, d) != (ea, ed) and a is not None and d is not None and not ({"patient_arrival", "patient_departure"} & set(c.alts)):
             enc["_superseded"].append(((a, d), c.doc_label))
     return enc, rows
+
+
+def _add_cand(cands: dict, k: tuple, c: Claim) -> None:
+    if all(x is not c for x in cands[k]):           # one record may reach the same set through several variants
+        cands[k].append(c)
 
 
 def _overlap_checks(encs: list[dict], res: Result) -> None:
@@ -445,7 +644,7 @@ def _plans(plan_claims: list[Claim], res: Result) -> None:
                        f"{same[0][1]['metric']} requirement; it counts once", [c.claim_id for _, _, cs in same for c in cs])
 
 
-def _assessments(acl: list[Claim], copy_docs: set[str], res: Result) -> None:
+def _assessments(acl: list[Claim], copy_docs: dict[str, list], res: Result) -> None:
     groups: dict[tuple, list[Claim]] = defaultdict(list)
     for c in acl:
         p = c.payload
@@ -454,7 +653,8 @@ def _assessments(acl: list[Claim], copy_docs: set[str], res: Result) -> None:
         forms = sorted({c.payload.get("form_id") for c in cs if c.payload.get("form_id")})
         buckets = {f: [c for c in cs if c.payload.get("form_id") in (f, None)] for f in forms} if len(forms) > 1 else {forms[0] if forms else None: cs}
         for form, bcs in buckets.items():
-            copies = [c for c in bcs if c.payload.get("is_copy_of_earlier") or c.sha256 in copy_docs]
+            copies = [c for c in bcs if c.payload.get("is_copy_of_earlier") or _covered(
+                copy_docs.get(c.sha256, ()), _norm_id(c.payload.get("form_id")), c.payload.get("completed_date"))]
             prim = [c for c in bcs if c not in copies] or copies
             scores = {c.payload.get("total_score") for c in bcs}
             key = f"{res.mrn}|{inst}|{d}|{form or '-'}"
@@ -505,24 +705,33 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
     claims = [c for c in claims if c.verified or c.kind == "document"]
     rel = [c for c in claims if c.kind == "relation"]
     corrections = defaultdict(list)
-    retransmitted: set[str] = set()
-    copy_docs: set[str] = set()
     for r in rel:
         t, eid = r.payload["type"], _norm_id(r.payload.get("encounter_id"))
         if t == "corrects_field" and eid:
             corrections[f"{mrn}|{eid}"].append(r)
-        elif t == "retransmits_original":
-            retransmitted.add(r.sha256)
-        elif t == "copies_measurement":
-            copy_docs.add(r.sha256)
+        elif t == "corrects_field":
+            res.decide(r.subject_key or r.doc_label, "R3", "correction_not_applied",
+                       f"{r.doc_label} corrects {r.payload.get('field')} {r.payload.get('old_value')} -> "
+                       f"{r.payload.get('new_value')}, but names no encounter, so it cannot be applied", [r.claim_id])
 
     events = [c for c in claims if c.kind == "service_event" and c.payload.get("service_date")]
+    acl = [c for c in claims if c.kind == "assessment"]
+    # copy relations are scoped to the records they name, not their whole document (#22)
+    retransmitted = _scopes([r for r in rel if r.payload["type"] == "retransmits_original"], "encounter_id",
+                            events, "encounter_id", "service_date")
+    copy_docs = _scopes([r for r in rel if r.payload["type"] == "copies_measurement"], "form_id",
+                        acl, "form_id", "completed_date")
     groups = _group_events(events, res)
     encs = []
     for key in sorted(groups):
         enc, rows = _reconcile_encounter(key, groups[key], corrections.get(key, []), retransmitted, res)
         encs.append(enc)
         res.intervals.extend(rows)
+    for key in sorted(set(corrections) - set(groups)):
+        for r in corrections[key]:
+            res.decide(key, "R3", "correction_not_applied",
+                       f"{r.doc_label} corrects {r.payload.get('field')} of an encounter that has no service record",
+                       [r.claim_id])
     _overlap_checks(encs, res)
     res.encounters = encs
     _plans([c for c in claims if c.kind == "plan_requirement"], res)
@@ -540,7 +749,7 @@ def reconcile_patient(mrn: str, claims: list[Claim]) -> Result:
                     res.decide(e["encounter_key"], "R9", "counted_under_plan",
                                f"session began before the plan signature ({p['signed_at']}) on the plan's first "
                                f"effective day; counted because plan effectivity is by date", p["claim_ids"])
-    _assessments([c for c in claims if c.kind == "assessment"], copy_docs, res)
+    _assessments(acl, copy_docs, res)
     _observations([c for c in claims if c.kind == "observation"], res)
     return res
 
