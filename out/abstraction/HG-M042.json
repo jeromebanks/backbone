@@ -3,13 +3,11 @@
     "mrn": "HG-M042",
     "name": "Rowan Mercer",
     "dob": "1991-04-12",
-    "reconciled_at": "2026-11-12T16:16:01",
-    "ruleset_version": "r3"
+    "ruleset_version": "r7"
   },
   "abstraction_version": {
     "extractor": "x1",
-    "ruleset": "r3",
-    "fingerprint": "d4193d4bf6e0e5afcbeb4f1470cdcb0c1a21ef96988ccc2804d771d20c791d35"
+    "ruleset": "r7"
   },
   "documents": [
     {
@@ -788,7 +786,7 @@
       "minutes_status": "established",
       "calculation": "09:00\u201309:50 (stated contact intervals; BH-D002) = 50 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -927,7 +925,7 @@
       "minutes_status": "established",
       "calculation": "10:15\u201311:15 (arrival\u2013departure; BH-D005) \u2212 break 10:45\u201311:00 = 45 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -1112,7 +1110,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -1233,7 +1231,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-05",
       "intervals": [],
       "records": [
@@ -1357,7 +1355,7 @@
       "minutes_status": "established",
       "calculation": "14:00\u201314:45 (stated contact intervals; BH-D007, BH-D008) = 45 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-05",
       "intervals": [
         {
@@ -1569,7 +1567,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D005) \u2212 break 10:40\u201310:55 = 75 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1747,7 +1745,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1863,7 +1861,7 @@
       "minutes_status": "established",
       "calculation": "11:00\u201311:45 (stated contact intervals; BH-D011) = 45 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -1983,7 +1981,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -2104,7 +2102,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
@@ -2178,7 +2176,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
@@ -2264,7 +2262,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [
         {
@@ -2400,7 +2398,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
@@ -2474,7 +2472,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-12",
       "intervals": [],
       "records": [
@@ -2541,7 +2539,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:15 (arrival\u2013departure; BH-D102, BH-D103) \u2212 break 10:45\u201311:00 = 60 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -2858,7 +2856,7 @@
       "minutes_status": "established",
       "calculation": "11:15\u201311:45 (stated contact intervals; BH-D105) = 30 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -3005,7 +3003,7 @@
       "minutes_status": "established",
       "calculation": "13:00\u201313:20 + 13:30\u201313:55 (stated contact intervals; BH-D106) = 45 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -3172,7 +3170,7 @@
       "minutes_status": "established",
       "calculation": "10:30\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 45 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -3343,7 +3341,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-19",
       "intervals": [
         {
@@ -3438,7 +3436,7 @@
       "minutes_status": "disputed",
       "calculation": "09:10\u201309:50 (stated contact intervals; BH-D111) = 40 min | 09:00\u201309:50 (stated contact intervals; BH-D110) = 50 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3624,7 +3622,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3820,7 +3818,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [],
       "records": [
@@ -3887,7 +3885,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -3975,7 +3973,7 @@
       "minutes_status": "established",
       "calculation": "10:00\u201311:30 (arrival\u2013departure; BH-D108) \u2212 break 10:45\u201311:00 = 75 min",
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -4141,7 +4139,7 @@
       "flags": [
         "BH-D113 states 45 min; patient-present computation gives 30 min"
       ],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [
         {
@@ -4261,7 +4259,7 @@
       "minutes_status": "not_applicable",
       "calculation": null,
       "flags": [],
-      "ruleset_version": "r3",
+      "ruleset_version": "r7",
       "week_start": "2026-01-26",
       "intervals": [],
       "records": [
@@ -4651,17 +4649,6 @@
       "statement": "Rowan's participation was on topic and they seemed receptive to peer suggestions.",
       "claim_ids": [
         "5edddc6b2093:observation:4"
-      ]
-    },
-    {
-      "observation_key": "HG-M042|obs|dc04baa30c25",
-      "mrn": "HG-M042",
-      "obs_date": "2026-01-07",
-      "domain": "sleep",
-      "source": "patient_report",
-      "statement": "Patient reported a poor night of sleep before the missed appointment.",
-      "claim_ids": [
-        "4521a120a4d7:observation:1"
       ]
     },
     {
@@ -5237,14 +5224,24 @@
       ]
     },
     {
-      "observation_key": "HG-M042|obs|62106cd7f12c",
+      "observation_key": "HG-M042|obs|95b54b22b9f4",
       "mrn": "HG-M042",
       "obs_date": "2026-01-19",
       "domain": "anxiety",
       "source": "clinician_observation",
       "statement": "Patient became visibly tense when discussion turned to returning to the workplace.",
       "claim_ids": [
-        "05a234a8adc9:observation:2",
+        "05a234a8adc9:observation:2"
+      ]
+    },
+    {
+      "observation_key": "HG-M042|obs|aca9fd190c08",
+      "mrn": "HG-M042",
+      "obs_date": "2026-01-19",
+      "domain": "anxiety",
+      "source": "patient_report",
+      "statement": "Patient said the amount of discussion felt difficult to manage.",
+      "claim_ids": [
         "05a234a8adc9:observation:3"
       ]
     },
@@ -5337,14 +5334,24 @@
       ]
     },
     {
-      "observation_key": "HG-M042|obs|2fa35a4f5f86",
+      "observation_key": "HG-M042|obs|f5ca167dec21",
       "mrn": "HG-M042",
       "obs_date": "2026-01-19",
       "domain": "engagement",
       "source": "clinician_observation",
       "statement": "Patient attended the group's opening check-in and accepted the exercise handout.",
       "claim_ids": [
-        "f3f25065559f:observation:0",
+        "f3f25065559f:observation:0"
+      ]
+    },
+    {
+      "observation_key": "HG-M042|obs|a50de212029d",
+      "mrn": "HG-M042",
+      "obs_date": "2026-01-19",
+      "domain": "engagement",
+      "source": "patient_report",
+      "statement": "Patient requested additional help from the individual clinician.",
+      "claim_ids": [
         "f3f25065559f:observation:1"
       ]
     },
@@ -5976,5 +5983,20 @@
       ]
     }
   ],
-  "other_decisions": {}
+  "other_decisions": {
+    "HG-M042|claim|4521a120a4d7:observation:1": [
+      {
+        "rule": "R0",
+        "outcome": "claim_rejected",
+        "reason": "BH-D015 observation: the date is not stated anywhere in the document (the extracted value was inferred)",
+        "claims": [
+          {
+            "claim_id": "4521a120a4d7:observation:1",
+            "kind": "observation",
+            "sha256": "4521a120a4d7a8f896d5fe9137a44f72719adc5cadbd839ef1b9d9646316b7c4"
+          }
+        ]
+      }
+    ]
+  }
 }
