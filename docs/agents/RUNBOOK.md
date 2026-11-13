@@ -6,7 +6,7 @@ to sources, and **run related questions and additional documents through the cod
 ## Before the call
 
 ```bash
-python -m pytest -q && python -m backbone verify-answers     # green, identical
+python -m pytest -q && python -m backbone verify-answers     # green; exit 0 = every saved result identical + post-check OK
 claude -p "say ok" --model claude-opus-5-5                    # subscription login works (LLM path ready)
 open docs/index.html                                          # human overview
 ```
@@ -40,7 +40,7 @@ If a question is outside the operators, the system says so (`unsupported_reason`
 
 ```bash
 bb ingest path/to/new_doc.txt        # prints: new_documents, extracted_llm, affected_patients, reconcile summary
-bb ask "<question about it>"         # the answer cache is invalidated automatically (fingerprint includes doc hashes)
+bb ask "<question about it>"         # cache miss: the fingerprint is a content hash of the whole abstraction
 ```
 
 What to point out:
@@ -49,17 +49,28 @@ What to point out:
 - Read `decisions` for the affected encounter to see how the new record was weighed. Is it a correction, a copy, a
   draft or a conflict?
 - **A revised treatment plan** is supported. Weeks spanning the change are judged against each plan, and
-  `compare(split="plan_change")` splits at the new plan.
+  `compare(split="plan_change")` splits at the first day a new or different requirement set takes effect (a plan
+  that just ends, with nothing in its place, is not a split point). A plan from a draft document is not operative.
 - **A new patient** is keyed by MRN; collection-wide questions include them.
+- **A document without a usable identity is quarantined, not guessed.** No MRN and no unique name (+ DOB) match,
+  several patients named, or an extracted MRN that differs from the printed one: `ingest` prints `QUARANTINED` and
+  lists it under `quarantined`, and `bb stats` counts it under `quarantined_documents`. Its claims count for nobody
+  until a later ingest can attribute it. For a demo of a new patient, include an MRN in the document.
 
 ## If something goes wrong
 
 - **Extraction fails or a schema error occurs:** `ingest` reports `failed` and continues. Rerun the file. Check `claude`
   login.
-- **A claim is rejected by R0:** the quote was not found. Look in `decisions` for rule R0 and inspect the cached
+- **A claim is rejected by R0:** it has no quote of its own, a quote was not found (a fuzzy match that changes a
+  digit does not count), a service event's clock times or stated minutes are not in its own quotes, or a date it
+  carries appears nowhere in the document. Look in `decisions` for rule R0. Its reason currently reads "quote not
+  found" whatever the cause (#68); the claim's `evidence` spans (`match: missing`) or its last, `grounding` entry
+  (`absent` values, `unverified_absent`) show which check failed. Check
+  `timeline` or `care` with `include_excluded` (rejections are listed as exclusions), and inspect the cached
   extraction in `cache/extractions/`.
-- **The answer post-check is not OK:** the JSON lists the offending numbers or citations. Treat the narrative with
-  caution; the `results` are still correct.
+- **The answer post-check is not OK:** `ask` has already regenerated the narrative once. The answer carries a
+  warning banner, is not cached, and its `postcheck` lists the offending numbers, dates or citations. Treat the
+  narrative with caution; the `results` are still what the engine computed.
 
 ## Talking points (what reviewers grade)
 
@@ -68,7 +79,7 @@ What to point out:
 | Completeness | all 5 questions plus 6 unseen ones answered |
 | Accuracy | golden tests; ablation |
 | Reproducible calculations | the `calculation` strings, `sql`, `verify-answers` |
-| Evidence quality | verified quotes with line numbers; 0 unverified claims |
+| Evidence quality | verified quotes with line numbers; 0 unverified claims | <!-- FINAL-NUMBERS -->
 | Uncertainty | bounds and UNDETERMINED; `depends_on_unresolved`; unsupported questions refused |
-| Follow-up performance | milliseconds to execute; 1 ms when cached; only new docs are extracted |
+| Follow-up performance | milliseconds to execute and to serve a cached answer; only new docs are extracted |
 | Research judgment | DECISIONS.md, the ablation, the limitations and the scale estimates in the README |

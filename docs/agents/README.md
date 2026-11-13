@@ -4,7 +4,7 @@ Start with [`/AGENTS.md`](../../AGENTS.md) (invariants, commands, confidentialit
 
 | File | Read when you are… |
 |---|---|
-| [HANDOFF.md](HANDOFF.md) | **starting a new session**: current state, open issues #1–#34, what costs money, user preferences |
+| [HANDOFF.md](HANDOFF.md) | **starting a new session**: what changed in the #1–#75 fixes, pending rebuilds and regenerations, open issues, what costs money, user preferences |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | orienting: layers, tables, modules, data flow, the results envelope |
 | [EXTRACTION.md](EXTRACTION.md) | changing what the LLM extracts, the prompt, the cache or the LLM backends |
 | [RECONCILIATION.md](RECONCILIATION.md) | changing how claims become encounters, minutes, eligibility, plans or assessments |

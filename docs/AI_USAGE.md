@@ -6,7 +6,8 @@
 number is deterministic code.
 
 **Measured vs estimated.** "Measured" figures come from this repository's runs (`cache/extractions/*.json`,
-`out/answers/*.json`, `out/benchmarks.json`). Cost figures are **API list-price equivalents** reported by the Claude
+`out/answers/*.json`, `out/benchmarks.json`). `out/benchmarks.json` was measured at the initial commit (`d38bc57`),
+before the fixes for issues #1–#75. Cost figures are **API list-price equivalents** reported by the Claude
 CLI: the prototype ran on a Claude subscription, so no API bill was actually incurred. Prices are Claude list
 prices per million tokens as of November 2026; re-check them before quoting.
 
@@ -24,7 +25,7 @@ prices per million tokens as of November 2026; re-check them before quoting.
 | 6 | Interval arithmetic, projection, plan verdicts (`intervals.py`, `project.py`) | **No** | n/a | n/a | n/a |
 | 7 | Operators + SQL (`operators.py`, `query.py`) | **No** | n/a | n/a | n/a |
 | 8 | **Planner** (`answer.py`): question → QueryPlan | **Yes (LLM)** | Claude Opus 5.5, effort `medium`, schema-constrained | Which operations, scope and parameters answer the question | Writing SQL or code, computing anything (it emits a validated plan only) |
-| 9 | **Narrator** (`answer.py`): results → cited answer | **Yes (LLM)** | Claude Opus 5.5, effort `medium`, schema-constrained | Wording, structure, and which computed facts and citations to present | New numbers, new arithmetic, uncited claims (enforced by the post-check) |
+| 9 | **Narrator** (`answer.py`): results → cited answer | **Yes (LLM)** | Claude Opus 5.5, effort `medium`, schema-constrained | Wording, structure, and which computed facts and citations to present | New numbers, new arithmetic, derived dates. The post-check enforces only that numbers and dates appear in the results and that citations are backed (see risk 4); the other rules are prompt instructions |
 | 10 | Post-check (`answer.postcheck`) | **No** | n/a | n/a | n/a |
 | 11 | Caches, `verify-answers`, export, benchmarks, ablation, HTML docs | **No** | n/a | n/a | n/a |
 | 12 | **`clinical-qa` Claude Code skill** | **Yes**: Claude Code itself plans and narrates | The user's Claude Code session | Same roles as 8 and 9 | Same limits. Numbers come from `python -m backbone plan`; answers must pass `python -m backbone postcheck` |
@@ -37,23 +38,57 @@ prices per million tokens as of November 2026; re-check them before quoting.
 
 1. **Extraction is the only AI step that feeds numbers.** A misread time or disposition flows into reconciliation.
    Mitigations:
-   - verbatim quotes are verified in code (R0; 0 unverified of 254 claims, measured);
+   - verbatim quotes are verified in code, and a fuzzy match must keep every token that contains a digit (R0;
+     0 unverified of 254 claims, measured); <!-- FINAL-NUMBERS -->
+   - value grounding: a service event whose clock times or stated minutes are not in its own quotes, or a claim
+     whose date appears nowhere in its document, is rejected (R0); other values not in the claim's own quotes
+     (mostly header dates) are flagged and counted by `stats`;
    - intervals are recorded, never minutes;
    - relationships are keyed on IDs the text states;
    - stated totals are cross-checked against computed ones (this caught D113's "45 min" vs 30 patient-present
      minutes);
    - the golden tests and the ablation.
 
-   **Residual risk:** a plausible but wrong value that *is* quoted correctly. Example: a correct quote attached to
-   the wrong field. The gold-set eval and agreement harness (ROADMAP Phase 1) are the next defence.
-2. **Patient attribution depends on the extracted MRN** (`ingest.py`). A misread MRN would attribute a document to the
-   wrong patient. In production this moves to a patient-matching service with review queues (ROADMAP §3.1 item 5).
+   **Residual risk:** a plausible but wrong value that *is* in the quote. Examples: the right time attached to the
+   wrong field (arrival vs departure), a wrong disposition or service type (these are not grounded), or a date
+   that is in the document but belongs to another event. The gold-set eval and agreement harness (ROADMAP Phase 1)
+   are the next defence.
+2. **Patient attribution starts from the extracted MRN** (`ingest.attribute_document`), but code checks it against
+   the text: an extracted MRN that differs from the MRN printed in the document is quarantined (`mrn_mismatch`); a
+   document that names several patients is quarantined (`multi_patient`); without an MRN, the name (and DOB) must
+   match exactly one known patient, else the single printed MRN is used, else the document is quarantined. Explicit
+   MRN corrections in the text are followed. **Residual risk:** an MRN the extractor and the text agree on but that is
+   wrong at the source, or a name-only match to the wrong same-named patient when only one is known. In production
+   this moves to a patient-matching service with review queues (ROADMAP §3.1 item 5).
 3. **The planner can answer the wrong question correctly.** A valid plan with the wrong scope gives right numbers
    for the wrong question. Mitigations: the plan is shown with every answer ("How this was computed"); a
    question → plan gold set; templates for common intents (CLINICAL_QA_DESIGN §3.1).
-4. **The narrator can misphrase.** The post-check enforces that numbers come from the results, documents exist, and
-   line references are backed by evidence. Prose interpretation is not machine-checked; the narrator is instructed
-   to separate fact from interpretation, and this is sampled for clinician review in production.
+4. **The narrator can misphrase.** The post-check (`answer.postcheck`, deterministic) fails an answer when:
+   - a number in it is not a quantity the computed results state. Candidates come only from JSON numbers and
+     free-standing numbers in result strings (calculations, reasons, notes, quotes); IDs, keys, hashes, file names,
+     dates, clock times and each step's echoed parameters, question and SQL are excluded. Numbers joined by a hyphen
+     ("10-minute", "30-45") are checked too;
+   - a date in it (ISO, m/d/yyyy, "January 7, 2026", "Jan 26–Feb 1", day lists, zero-padded "01-26") is not
+     stated in the results, is not a step's scope bound, and is not the last day of a reported Mon–Sun week;
+   - it cites a document that is not in the corpus or not in the results;
+   - it cites a label that several documents share without `LABEL [sha12]`, or with a `[sha12]` no such document has;
+   - any line of a cited `L<a>` or `L<a>–<b>` range is outside that document's evidence passages.
+
+   It is a **gate**: a failing narration is regenerated once with the failures fed back; if it still fails, the
+   answer is returned with a warning banner and never cached. A cache hit is post-checked again before it is served.
+
+   **What it does not check.** It is set membership, not grounding of each statement:
+   - a number or date that does appear in the results but is attached to the wrong week, encounter or patient passes,
+     and any number inside a quoted evidence passage counts as stated;
+   - numbers written as words ("twelve sessions") and clock times are not checked; a year-less date matches any
+     year;
+   - it does not check that statements are cited at all (an uncited sentence passes), and an unknown document is
+     caught only in the `(ID Ln)` citation form or as a corpus label;
+   - it does not check prose claims, interpretation, improvement or causation, nor whether the plan answered the
+     question that was asked (risk 3).
+
+   The narrator is instructed to separate fact from interpretation and not to derive numbers or dates; those are
+   prompt rules, not checks. In production, answers are sampled for clinician review.
 
 ### Determinism and reproducibility
 
@@ -61,8 +96,10 @@ prices per million tokens as of November 2026; re-check them before quoting.
   - the **extraction cache** (per document hash, extractor version and model);
   - the **answer cache** (per question and abstraction fingerprint).
 - Everything downstream of the extraction cache is deterministic and byte-reproducible. Rebuilding from the cache
-  makes 0 LLM calls, and `python -m backbone verify-answers` re-executes every saved plan and requires identical
-  results.
+  makes 0 LLM calls. `python -m backbone verify-answers` (read-only) re-executes every saved plan, requires identical
+  results, re-runs the current post-check on every saved narrative, and exits 1 if either fails.
+- The answer cache key includes a content hash of the abstraction (documents, committed extractions, claims and
+  derived tables) and the code versions, so any change to what an answer was computed from is a cache miss.
 - Re-running extraction is treated as a new extractor run, not a correction. Its effect is measured by diffing
   reconciled outcomes.
 
@@ -73,11 +110,11 @@ prices per million tokens as of November 2026; re-check them before quoting.
 | What | Measured |
 |---|---|
 | Extraction, 31 documents | **$1.38 total**, **$0.045/doc**; 8,318 input + 1,574 output tokens per doc (≈90% of input is the fixed prompt + schema); 13.2 s mean per doc; 58 s wall clock at concurrency 8 |
-| Answering, 11 saved questions (planner + narrator) | **$2.06 total**; $0.08–0.62 per development question; $0.01 for a refused (unsupported) question; 3.6K–97K input tokens per question |
-| Planner latency | 2.5–5.8 s |
-| Narrator latency | 14–49 s; **dominates** answer time and cost |
+| Answering, 11 saved questions (planner + narrator) | **$2.06 total**; $0.08–0.62 per development question; $0.01 for a refused (unsupported) question; 3.6K–97K input tokens per question | <!-- FINAL-NUMBERS -->
+| Planner latency | 2.5–5.8 s | <!-- FINAL-NUMBERS -->
+| Narrator latency | 14–49 s; **dominates** answer time and cost | <!-- FINAL-NUMBERS -->
 | Execution (no AI) | 7–10 ms per question; 0.2–1.7 ms per operator |
-| Repeated question (cache) | ~1.3 ms, $0 |
+| Repeated question (cache) | ~1.3 ms, $0 (benchmark at `d38bc57`; a hit now also hashes the abstraction, ~2 ms, and re-runs the post-check) |
 | Whole development effort (estimate) | about $10–20 list-equivalent: one extraction pass plus several regenerations of the answer set |
 
 ---

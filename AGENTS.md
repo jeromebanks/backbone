@@ -24,27 +24,33 @@ documents/ → ingest (sha256) → extract (LLM, 1 call/doc, cached) → claims 
           → reconcile (pure Python rules R0–R9) → encounters, intervals, plans, assessments, decisions [clinical layer]
           → project.py (bounds, Mon–Sun weeks, plan-in-effect, MET/NOT_MET/UNDETERMINED)            [shared semantics]
 question  → LLM → QueryPlan (typed JSON DSL) → 4 operators (read-only SQL) → results envelope
-          → LLM narrates from results only → post-check (numbers, doc IDs, line refs)
+          → LLM narrates from results only → post-check gate (numbers, dates, documents, line refs)
 ```
 
 ## Commands
 
 ```bash
-python -m pytest -q                                    # full test suite, no LLM, ~1 s — run after every change
+python -m pytest -q                                    # full test suite, no LLM, a few seconds — run after every change
 python -m backbone verify-answers                      # read-only, no LLM: saved results identical + post-check OK, else exit 1
 python -m backbone verify-answers --rewrite            # also refresh saved answers' post-check field and Markdown
 python -m backbone plan plans/weekly_compliance.json   # run a hand-written QueryPlan (no LLM)
-python -m backbone stats | reconcile | export --patient HG-M042 | benchmark
+python -m backbone stats | reconcile | export --patient HG-M042
 python -m backbone directory | schema                 # patients in the abstraction; QueryPlan JSON schema
 python -m backbone plan - --summary --out /tmp/r.json  # plan from stdin → compact readout + full results
-python -m backbone postcheck answer.md --results /tmp/r.json   # numbers/citations in an answer must be backed
+python -m backbone postcheck answer.md --results /tmp/r.json   # numbers, dates and citations must be backed by results
 python -m backbone.ablation                            # naive-rule experiment → out/ablation.md
 python docs/build_site.py                              # regenerate docs/index.html from the DB + benchmarks
 # LLM-backed (uses Claude Opus 5.5 via `claude -p` = the user's subscription; costs usage — ask first):
 python -m backbone ingest <paths>      # extracts only new sha256s; re-reconciles only affected patients
 python -m backbone ask "<question>"    # answer cache hit = free
 python -m backbone answer questions.json
+python -m backbone benchmark          # times 5 repeats of the first question via `ask`: up to 5 full LLM answer runs on cache misses
 ```
+
+Read-only commands open the DB with `db.connect_readonly` and never write it: `directory`, `stats`, `plan`,
+`postcheck`, `export` (it writes export files) and `verify-answers` (with `--rewrite` it writes only the saved answer
+files). `schema` does not open the DB. `ingest`, `reconcile`, `ask`, `answer`, `benchmark` and `docs/build_site.py`
+open it read-write.
 
 Python ≥ 3.11, dependencies `pydantic` (+ `pytest`). SQLite at `out/backbone.db` (override with `--db` or
 `BACKBONE_DB`). LLM backend: `BACKBONE_LLM=claude-cli` (default) or `anthropic-api` (needs `ANTHROPIC_API_KEY`;
@@ -60,14 +66,22 @@ Never move a clinical decision or calculation into a prompt. Details, model choi
 
 1. **The LLM never does arithmetic that reaches an answer.** Extraction records intervals and stated values.
    Minutes come from `intervals.py`, and counts and verdicts from `project.py`.
-2. **Claims are not facts.** `claims` is append-only evidence. The clinical tables are derived by `reconcile.py` and
-   must be fully rebuildable from claims. Never hand-edit derived tables.
+2. **Claims are not facts.** `claims` is the evidence layer: what each document's current extraction asserts.
+   Reconciliation never writes it. It is **not** append-only: when a document is (re-)extracted (a new
+   `EXTRACTOR_VERSION` or model, or a retry after a failure), ingest deletes that document's claims and writes the new
+   set in one transaction, and (re-)attribution rewrites their `patient_mrn` (NULL while quarantined). Earlier
+   extractions are kept in `extractions` (keyed by sha256, extractor version and model) and `cache/extractions/`. The
+   clinical tables are derived by `reconcile.py` and must be fully rebuildable from claims. Never hand-edit derived
+   tables.
 3. **Precedence follows document relationships, never document date.** This covers explicit field corrections,
    retransmissions/copies and evidence tiers. There is no last-write-wins.
 4. **Uncertainty is carried as `[low, high]` bounds.** Unknown never becomes 0. Verdicts are three-valued
    (MET if it holds at both bounds, NOT_MET at neither, else UNDETERMINED).
-5. **Every quote is verified by code.** `evidence.py` locates it and computes line numbers. Unverifiable claims are
-   dropped by rule R0. Never trust LLM-reported locations.
+5. **Every quote is verified by code.** `evidence.py` locates it and computes line numbers; a fuzzy match must keep
+   every digit-bearing token. A claim is unverified (dropped by rule R0) if it has no non-blank quote of its own, a
+   quote is not found, a service event's clock times or stated minutes are not in its own quotes, or a date it carries
+   appears nowhere in its document. Other ungrounded values are flagged, not dropped (`docs/agents/EXTRACTION.md`).
+   Never trust LLM-reported locations.
 6. **No patient facts in prompts or production code.** No encounter IDs, names, dates or expected answers in
    `extract.py`, `answer.py` or the rules. Hand-derived expected values live **only** in `tests/test_pipeline.py`.
 7. **Operators hold no clinical semantics.** Eligibility, minutes and plan logic live in `reconcile.py` and
@@ -114,8 +128,14 @@ and never answer from raw `documents/`. Design for the production version: `docs
 - The CLI runs from a temp cwd with `--setting-sources ""` and `--tools ""`, so no repo `CLAUDE.md` leaks into
   extraction prompts.
 - `documents.sha256` is the identity. `doc_label` (header `Document ID`, else filename stem) is not unique: a
-  near-duplicate copy shares the label.
-- Encounter keys are `MRN|EncounterID`, or `MRN|U-<date>-<type>-<n>` for unidentified contacts.
+  near-duplicate copy shares the label. When a label is shared, results name each document `LABEL [sha12]`, and an
+  answer must cite it that way or the post-check fails (`ambiguous_citations`).
+- Encounter keys are `MRN|EncounterID`, or `MRN|U-<date>-<type>-<n>` for unidentified contacts. A disputed service
+  date or type adds `uncertain` alternative rows `<key>~<date>-<type>` that share the encounter ID and count as at
+  most one session.
+- A document that cannot be attributed to exactly one patient is **quarantined** (`quarantine` table), not given a
+  new or shared patient. Its claims stay as evidence with `patient_mrn` NULL. `ingest` lists quarantines and
+  `stats` counts them.
 - Collection-scale operators cap per-row detail at `DETAIL_LIMIT` (200) and add a note. Totals are always complete.
 - Don't run the answer pipeline concurrently with benchmarks if you need clean latency numbers.
 

@@ -7,7 +7,8 @@ a tech stack and a system design, and it lists the scalability choke points: whe
 they are (measured where possible), and how to remove them.
 
 **Measured vs estimated.** Figures marked *measured* come from `out/benchmarks.json` (31 real documents; synthetic
-query-layer scale up to 10K patients). Everything else is an estimate and is labelled as one.
+query-layer scale up to 10K patients), measured at the initial commit (`d38bc57`), before the fixes for issues
+#1–#75. Everything else is an estimate and is labelled as one.
 
 ---
 
@@ -31,11 +32,11 @@ The problem statement implies these assumptions:
 
 | Keep (it's the product's core) | Replace or extend |
 |---|---|
-| Claims ≠ facts: an append-only evidence layer, with the clinical layer derived from it | SQLite → Postgres; filesystem → object storage + events |
+| Claims ≠ facts: an evidence layer (replaced per document on re-extraction, never edited by reconciliation), with the clinical layer derived from it | SQLite → Postgres; filesystem → object storage + events |
 | Extracting intervals, never minutes; interval algebra in code | One-shot ingest CLI → durable, queue-driven workflows |
 | Precedence by relationship (corrections, copies, tiers), never by date | One patient per document → claims carry their own patient |
 | `[low, high]` bounds and MET / NOT_MET / UNDETERMINED | The answer-cache fingerprint covers the whole corpus → scope it to the patients a question touches |
-| Code-verified quotes and line spans | `.txt` only → normalisation pipeline (PDF, OCR, HL7/FHIR) |
+| Code-verified quotes and line spans | plain text only (`.txt`/`.md`) → normalisation pipeline (PDF, OCR, HL7/FHIR) |
 | Versioned extractor, rules and queries; content-hash extraction cache | Per-query projection → a materialised `patient_week` |
 | A typed `QueryPlan` over shared projection semantics; the LLM never writes SQL | Single-pass extraction → evaluated, model-routed, batched extraction |
 | Golden tests, `verify-answers`, ablation | One hand-labelled patient → a labelled gold set and continuous evaluation |
@@ -144,7 +145,7 @@ Ordered by when they bite. "Where" points at today's code.
 |---|---|---|---|---|
 | 1 | **LLM extraction throughput, cost and rate limits**: the first bottleneck | `extract.py:extract_document` via the `ThreadPoolExecutor` in `ingest.py` | *Measured:* 13.2 s/doc, 8.3K input + 1.6K output tokens, $0.045/doc list, 0.53 docs/s at concurrency 8. *Estimate:* 1M docs ≈ 10B tokens ≈ $45K list price and ~22 days at that rate | **Batch API** (−50%; throughput set by batch quota, not our threads). **Prompt caching** of the fixed prompt + schema (~90% of input). **Model routing** by eval (Sonnet 5.5 ≈ ½ price; Haiku 5.5 ≈ 1/40 where accuracy holds). A cheap classifier skips documents with no clinical events and deduplicates near-copies. Concurrency is sized to tokens-per-minute limits per key/region. *Estimate:* $8–20K for a 1M backfill, depending on the model mix |
 | 2 | **Re-extraction when the prompt or schema changes** (the whole corpus is invalidated) | `EXTRACTOR_VERSION` invalidates every cache entry | *Estimate:* the full cost of #1 again | Field-additive schema changes extract only the new fields. Shadow-evaluate on a sample; re-extract only affected document types; keep old extractions for reproducibility |
-| 3 | **Answer cache invalidated by any new document anywhere** | `answer.py:fingerprint()` hashes **all** document sha256s | With daily arrivals the hit rate is ~0% after every feed. Each miss is 20–52 s and $0.08–0.62 (*measured*) | Key on (normalised plan, versions, `max(recorded_time)` of the patients in scope). Collection-wide answers are keyed on a projection snapshot ID |
+| 3 | **Answer cache invalidated by any new document anywhere** | `answer.py:fingerprint()` hashes the content of the **whole** abstraction (documents, extractions, claims, every derived table) | With daily arrivals the hit rate is ~0% after every feed. Each miss is 20–52 s and $0.08–0.62 (*measured*). The hash itself is a full scan per lookup: ~2 ms on this corpus, ~1 s on the 10K-patient synthetic clone (timed in development) | Key on (normalised plan, versions, `max(recorded_time)` of the patients in scope). Collection-wide answers are keyed on a projection snapshot ID |
 | 4 | **Ingest rescans and rehashes the whole input directory** | `ingest.discover()` + `f.read_bytes()` on every file, every run | Fine at 31 docs. At 1M docs every incremental ingest reads the whole corpus (*estimate:* tens of GB of I/O) | Event-driven intake: hash once at upload; S3 events → queue; no scans |
 | 5 | **One patient per document** | `ingest.py` sets `documents.patient_mrn` from the document header; claims inherit it | A multi-patient roster (text labels several MRNs) or a document without a uniquely matching identity is quarantined, not attributed: its evidence is kept but counts for nobody | Per-claim `patient_ref` + a patient-matching service; reconciliation fans out to every patient touched |
 | 6 | **Collection-wide compliance queries** (N+1 per patient-week) | `project.weekly_compliance` issues a SQL query per patient-week | *Measured:* 0.93 s at 2K patients and 6.2 s at 10K (linear). *Estimate:* ~20 s at 32K and minutes at 300K | Materialised `patient_week` rows maintained on reconcile. Compliance and streak detection as one set-based SQL (window functions) or in the warehouse. Per-patient queries are already flat (0.4–0.7 ms *measured*) |

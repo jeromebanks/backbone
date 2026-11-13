@@ -14,11 +14,12 @@
 | Planner | LLM writes a `QueryPlan` (typed JSON DSL, Pydantic-validated) | 2.8–4.7 s |
 | Executor | four deterministic operators over SQLite | 7–10 ms per question |
 | Narrator | LLM writes a cited answer from the full results JSON | 15–49 s; 13K–97K input tokens |
-| Verifier | post-check: numbers ∈ results, cited documents exist, line references backed by evidence passages | 11/11 saved answers pass |
-| Cache | per question + whole-corpus fingerprint | 1.3 ms on a hit |
+| Verifier | post-check gate: numbers and dates must be stated in the results; cited documents must exist and be in the results (shared labels cited as `LABEL [sha12]`); every cited line must be inside an evidence passage. One regeneration on failure, then a flagged, uncached answer. Set membership only: no check of prose, causation, or which week/event a number belongs to | 11/11 saved answers pass | <!-- FINAL-NUMBERS -->
+| Cache | per question + fingerprint (content hash of the whole abstraction + code versions); hits are post-checked again | 1.3 ms on a hit (before the content hash and re-check were added) |
 | Interfaces | `python -m backbone ask`, and the `clinical-qa` Claude Code skill (Claude Code is the planner and narrator; the CLI is the calculator) | |
 
-**End to end: 20–52 s and $0.08–0.62 per new question (measured).** Narration dominates both. Execution is
+**End to end: 20–52 s and $0.08–0.62 per new question (measured on the 5 development questions at the initial
+commit, `out/benchmarks.json`).** Narration dominates both. Execution is
 essentially free. The design below keeps the architecture and attacks the latency, cost, concurrency and governance
 gaps.
 
@@ -69,7 +70,7 @@ Answer composer
    ├─ deterministic templates for numeric intents (tables, ranges, calculations, exclusions): no LLM
    └─ narrator LLM (streaming) for explanatory/qualitative parts, given a COMPACT results digest
    ▼
-Verifier ── post-check (numbers, document IDs, line refs); faithfulness checks on sampled answers;
+Verifier ── post-check (numbers, dates, document IDs, line refs); faithfulness checks on sampled answers;
    │        on failure: one regeneration, then fall back to the template answer plus raw results
    ▼
 Response ── streamed answer · "how this was computed" (plan, calculations, SQL) · evidence drawer · feedback buttons
@@ -95,8 +96,11 @@ Audit + analytics ── qa_exchanges (question, plan, versions, results hash, a
    with proportionally lower narration latency and cost.
 4. **Streaming and a split response.** The deterministic part (direct answer, table, calculation) renders
    immediately from results. The narrative streams in after it. The clinician sees verified numbers first.
-5. **Verification is a gate, not a log.** A post-check failure triggers one regeneration with the failures fed back.
-   If it fails again, the response falls back to the template answer. A wrong number is never shown silently.
+5. **Verification is a gate, not a log.** A post-check failure triggers one regeneration with the failures fed back
+   (the prototype does this today). If it fails again, the prototype returns the answer with a warning banner and
+   does not cache it; production falls back to the template answer instead. A number the results do not state is
+   never shown silently. The post-check is set membership, so faithfulness (right number for the right week, no
+   unsupported causal claims) still needs the sampled checks below.
 6. **Three answer tiers, always labelled:**
    - **Computed:** operators answered the question.
    - **Retrieved, not computed:** the question is outside the operators, so quoted passages are returned from
@@ -278,5 +282,5 @@ and developers working in the repo, and the production service is the same contr
 | Claude writes the QueryPlan JSON | intent templates, or the planner LLM |
 | `python -m backbone plan --summary --out` | executor + digest |
 | Claude writes the answer | template composer + streaming narrator |
-| `python -m backbone postcheck` | verifier gate with regeneration and fallback |
+| `python -m backbone postcheck` (Claude rewrites until it passes) | verifier gate with regeneration and fallback |
 | `/tmp` scratch files | `qa_exchanges` audit table |

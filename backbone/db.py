@@ -1,10 +1,19 @@
-"""SQLite persistence. Two layers:
+"""SQLite persistence.
 
-evidence layer   documents, extractions, claims, quarantine, identifier_changes, attribution_notes (ingest/extract)
-bookkeeping      pending_reconcile (patients whose evidence changed and are not yet reconciled)
-clinical layer   patients, encounters, encounter_intervals,  (derived; rebuilt per patient by reconcile.py)
+evidence layer   documents, extractions, claims                (ingest/extract; a document's claims are replaced
+                                                                when it is re-extracted, never edited by reconcile)
+attribution      quarantine, identifier_changes, attribution_notes  (ingest: unattributable documents, MRN
+                                                                corrections stated in text, non-default attribution)
+bookkeeping      pending_reconcile                             (patients whose evidence changed, not yet reconciled;
+                                                                cleared by trigger when reconcile stamps the patient)
+patients         patients                                      (created at attribution; reconcile stamps
+                                                                reconciled_at and removes a patient left with nothing)
+clinical layer   encounters, encounter_intervals,              (derived; rebuilt per patient by reconcile.py)
                  plan_requirements, assessments, observations, decisions, conflicts
-projection       v_encounter_week, v_patient_week            (SQL views over the clinical layer)
+projection       v_encounter_week                              (SQL view: each encounter with its Monday week start)
+operations       answer_cache, run_log
+
+`connect()` applies the DDL (read-write). `connect_readonly()` opens the file read-only and never runs DDL.
 """
 from __future__ import annotations
 

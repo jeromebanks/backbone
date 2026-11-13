@@ -8,11 +8,16 @@
 **Today.** `python -m backbone ingest <paths>` does everything in one process:
 - walks the folder and hashes every file;
 - extracts new hashes in a thread pool;
-- verifies quotes, writes claims;
-- reconciles the patients it touched.
+- verifies quotes and values, writes claims;
+- attributes each document to one patient, or quarantines it, and re-runs attribution for earlier quarantined and
+  name-matched documents;
+- marks the affected patients pending in the same transaction as the claims;
+- reconciles the patients it touched (and any a crashed earlier run left pending).
 
 That is correct and idempotent, but it is a single-process batch job: it re-reads the whole input on every run and
-handles one patient per document. It accepts only `.txt` files.
+handles one patient per document (a document naming several patients is quarantined). Inputs are plain text: a
+directory walk picks up `.txt` and `.md` files (any case, recursively), and a file named explicitly on the command
+line is read whatever its suffix. Bytes are hashed as-is and decoded as UTF-8, with undecodable bytes replaced.
 
 **Principle that makes scaling easy: reconciliation is order-independent.** Precedence follows document
 relationships (corrections, copies, evidence tiers), never arrival or document date. So the pipeline needs **no

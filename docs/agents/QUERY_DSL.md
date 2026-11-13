@@ -29,7 +29,7 @@ There are two front-ends that build the **same object**:
 | `care` | `select_encounters`, `aggregate` | totals with bounds, `by_service_type`, groups (bucketed once), facts per encounter (an `uncertain` row adds `counted_minutes`, its 0..high contribution, #65), exclusions with records (plus R0-rejected claims when `include_excluded`), R0–R4/R7/R9 decisions, evidence |
 | `compliance` | `weekly_compliance`, `consecutive_runs` | rejects `scope.service_types` (each goal counts the types its plan states; validation error since #47, an `unsupported` envelope for unvalidated steps); weeks (status, evaluations per requirement set, `minutes_calculation`, notes), runs, exclusions, R2/R3/R4/R9 decisions, plan evidence |
 | `timeline` | encounters, claims, relations, assessments, observations | documents with what each asserted (disposition, arrival/departure, intervals) and corrections/retransmissions; an assertion is listed under the primary encounter row when it is shown, with `identity_alternatives` naming the shown `~` alternative rows that share the claim (#67); assessments with `copies_not_counted`; `exclusions` lists R0-rejected claims in scope (dated by a date the claim's document states; a claim with none, or whose date ingest found nowhere in its document (`unverified_absent`, #52/#68, named in `unstated_dates`), is listed for every scope, flagged `undated: true`, after the dated ones and with a note (#60); a claim's service type must match `service_types`) |
-| `compare` | `plan_change_dates`, `aggregate` | before/after totals, minutes per week, by type, conflicts, evidence; an explicit note when there is no plan change. Both sides are clipped to the scope; a split outside it gives one side and a note |
+| `compare` | `plan_change_dates`, `aggregate` | before/after totals, minutes per week, by type, conflicts, evidence. `split="plan_change"` splits at the first day in (start, end] on which a non-empty requirement set different from the previous day's takes effect (a revision, a first plan starting inside the scope, a plan resuming after a gap; compared by requirement signature, so an identical restatement is no change). A day on which requirements simply stop applying is not a change. Later changes are named in a note but not split; no change gives an explicit note. Both sides are clipped to the scope; a split outside it gives one side and a note |
 
 Rules for operators:
 - They take semantics only from `project.py` and never re-derive eligibility or minutes.
@@ -70,19 +70,24 @@ Rules for operators:
 - The planner (effort `medium`) produces a `QueryPlan`, and `question` is overwritten with the user's text. If
   there are no steps and `unsupported_reason` is set, the answer is "Not answerable with the supported operations".
 - The narrator (effort `medium`) produces `NarrativeOut{answer_markdown, unresolved[], caveats}`. It is given rules:
-  only numbers from the results, no new arithmetic, cite `(DOC-ID L<lines>)` using only listed line numbers (never a
-  range over non-adjacent lines: `L6–7, L9`, not `L6–9`), separate fact from interpretation, and list exclusions.
+  only numbers from the results, no new arithmetic (including compounds such as a derived "10-minute" gap), only
+  dates the results state (no derived dates such as the days after a period ends), cite `(DOC-ID L<lines>)` using
+  only listed line numbers (never a range over non-adjacent lines: `L6–7, L9`, not `L6–9`), cite a shared label as
+  `LABEL [sha12]`, separate fact from interpretation, and list exclusions. These are instructions; the post-check
+  below is what is enforced.
 - `postcheck` checks these things against the results **minus the echoed `question`, `plan`, each step's
   `params` and SQL text**, so a number or document the asker typed cannot back itself. A parameter value counts only
   where the operator also states it in its computed output:
-  - Every number in the narrative (excluding IDs, line refs, short shas, and calendar notation: ISO dates and
-    datetimes, clock times, `1/7`, month-name dates including day lists such as `Jan 8, 15 and 27`, `January 2026`)
-    must be a number the results **state** (`_known_numbers`, #44): any JSON number, or a free-standing number in a
-    human-readable string (calculations, reasons, notes, statements, evidence quotes). Identifier fields (`claim_id`,
-    `doc_id`, `file`, `lines`, `rule`, `requirement`, `*_key`, `*_id`, `*_sha` …) contribute nothing, and inside
-    strings the same calendar notation plus keys (`MRN|…`), claim IDs, hex and label-like tokens (`BH-D103`,
-    `PHQ-9`, `note_88.txt`) are removed first. Before #44 an unanchored digit scan admitted the digits of hex, keys
-    and dates (on DEV-01, 71 of the integers 0–200; now 20).
+  - Every number in the narrative (excluding IDs such as `BH-D103` or `PHQ-9`, unidentified-contact keys, line
+    refs, short shas, and calendar notation: ISO dates and datetimes, clock times, `1/7/2026`, zero-padded `01-26`,
+    month-name dates including day lists such as `Jan 8, 15 and 27`, `January 2026`) must be a number the results
+    **state** (`_known_numbers`, #44): any JSON number, or a free-standing number in a human-readable string
+    (calculations, reasons, notes, statements, evidence quotes). Identifier fields (`claim_id`, `doc_id`, `file`,
+    `lines`, `rule`, `requirement`, `*_key`, `*_id`, `*_sha` …) contribute nothing, and inside strings the same
+    calendar notation plus year-less `1/7`, keys (`MRN|…`), claim IDs, hex and label-like tokens (`BH-D103`, `PHQ-9`,
+    `note_88.txt`) are removed first. Before #44 an unanchored digit scan admitted the digits of hex, keys and dates
+    (on DEV-01, 71 of the integers 0–200; now 20). Numbers joined to a hyphen are checked too: `10-minute` and both
+    ends of `30-45` (#69). A year-less `4/5` in the answer is checked as two numbers (it may be a ratio).
   - Cited labels are matched against **the corpus's own document labels**, optionally followed by `[sha12]`. A
     cited document that does not appear in the results (`documents_not_in_results`) fails the check, as does a
     `[sha12]` that no document with that label has (`unknown_documents`), and a label several documents share cited
@@ -90,6 +95,13 @@ Rules for operators:
   - Every line of every `L<a>` or `L<a>–<b>` in a citation group must fall inside an evidence passage for that
     document. Adjacent passages may together cover a range; a reversed range fails. Passages are keyed by
     `(doc_id, doc_sha)`, so two same-label documents never back each other's lines (#59).
+  - Every date in the narrative (ISO, `m/d/yyyy`, zero-padded `01-26`, `January 7, 2026`, `Jan 26–Feb 1`, day lists,
+    `26 January 2026`) must be stated in the computed output, be a `start`/`end` of some step's scope, or be the last
+    day (Sunday) of a Monday–Sunday week the results report (`dates_not_in_results`, #70). A year-less date matches
+    any year.
+  - It does **not** check: whether a backed number or date is attached to the right week, encounter or patient (any
+    number in an evidence quote counts as stated); numbers written as words; clock times; uncited statements;
+    prose, interpretation or causation.
 - The post-check is a gate in `answer_question`. A failing narration is regenerated once, on the same results, with
   the failures and the previous answer in the prompt. If it still fails, the answer is returned with
   `postcheck.ok = false`, a warning banner in its Markdown, and is **not** cached. On a cache hit the post-check is
@@ -148,5 +160,7 @@ Question-coverage gaps (what clinicians will ask that we can't answer) are in
   say the count is not computed. Never count by hand.
 
 - There is no second planning round: if the first plan misses something, the narrator says what the results lack.
-- The post-check validates numbers and citations, not prose claims.
-- The narrator receives the full evidence JSON (13K–97K input tokens).
+- The post-check validates numbers, dates and citations by set membership, not prose claims or which event a
+  number belongs to.
+- The narrator receives the full evidence JSON (13K–97K input tokens on the 5 development questions, measured at the
+  initial commit).

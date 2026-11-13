@@ -36,7 +36,7 @@ typos are forgiven but a changed number is not. Spans go into `claims.evidence` 
 own and every quote was found. A blank quote is a `missing` span, not something to skip. A service event's
 nontherapeutic-interval quotes are verified too, but they cannot stand in for the event's own `quotes`. The document
 claim carries no quotes and is exempt. Unverified claims are dropped by R0. In this corpus 254 claims
-were extracted, with 0 fuzzy matches and 0 unverified quotes (1 claim is unverified for an absent date; see below).
+were extracted, with 0 fuzzy matches and 0 unverified quotes (1 claim is unverified for an absent date; see below). <!-- FINAL-NUMBERS -->
 
 ## Value grounding (`evidence.ground_values`, `ingest.grounding_fields`) — a flag, not a filter (#36)
 
@@ -56,7 +56,7 @@ Why a flag: measured on the corpus (223 non-document claims), 165 have a value n
 dates taken from the header (165 `document`). Times: 116 `quote`, 1 `document`; stated minutes: 11/11 `quote`;
 scores/thresholds: 4 `quote`, 2 `document`. Only **one** value is `absent` from the whole document (BH-D015, an
 observation dated the day before the note, inferred from "a poor night of sleep"). Dropping on ungrounded values would
-have removed real evidence and moved golden results. An `absent` date is now R0-fatal (#52); on the corpus this
+have removed real evidence and moved golden results. An `absent` date is now R0-fatal (#52); on the corpus, once `out/backbone.db` is rebuilt, this
 rejects exactly that BH-D015 observation (one `observations` row fewer, one R0 decision more; golden values
 unchanged). `python -m backbone stats` reports these counts per kind.
 
@@ -76,7 +76,9 @@ every entry: the 31 documents cost ~$1.38 at list price and take ~60 s at concur
 - `anthropic-api`: `client.beta.messages.stream` with `output_config={"effort", "format": json_schema}` and
   server-side `fallbacks="default"`, checking `stop_reason == "refusal"`. **Never exercised** (no key was available).
 - `complete_json` sanitises the schema (strips `discriminator`), validates with Pydantic, and retries twice on
-  transport or validation errors. A schema rejection is not retried.
+  transport or validation errors. A validation error (Pydantic, or a validator such as compliance rejecting
+  `service_types`) is fed back to the next attempt; transport errors are retried unchanged. A schema rejection is
+  not retried.
 - Ingest runs extraction in a thread pool (`BACKBONE_CONCURRENCY`, default 6). A failed document is logged in the
   stats and does not stop the run.
 

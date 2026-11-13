@@ -263,7 +263,8 @@ deterministic code.</p>
   computed in a single module, so every query uses the same semantics.</p></div>
   <div class="card"><h3 style="margin-top:0">4 · Questions: a typed query plan</h3><p class="small">The LLM turns a
   question into a validated <code>QueryPlan</code> over four operators. Code executes it in milliseconds. The LLM
-  then writes the answer from the results alone, and a post-check verifies every number and citation.</p></div>
+  then writes the answer from the results alone. A post-check gate rejects any number or date the results don't
+  state and any citation not backed by an evidence passage; it does not judge the prose.</p></div>
 </div>
 
 <h2 id="results">Weekly results</h2>
@@ -322,16 +323,16 @@ records that mention it, the verified source passages, and the rules applied.</p
 <h2 id="rules">Reconciliation rules</h2>
 <div class="tablewrap"><table>
 <tr><th>Rule</th><th>What it does</th></tr>
-<tr><td><b>R0</b></td><td>Reject any claim whose quote cannot be located in the source text (none rejected in this corpus).</td></tr>
-<tr><td><b>R1</b></td><td>Encounter identity by ID; otherwise same date + service type (+ overlapping times); otherwise a separate contact.</td></tr>
-<tr><td><b>R2</b></td><td>Drafts, templates and billing rows are not attendance evidence.</td></tr>
-<tr><td><b>R3</b></td><td>Explicit corrections replace only the field they correct; retransmitted copies carry no independent weight. Precedence follows relationships, never document date.</td></tr>
-<tr><td><b>R4</b></td><td>Evidence tiers (notes, registers, corrections, platform logs above schedule listings). Disagreement within the deciding tier is a dispute, carried as a range.</td></tr>
+<tr><td><b>R0</b></td><td>Reject a claim with no quote of its own, a quote that cannot be located in the source text (a fuzzy match may not change a digit), service-event times or stated minutes missing from its own quotes, or a date its document never states (none rejected in this corpus).</td></tr> <!-- FINAL-NUMBERS -->
+<tr><td><b>R1</b></td><td>Encounter identity by ID; otherwise the one encounter with the same date and service type whose actual times overlap; otherwise a separate contact. A disputed date or type becomes alternative "uncertain" rows counted as at most one session, never a majority pick.</td></tr>
+<tr><td><b>R2</b></td><td>Drafts, templates and billing rows are not attendance evidence. Requirements from a draft plan are not operative.</td></tr>
+<tr><td><b>R3</b></td><td>Explicit corrections replace only the field they correct (arrival, departure, disposition, contact interval, service type). They are resolved as a graph, so claim order never matters: a chain ends at its last value, and competing corrections keep every alternative as a range plus a conflict. A correction that can't be applied is reported. Retransmitted copies carry no independent weight and cover only the records they name. Precedence follows relationships, never document date.</td></tr>
+<tr><td><b>R4</b></td><td>Evidence tiers (notes, registers, corrections, platform logs above schedule listings). Disagreement within the deciding tier is a dispute, carried as a range. Breaks, disconnections and absences are decided per kind; different accounts of one kind are alternatives, never added together.</td></tr>
 <tr><td><b>R5</b></td><td>A session counts if it is psychotherapy, attended, and the patient was present. Unknown attendance is "uncertain", never zero.</td></tr>
-<tr><td><b>R6</b></td><td>Minutes = present intervals − breaks − disconnections − patient-absent portions.</td></tr>
+<tr><td><b>R6</b></td><td>Minutes = present intervals − breaks − disconnections − patient-absent portions. An inverted, overnight or incomplete interval gives unknown minutes with a flag, never a silent zero.</td></tr>
 <tr><td><b>R7</b></td><td>A patient cannot be in two encounters at once; overlaps are flagged.</td></tr>
 <tr><td><b>R8</b></td><td>Assessments are identified by instrument, completion date and form; imports and copies are not new assessments.</td></tr>
-<tr><td><b>R9</b></td><td>Plan requirements apply by effective date. A revision supersedes earlier goals from its start date. A week spanning a change is judged on whole-week totals against each plan, and is UNDETERMINED if they disagree.</td></tr>
+<tr><td><b>R9</b></td><td>Plan requirements apply by effective date. A revision supersedes earlier goals from its start date. A week spanning a change is judged on whole-week totals against each plan, and is UNDETERMINED if they disagree. Each goal counts its own service types; a goal over a period other than Monday–Sunday weeks is UNDETERMINED (unsupported).</td></tr>
 </table></div>
 
 <h2 id="uncertainty">Uncertainty: ranges and three-valued verdicts</h2>
@@ -349,11 +350,11 @@ deterministic code. Full detail, model choice and cost projections are in <code>
 <tr><td>Extraction (one call per document)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>What each document asserts: intervals, dispositions, signatures, corrections, assessments, with quotes</td><td>Quotes verified by code; no durations or conflict resolution; cached per document hash</td></tr>
 <tr><td>Quote verification, claims, reconciliation (R0–R9), interval arithmetic, plan verdicts, SQL operators</td><td><span class="pill MET">Deterministic</span></td><td>n/a</td><td>Versioned rules; golden tests; byte-identical reruns</td></tr>
 <tr><td>Planner (question → QueryPlan)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>Which operations and scope answer the question</td><td>Schema-validated plan only; no SQL or code; the plan is shown with every answer</td></tr>
-<tr><td>Narrator (results → answer)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>Wording and which computed facts to present</td><td>Post-check: every number in the results, every citation backed by evidence</td></tr>
+<tr><td>Narrator (results → answer)</td><td><span class="pill UNDETERMINED">LLM</span></td><td>Wording and which computed facts to present</td><td>Post-check gate: numbers and dates must appear in the results, cited lines must be inside evidence passages; one regeneration, then the answer is flagged and not cached. Prose and causation are not checked</td></tr>
 <tr><td>Post-check, caches, verification, exports</td><td><span class="pill MET">Deterministic</span></td><td>n/a</td><td>n/a</td></tr>
 </table></div>
-<p class="small muted">Measured: extraction $0.045 per document (list-price equivalent, Opus 5.5); answers $0.08–0.62 per new
-question, dominated by narration. Estimated: a 1M-document batched backfill costs ~$15K with Opus, ~$7.7K with Sonnet
+<p class="small muted">Measured at the initial commit: extraction $0.045 per document (list-price equivalent, Opus 5.5);
+answers $0.08–0.62 per new question, dominated by narration. Estimated: a 1M-document batched backfill costs ~$15K with Opus, ~$7.7K with Sonnet
 and ~$0.4K with Haiku, with the model mix decided by a gold-set eval.</p>
 
 <h2 id="dsl">The query DSL</h2>
@@ -363,9 +364,9 @@ of four operators:</p>
 <div class="tablewrap"><table>
 <tr><th>Operator</th><th>Returns</th></tr>
 <tr><td><code>care</code></td><td>Sessions, therapy days and minutes/hours (with ranges) by type, day, week or patient; optionally every record that doesn't count, and why.</td></tr>
-<tr><td><code>compliance</code></td><td>Per week: the goal in effect, delivered totals, the verdict, exclusions; runs of N weeks below goal (definite vs dependent on unresolved records).</td></tr>
+<tr><td><code>compliance</code></td><td>Per week: the goal in effect, delivered totals, the verdict, exclusions; runs of N weeks below goal (definite vs dependent on unresolved records). Each goal counts the service types its plan states, so this operator takes no service-type filter.</td></tr>
 <tr><td><code>timeline</code></td><td>Chronology of encounters, documents (and what each asserted), decisions, assessments and observations. A one-day scope reconstructs that day.</td></tr>
-<tr><td><code>compare</code></td><td>Care before vs after a date or a treatment-plan change.</td></tr>
+<tr><td><code>compare</code></td><td>Care before vs after a date, or the first day a new or different treatment-plan requirement set takes effect (a plan that just ends is not a change). Both sides stay inside the requested dates.</td></tr>
 </table></div>
 <div class="grid2">
 <div><h3>As JSON (what the model emits)</h3>
@@ -395,11 +396,13 @@ evidence passage.</p>
 <p>The same weekly projection, re-run after treating the records the way common shortcuts would. Outlined cells are
 verdicts that differ from this system's.</p>
 <div class="tablewrap"><table id="ablation"></table></div>
-<p class="small muted">Five of the seven shortcuts flip at least one weekly verdict. "Latest document wins" leaves
+<p class="small muted">Six of the seven shortcuts flip at least one weekly verdict. "Latest document wins" leaves
 the verdicts alone but inflates week 3's minutes and creates an impossible overlap between two sessions.</p>
 
 <h2 id="performance">Performance &amp; scale</h2>
-<p>All figures are measured on a laptop (<span id="machine"></span>). Scale figures use a <b>synthetic</b>
+<p>All figures are measured on a laptop (<span id="machine"></span>), at the initial commit, before the fixes for
+issues #1–#75; they have not been re-measured since. Answer lookups now also hash the abstraction's content (about
+2 ms here) and re-run the post-check on a cache hit. Scale figures use a <b>synthetic</b>
 collection: the real patient's reconciled records cloned per patient, which measures the query layer only.</p>
 <div class="tablewrap"><table id="perf"></table></div>
 <div class="tablewrap"><table id="scale"></table></div>
@@ -419,7 +422,11 @@ Postgres plus a queue of patients whose records changed.</li>
 <li><b>Extraction is a single pass.</b> Passing mentions of appointments sometimes become separate "unidentified
 contacts". They never count as therapy, but they add noise. Next: an agreement harness (k runs, cheaper models)
 measuring field-level stability, and stricter handling of mentions.</li>
-<li>The post-check verifies numbers and citations, not prose interpretation.</li>
+<li>The post-check checks that numbers and dates appear in the results and that citations are backed by evidence
+passages. It does not check that a number belongs to the right week or event, numbers written as words, prose
+interpretation or causation.</li>
+<li>A document that can't be attributed to exactly one patient is quarantined: kept as evidence, counted for
+nobody, until a later ingest can attribute it.</li>
 <li>There is no second planning round if the first query plan is insufficient.</li>
 <li>Provider identities are not merged, deliberately: "N. Ellis" at the desk is not assumed to be "Nora Ellis, LCSW".</li>
 <li>The API-key LLM backend is implemented but not exercised; all results used a Claude subscription via Claude Code.</li>
@@ -438,7 +445,7 @@ measuring field-level stability, and stricter handling of mentions.</li>
 
 <h2 id="run">Running it</h2>
 <pre><code>python -m pytest -q                                   # full test suite, no LLM calls
-python -m backbone verify-answers                     # saved answers reproduce exactly
+python -m backbone verify-answers                     # read-only: saved results identical + post-check passes
 python -m backbone plan plans/weekly_compliance.json  # hand-written plan, no LLM
 python -m backbone ingest path/to/new_doc.txt         # extracts only new docs; re-reconciles that patient
 python -m backbone ask "Which weeks met the day goal but not the minute goal?"

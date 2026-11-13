@@ -15,7 +15,7 @@ documents/ ─ingest (sha256)─► documents ─extract (LLM, cached per sha256
                                                                               │
 question ─LLM─► QueryPlan (typed JSON DSL, validated) ─► 4 operators (read-only parameterized SQL) ─► results envelope
                                                                               │
-                                     LLM narrates ONLY from results ─► post-check (numbers, doc IDs, line refs)
+                                     LLM narrates ONLY from results ─► post-check gate (numbers, dates, documents, line refs)
 ```
 
 **Docs:** open [`docs/index.html`](docs/index.html) for a visual overview, including an interactive encounter timeline
@@ -27,7 +27,7 @@ is in [`docs/ROADMAP.md`](docs/ROADMAP.md), with deeper designs for [ingestion](
 ## Results on the development questions
 
 Full answers with citations, plans, arithmetic and evidence tables: [`out/answers/ANSWERS.md`](out/answers/ANSWERS.md)
-(and `out/answers/DEV-0x.md` per question). Every answer passed the post-check.
+(and `out/answers/DEV-0x.md` per question). Every answer passed the post-check. <!-- FINAL-NUMBERS -->
 
 | Week (Mon–Sun) | Therapy sessions counted (patient-present minutes) | Days | Minutes | Goal ≥3 days & ≥150 min |
 |---|---|---|---|---|
@@ -72,10 +72,16 @@ pip install -e '.[dev]'          # or: uv sync --extra dev
 python -m pytest -q                                   # full test suite, no LLM calls
 python -m backbone stats                              # what is in the abstraction
 python -m backbone plan plans/weekly_compliance.json  # run a hand-written query plan (no LLM at all)
-python -m backbone verify-answers                     # re-execute every saved answer's plan: results must be identical
+python -m backbone verify-answers                     # read-only: re-run every saved plan + post-check; exit 1 on any change or failure
+python -m backbone verify-answers --rewrite           # also refresh the saved post-check fields and Markdown (results untouched)
 python -m backbone export --patient HG-M042           # out/abstraction/HG-M042.json (+ .graph.json)
-python -m backbone benchmark                          # out/benchmarks.json
 ```
+
+`verify-answers` opens the database read-only and writes no files unless `--rewrite` is given. It exits 1 when any
+saved plan's results differ from the saved results, when any saved answer fails the current post-check, or when it
+finds no saved answer to check. `python -m backbone benchmark` (writes `out/benchmarks.json`) is offline except for
+its cached-repeat step, which asks the first development question 5 times against `out/backbone.db`: up to 5 full
+LLM answer runs if that answer is not in the cache (or fails the post-check and so is never cached).
 
 LLM-backed commands (new documents, new questions) use **Claude Opus 5.5**. By default they call Claude Code
 headless (`claude -p`), which uses a Claude subscription login. All results here were produced that way.
@@ -92,8 +98,13 @@ python -m backbone answer questions.json              # -> out/answers/DEV-0x.{m
 
 **Adding documents never rebuilds the abstraction.** Ingest hashes each file; byte-identical files are recorded
 as extra paths of the same document; only new hashes are extracted; only the patients whose evidence changed are
-re-reconciled (milliseconds per patient). **New questions never re-read documents**: they compile to a `QueryPlan`
-over the saved tables. Repeated questions are served from an answer cache keyed by the abstraction fingerprint.
+re-reconciled (milliseconds per patient). Patients whose evidence changed are marked pending in the same transaction
+as the claims, so a crash before reconciliation is picked up by the next `ingest` or `reconcile`. A document that
+cannot be attributed to exactly one patient is quarantined (kept as evidence, counted for nobody) and re-attributed
+automatically once it can be. **New questions never re-read documents**: they compile to a `QueryPlan` over the saved
+tables. Repeated questions are served from an answer cache keyed by the abstraction fingerprint, a content hash of
+the documents, extractions, claims and derived tables plus the code versions; a cached answer is post-checked again
+before it is served.
 
 The query DSL can also be used directly from Python:
 
@@ -117,12 +128,20 @@ conflicts**. It records intervals as written: scheduled times, arrival and depar
 disconnections, and portions without the patient.
 
 Every claim carries verbatim quotes. `backbone/evidence.py` locates each quote in the source text and converts it to
-**line numbers computed by code**; claims whose quotes cannot be found are rejected (rule R0). In this corpus 0 of
-the claims needed fuzzy matching and none were rejected.
+**line numbers computed by code**. A fuzzy match is accepted only if every token containing a digit (times, minutes,
+IDs) is unchanged. A claim is rejected (rule R0) when it has no quote of its own, a quote cannot be found, a service
+event's clock times or stated minutes are not in its own quotes, or a date it carries appears nowhere in its
+document. Other values not stated in the claim's own quotes (typically a date taken from the header) are flagged,
+not rejected. In this corpus 0 of the claims needed fuzzy matching and none were rejected. <!-- FINAL-NUMBERS -->
 
 Cross-document links use only keys the text states, because one call sees one document. For example, D103 states
 "departure for HG-E110 is 11:15, replacing 11:30", and D014 states "copied result from form HG-Q116 completed
 2026-01-16". Reconciliation resolves those keys.
+
+Each document is attributed to one patient by its MRN (checked against the MRN printed in the text), else by a
+unique name (and DOB) match, else by the single MRN the text prints. An explicit "MRN X corrected to Y" moves every
+document carrying X. A document that names several patients, or that matches none or several, is **quarantined**
+instead of being guessed. No corpus document is quarantined.
 
 Extractions are cached by `(sha256, extractor version, model)` in `cache/extractions/`, so the whole abstraction
 rebuilds from scratch with zero LLM calls.
@@ -133,16 +152,16 @@ Every consequential choice is written to `decisions`, and every unresolved disag
 
 | Rule | What it does | Where it matters in this corpus |
 |---|---|---|
-| R0 | reject claims whose quotes are not in the source | (none rejected) |
-| R1 | encounter identity by ID; otherwise same date + type (+ overlapping times); otherwise a separate contact | D015/D103 mentions without IDs |
-| R2 | drafts, templates and billing rows are not attendance evidence | D112 unsigned template + posted charge for no-show E116 |
-| R3 | field-scoped explicit corrections; retransmitted copies carry no independent weight; **precedence follows relationships, never document date** | D103 corrects E110 departure; D104 (received later) is a resend of the uncorrected roster |
-| R4 | evidence tiers (notes, registers, corrections, platform logs > schedule listings, notices); disagreement within the deciding tier becomes a **dispute carried as bounds** | E115: D110 says 09:00–09:50, D111 says 09:10–09:50 |
+| R0 | reject claims without a quote of their own, with a quote not in the source, with service-event times or stated minutes not in their own quotes, or with a date absent from the document | (none rejected) | <!-- FINAL-NUMBERS -->
+| R1 | encounter identity by ID; an ID-less record joins the one encounter with the same date and type whose actual times overlap its own (when both state times); otherwise a separate contact. A disputed date or type becomes `uncertain` alternative rows, counted as at most one session, never a majority pick | D015/D103 mentions without IDs |
+| R2 | drafts, templates and billing rows are not attendance evidence; requirements from a draft plan are not operative | D112 unsigned template + posted charge for no-show E116 |
+| R3 | field-scoped explicit corrections (arrival, departure, disposition, contact interval, service type), resolved as a **graph** in any claim order: a chain ends at its last value; competing corrections or a cycle keep every alternative as disputed bounds plus a conflict; a correction that cannot be applied is reported. Retransmission and copy relations cover only the records they name. **Precedence follows relationships, never document date** | D103 corrects E110 departure; D104 (received later) is a resend of the uncorrected roster |
+| R4 | evidence tiers (notes, registers, corrections, platform logs > schedule listings, notices); disagreement within the deciding tier becomes a **dispute carried as bounds**. Breaks, disconnections and absences are decided per kind by the first tier that states that kind; different accounts of one kind are alternatives, never summed | E115: D110 says 09:00–09:50, D111 says 09:10–09:50 |
 | R5 | a session counts if it is psychotherapy, attended, with the patient present; unknown attendance is *uncertain*, never 0 | collateral (E109), coordination (E114), med management (E106, E120) |
-| R6 | **minutes = present intervals − breaks − disconnections − patient-absent portions**; stated totals are only cross-checks | group breaks, late arrival (E113), partner-only 15 min (E119: note says 45, counted 30) |
+| R6 | **minutes = present intervals − breaks − disconnections − patient-absent portions**; stated totals are only cross-checks. An inverted, overnight or incomplete interval gives unknown minutes with a flag, never a silent 0 | group breaks, late arrival (E113), partner-only 15 min (E119: note says 45, counted 30) |
 | R7 | one patient cannot be in two places at once; overlaps are flagged | the superseded 11:30 departure would overlap E111 at 11:15, which supports the correction |
 | R8 | assessments are identified by (instrument, completion date, form ID); imports and copies are not new assessments | D014 (filed Jan 26) copies the Jan 16 PHQ-9 |
-| R9 | plan requirements apply by **effective date**: a revision supersedes earlier requirements from its effective date; identical restated goals count once; conflicting same-date goals are each evaluated. A week spanning a change is judged on **whole-week totals against each requirement set**, and is UNDETERMINED if they disagree | E101 at 09:00 precedes the plan signature (13:05) on the plan's first day; it is counted and the decision is logged. Mid-week revisions, restated goals and conflicts are tested on fixtures, since the corpus has a single plan |
+| R9 | plan requirements apply by **effective date**: a revision supersedes earlier requirements from its effective date; identical restated goals count once; conflicting same-date goals are each evaluated. A week spanning a change is judged on **whole-week totals against each requirement set**, and is UNDETERMINED if they disagree. Each requirement counts its own service types; a period other than Mon–Sun weeks is UNDETERMINED (unsupported); `==` is MET only when both bounds equal the threshold | E101 at 09:00 precedes the plan signature (13:05) on the plan's first day; it is counted and the decision is logged. Mid-week revisions, restated goals and conflicts are tested on fixtures, since the corpus has a single plan |
 
 ### 3. Shared projection + typed query plans (the DSL)
 `backbone/project.py` is the **only** place that turns encounters into numbers. Every quantity is a `[low, high]`
@@ -150,15 +169,16 @@ bound. Plan verdicts are mechanical: **MET** if the requirement holds at both bo
 neither, otherwise **UNDETERMINED**. "Unknown" never silently becomes 0.
 
 Questions compile to a `QueryPlan` (`backbone/query.py`): a list of typed steps, each with a shared `Scope`
-(patients or `"all"`, dates, service types, include excluded records, include evidence). There are four operators
+(patients or `"all"`, dates, service types (not allowed on `compliance`), include excluded records, include evidence).
+There are four operators
 (`backbone/operators.py`):
 
 | op | returns |
 |---|---|
 | `care(group_by)` | sessions, distinct therapy days and minutes/hours with bounds, by type/day/week/patient; with `include_excluded`, every record that does not count and why |
-| `compliance(consecutive_below)` | per Mon–Sun week: the goal in effect, delivered totals, MET/NOT_MET/UNDETERMINED, exclusions; runs of N weeks below goal, marked *definite* or *depends on unresolved documentation* |
+| `compliance(consecutive_below)` | per Mon–Sun week: the goal in effect, delivered totals, MET/NOT_MET/UNDETERMINED, exclusions; runs of N weeks below goal, marked *definite* or *depends on unresolved documentation*. Each goal counts the service types its plan states, so a `service_types` scope is rejected at validation |
 | `timeline(kinds)` | chronology of encounters, documents (and what each asserted), decisions, assessments, observations; a one-day scope reconstructs that day |
-| `compare(split)` | care before vs after a date or a treatment-plan change |
+| `compare(split)` | care before vs after a date, or the first day a new or different treatment-plan requirement set takes effect (a plan ending with nothing in its place is not a change); both sides are clipped to the scope |
 
 All operators return one machine-readable envelope: `totals`, `groups`, `facts`, `calculation` (human-readable
 arithmetic), `exclusions`, `conflicts`, `decisions`, `evidence` (doc, file, lines, quote) and the exact
@@ -170,8 +190,12 @@ front-end that builds the identical `QueryPlan`.
 1. The planner LLM call maps question → `QueryPlan`, validated against the schema.
 2. Code executes the plan in milliseconds.
 3. The narrator LLM call writes the answer **only from the results**, citing `(DOC-ID L<lines>)`.
-4. A **post-check** flags any number in the answer that is not in the computed results, any unknown document, and
-   any line reference outside an evidence passage.
+4. A **post-check** gates the answer. It fails on a number (including in compounds such as "10-minute") or a date
+   that the computed results do not state, a cited document that is unknown or not in the results, a shared label
+   cited without its `[sha12]`, and any cited line not inside an evidence passage. A failing answer is regenerated
+   once with the failures fed back; if it still fails it is returned with a warning banner and not cached. The
+   check is set membership: it does not verify that a stated number belongs to the right week or event, and it
+   does not check prose claims or causation.
 
 Each answer file (`out/answers/DEV-0x.md`) shows the answer, the plan, the arithmetic, the post-check and a table of
 every evidence passage.
@@ -196,10 +220,11 @@ the same projection after editing a copy of the reconciled encounters the way co
 
 ⚠ = verdict differs from this system.
 
-**What I learned.** Each simple rule that seems reasonable (scheduled duration, stated session length, the most
-recent document, the primary note, a posted charge, partner-family contact) changes **at least one weekly verdict**,
-except "latest document wins", which changes the minutes (and creates an impossible overlap that R7 detects). Three of
-the four weekly verdicts are fragile. Week 4 is the instructive case: a pipeline that picks *either* E115 note flips
+**What I learned.** Six of the seven simple rules that seem reasonable (scheduled duration, a draft or posted charge
+as attendance, picking either E115 note, the stated E119 session length, partner-only contact as family therapy)
+change **at least one weekly verdict**. The seventh, "latest document wins", leaves the verdicts alone but changes
+week 3's minutes (180 → 195) and creates an impossible overlap that R7 detects. Three of the four weekly verdicts are
+fragile. Week 4 is the instructive case: a pipeline that picks *either* E115 note flips
 week 4 to a confident MET or NOT_MET. The record supports neither, and the bounds make that visible instead of hiding
 it. The same mechanism makes the answer to "who had two consecutive weeks below goal" robust: Rowan qualifies on
 weeks 1–2 regardless of the week 4 dispute (`definite`, not `depends_on_unresolved`).
@@ -220,12 +245,14 @@ so a mention ("next appointment remains Jan 9") is a `reference`, not a `service
 data to choose the cheapest model that preserves this corpus's reconciled results, which is the main cost lever at scale.
 
 **Also known:**
-- One clinical day per service (no overnight encounters).
+- Minutes are computed within one service date. An overnight, inverted or incomplete interval is not interpreted:
+  it gives unknown minutes with a flag (bounded only by a valid schedule).
 - Times are local, with no time-zone handling.
 - Provider identity is not resolved: "N. Ellis" (desk staff) vs "Nora Ellis, LCSW" is deliberately not merged.
 - Observation statements are LLM paraphrases (their quotes are verified).
-- The narrator can still phrase interpretations. The post-check verifies numbers, documents and line references,
-  not prose.
+- The narrator can still phrase interpretations. The post-check checks that numbers and dates appear in the
+  results and that citations are backed by evidence passages. It does not check that a number is attached to the
+  right week or event, numbers written as words, prose claims or causation.
 - There is no second planning round if the first plan is insufficient.
 - **Question coverage is narrower than a real review.**
   - There is no operator yet for: no-show and cancellation counts, signature timeliness, authorization use (the
@@ -236,7 +263,11 @@ data to choose the cheapest model that preserves this corpus's reconciled result
 ## Performance (measured)
 
 All figures below were measured on an Apple-silicon Mac (Darwin arm64, Python 3.12, SQLite 3.48). Raw numbers are in
-[`out/benchmarks.json`](out/benchmarks.json) (`python -m backbone benchmark`).
+[`out/benchmarks.json`](out/benchmarks.json) (`python -m backbone benchmark`). They were measured at the initial commit
+(`d38bc57`), **before** the fixes for issues #1–#75, and have not been re-measured since. Some paths now do more work:
+every answer lookup first hashes the abstraction's content (about 2 ms on this corpus, timed during development, not
+benchmarked), a cache hit re-runs the post-check, and every ingest re-runs attribution for quarantined and
+name-matched documents.
 
 | What | Measured |
 |---|---|
@@ -249,7 +280,7 @@ All figures below were measured on an Apple-silicon Mac (Darwin arm64, Python 3.
 | Per-patient operators on the real abstraction (median) | care by week 0.4 ms · compliance 0.7 ms · reconstruct day 0.2 ms · symptom course 1.6 ms · care with exclusions + evidence 0.8 ms |
 | Answering a new question end to end (5 dev questions) | **20–52 s**: plan 2.8–4.7 s (LLM) · **execute 7–10 ms** · narrate 15–49 s (LLM); list-price $0.08–0.62 per question |
 | Repeating a question (answer cache) | **1.3 ms** median |
-| Saved abstraction | 2.9 MB SQLite (`out/backbone.db`) + 136 KB extraction cache; 254 claims (0 unverified), 26 encounters, 77 decisions, 1 conflict |
+| Saved abstraction | 2.9 MB SQLite (`out/backbone.db`) + 136 KB extraction cache; 254 claims (0 unverified), 26 encounters, 77 decisions, 1 conflict | <!-- FINAL-NUMBERS -->
 
 **Collection scale (SYNTHETIC).** The real patient's reconciled layer was cloned per patient. Documents and claims
 were not cloned, so this measures the **query layer only**:
@@ -296,7 +327,8 @@ The LLM is used in exactly three runtime places:
 
 Everything that decides a clinical number is deterministic: hashing, quote verification, reconciliation rules,
 interval arithmetic, plan verdicts, SQL operators and the post-check. Extraction is the only AI step that feeds
-numbers. It is guarded by code-verified quotes, interval-only extraction, cross-checks and golden tests.
+numbers. It is guarded by code-verified quotes, value grounding (a service event's times and minutes must be in its
+own quotes), interval-only extraction, cross-checks and golden tests.
 
 Model choice, cost projections (for example, an estimated ~$15K with Opus or ~$7.7K with Sonnet for a 1M-document
 batched backfill) and the risks are in **[`docs/AI_USAGE.md`](docs/AI_USAGE.md)**.
@@ -329,7 +361,8 @@ backbone/llm.py         claude-cli | anthropic-api backends   backbone/query.py 
 backbone/evidence.py    quote → verified line spans           backbone/operators.py   care, compliance, timeline, compare
 backbone/ingest.py      hash, dedupe, extract, claims         backbone/dsl.py         fluent Python builder → QueryPlan
 backbone/intervals.py   interval algebra                      backbone/answer.py      plan → execute → narrate → post-check
-backbone/export.py      patient JSON + property graph         backbone/bench.py, ablation.py
+backbone/export.py      patient JSON + property graph         backbone/summary.py     compact `plan --summary` readout
+backbone/paths.py       safe output file names                backbone/bench.py, ablation.py
 cache/extractions/      shipped extraction cache              out/                    db, answers, abstraction, benchmarks
 plans/                  hand-written QueryPlans (no LLM)      tests/                  rule unit tests + golden end-to-end tests
 docs/index.html         human overview (built by docs/build_site.py)   AGENTS.md, CLAUDE.md, docs/agents/   agent guides

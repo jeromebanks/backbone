@@ -4,9 +4,11 @@
 
 | Layer | Produced by | Tables | Mutability |
 |---|---|---|---|
-| Source | the filesystem | `documents` (sha256 PK, `doc_label`, `paths` JSON, `text`, `patient_mrn`) | append; a duplicate file adds a path |
+| Source | the filesystem | `documents` (sha256 PK, `doc_label`, `paths` JSON, `text`, `patient_mrn`) | append; a duplicate file adds a path; `patient_mrn` is set by (re-)attribution |
 | Extraction | `extract.py` (LLM) | `extractions` (raw JSON, latency, tokens, cost) + `cache/extractions/*.json` | keyed by (sha256, `EXTRACTOR_VERSION`, model) |
-| Evidence | `ingest.build_claims` | `claims` (one row per assertion; `payload` JSON; `evidence` = verified spans; `verified`) | rebuilt per document on re-extraction |
+| Evidence | `ingest.build_claims` | `claims` (one row per assertion; `payload` JSON; `evidence` = verified spans + a grounding entry; `verified`) | not append-only: a document's claims are deleted and rewritten when it is (re-)extracted; `patient_mrn` is rewritten by (re-)attribution; never written by reconcile |
+| Attribution | `ingest.attribute_document`, `ingest.reattribute` | `quarantine` (unattributable documents), `identifier_changes` (MRN corrections stated in text), `attribution_notes` (why a document was attributed other than by its extracted MRN) | rewritten per document whenever it is (re-)attributed |
+| Bookkeeping | `ingest` (mark) / `reconcile.persist` (clear, by trigger) | `pending_reconcile` (patients whose evidence changed and are not yet reconciled) | marked in the claims' transaction |
 | Clinical | `reconcile.py` | `patients`, `encounters`, `encounter_intervals`, `plan_requirements`, `assessments`, `observations`, `decisions`, `conflicts` | **derived**; deleted and rebuilt per patient |
 | Projection | `project.py` + view `v_encounter_week` | none persisted (computed per query) | pure |
 | Answers | `answer.py` | `answer_cache`, `out/answers/*.json|md` | keyed by question + fingerprint |
@@ -18,8 +20,10 @@
 schema.py      Pydantic extraction contract (DocumentInfo, ServiceEvent, Relation, Assessment, Observation, PlanRequirement)
 extract.py     SYSTEM prompt, extract_document() with file cache
 llm.py         complete_json(): claude-cli | anthropic-api backends, schema sanitising, retries, usage capture
-evidence.py    DocumentIndex.locate(quote) → line span (exact | normalized | fuzzy ≥0.92 | missing)
-ingest.py      discover → sha256 → documents → parallel extract → build_claims → affected patient MRNs
+evidence.py    DocumentIndex.locate(quote) → line span (exact | normalized | fragments | fuzzy ≥0.92 with digits kept | missing);
+               ground_values (is each payload value stated in the claim's own quote / the document / nowhere)
+ingest.py      discover → sha256 → documents → parallel extract → build_claims → attribute or quarantine →
+               reattribute → pending_reconcile → affected patient MRNs
 intervals.py   minute-resolution interval algebra: normalize, subtract, intersect, total, overlaps
 reconcile.py   reconcile_patient(mrn, claims) → Result (pure) ; persist() ; reconcile_patients()
 project.py     select_encounters, aggregate (bounds), requirement_sets_on, weekly_compliance, plan_change_dates,
@@ -27,7 +31,10 @@ project.py     select_encounters, aggregate (bounds), requirement_sets_on, weekl
 query.py       Scope, CareStep/ComplianceStep/TimelineStep/CompareStep, QueryPlan, execute_plan()
 operators.py   care, compliance, timeline, compare → envelope; evidence/decision/conflict lookups
 dsl.py         fluent builder → QueryPlan
-answer.py      directory(), planner → execute → narrator → postcheck(); answer cache; verify_answers()
+summary.py     compact readout for `plan --summary`
+answer.py      directory(), planner → execute → narrator → postcheck() gate (one regeneration); answer cache keyed by
+               fingerprint() (content hash); verify_answers()
+paths.py       safe_output_path(): output file names from question IDs and MRNs
 export.py      out/abstraction/<MRN>.json (nested) and .graph.json (nodes/edges)
 bench.py       measured benchmarks; ablation.py naive-rule experiment
 cli.py         argparse entry point (python -m backbone …)
@@ -80,7 +87,7 @@ cli.py         argparse entry point (python -m backbone …)
   name-only document then matches). Only actual changes are applied, and they are reported in
   `stats["reattributed"]`; the old and new owners are marked pending, and an old owner left with nothing is removed.
 - **Read-only commands** (`directory`, `stats`, `postcheck`, `export`, `plan`, `verify-answers`) open the DB with
-  `db.connect_readonly`: no DDL runs, so the file stays byte-identical (#45). Tables or the week view missing from
+  `db.connect_readonly` (`verify-answers --rewrite` too; it writes only the saved answer files): no DDL runs, so the file stays byte-identical (#45). Tables or the week view missing from
   an older DB are created as empty TEMP objects on that connection only. `stats` also reports value grounding per
   kind (`grounding: {date|time|minutes|number: {quote, document, absent}}`) and `pending_reconcile`
   (`patients`, `oldest_marked_at`) (#56).
@@ -117,13 +124,20 @@ cli.py         argparse entry point (python -m backbone …)
    transaction. `reattribute` then revisits quarantined and name-matched documents.
 5. `reconcile_patients(affected)` deletes and rebuilds only those patients' clinical rows (~4 ms per patient), which
    clears their pending marks.
-6. Saved answers are invalidated automatically, because the fingerprint includes every document's sha256.
+6. Cached answers are invalidated automatically: the fingerprint is a content hash of the documents, committed
+   extractions, claims and derived tables (plus the code versions), so any change to what an answer is computed
+   from changes it. An identical rebuild does not. Saved answers in `out/answers/` are files and are not changed;
+   `verify-answers` shows whether their results still reproduce.
 
 ## Data flow for a question
 
-1. `answer_question` checks `answer_cache` (keyed by question + fingerprint).
+1. `answer_question` checks `answer_cache` (keyed by question + fingerprint). A hit is post-checked again and is
+   served only if it passes.
 2. On a miss, the planner LLM (effort `medium`) returns a `QueryPlan`, validated by Pydantic.
 3. `execute_plan` runs it (read-only, milliseconds).
 4. The narrator LLM writes from `_slim(results)`, which omits SQL.
-5. `postcheck` verifies numbers, document labels and line references.
-6. The result is persisted to the cache and `out/answers/`.
+5. `postcheck` checks numbers (including hyphenated compounds) and dates against what the results state, cited
+   documents (and `LABEL [sha12]` for shared labels), and that every cited line is inside an evidence passage. On
+   failure the narrator is re-run once with the failures fed back. Details: QUERY_DSL.md.
+6. A passing result is cached; a still-failing one is returned flagged (banner) and not cached. `answer_file` writes
+   `out/answers/` either way.

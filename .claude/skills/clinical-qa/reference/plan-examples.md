@@ -60,8 +60,11 @@ engagement, overall_progress, other).
  "steps": [{"op": "compare", "split": "2026-01-19",
             "scope": {"patients": ["HG-M042"], "start": "2026-01-05", "end": "2026-01-30"}}]}
 ```
-Use `"split": "plan_change"` to split at the first change of treatment-plan requirements. If there is no change, the
-results include a note saying so; report that rather than inventing a split.
+Use `"split": "plan_change"` to split at the first day inside the scope (after its first day) on which a new or
+different treatment-plan requirement set takes effect: a revision, or a first plan starting mid-scope. A plan that
+simply ends with nothing in its place is not a change, and an identical restated plan is not one either. Later
+changes are named in a note but not split. If there is no change, the results include a note saying so; report that
+rather than inventing a split.
 
 ## Collection-wide: who had two consecutive weeks below their requirements?
 ```json
