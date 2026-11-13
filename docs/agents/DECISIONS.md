@@ -240,6 +240,13 @@ Each entry: decision · why · rejected alternatives · status. Add new entries 
     overlapping the other contact's own times is why R1 placed it in both (#78). One R7 `ambiguous_account` note per
     record replaces those flags. Overlaps between the contacts' other records are still flagged.
 
+47. **Unsigned and unknown-finality treatment plans stay operative, with a visible note (#51).** Only drafts are
+    excluded (42). An unsigned plan, or one whose finality the document does not state, still takes effect, and each
+    such document gets one R2 `plan_operative_unsigned` / `plan_operative_unknown_finality` decision telling the
+    reviewer to check it before relying on its verdicts. Chosen by the project owner over "require a signature",
+    which is closer to clinical practice but would silently leave weeks without a plan. On this corpus the only plan
+    (BH-D003) is signed and final, so nothing changes.
+
 ## Open questions / likely next decisions
 
 - Persist a `patient_week` projection and compute collection-wide compliance as set-based SQL (6.2 s at 10K

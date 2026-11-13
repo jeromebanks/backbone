@@ -247,3 +247,25 @@ def test_compliance_does_not_silently_ignore_a_service_type_scope(tmp_path):
     r = execute_plan(conn, QueryPlan.model_construct(question="t", steps=[step], unsupported_reason=None))["results"][0]
     assert r["groups"] == [] and r["totals"].get("unsupported")
     assert any("service_types" in n for n in r["notes"])
+
+
+# ---------------------------------------------------------------- #51 unsigned / unknown-finality plans
+
+@pytest.mark.parametrize("signed,finality,note", [(False, "final", "unsigned"), (True, "unknown", "unknown_finality"),
+                                                  (False, "unknown", "unsigned")])
+def test_unsigned_or_unknown_finality_plan_stays_operative_with_a_visible_note(tmp_path, signed, finality, note):
+    # Policy (#51, DECISIONS 47): only drafts are excluded; an unsigned or unknown-finality plan still takes effect,
+    # but every one of its requirements carries an R2 decision a reviewer can see.
+    claims = [plan("PLAN", "therapy_days", 1), doc("PLAN", signed=signed, finality=finality),
+              *with_docs(session("E1", "2026-02-02", "individual_therapy", "09:00", "09:50"))]
+    conn, res = build(tmp_path, claims)
+    assert [p["doc_label"] for p in res.plans] == ["PLAN"]
+    notes = [d for d in res.decisions if d["rule"] == "R2" and d["outcome"] == f"plan_operative_{note}"]
+    assert len(notes) == 1 and "PLAN" in notes[0]["reason"]
+    assert week(conn)["status"] == "MET"
+
+
+def test_signed_final_plan_gets_no_policy_note(tmp_path):
+    claims = with_docs(plan("PLAN", "therapy_days", 1), session("E1", "2026-02-02", "individual_therapy", "09:00", "09:50"))
+    _, res = build(tmp_path, claims)
+    assert not [d for d in res.decisions if d["outcome"].startswith("plan_operative_")]

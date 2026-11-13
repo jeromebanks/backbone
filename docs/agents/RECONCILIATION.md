@@ -121,6 +121,8 @@ ids, so the export and operators show why the document belongs to the patient. A
 7. `_plans`: one row per (source document sha256, full requirement identity: metric, comparator, threshold, period,
    dates, counted types, patient presence).
    - Requirements from a `draft` document are not operative: an R2 `plan_not_operative` decision, claims kept as evidence.
+   - Requirements from an unsigned document, or one whose finality is `unknown`, stay operative (#51) with one R2
+     `plan_operative_unsigned` / `plan_operative_unknown_finality` note per document, so the verdict's basis is visible.
    - Counted types = the stated list (all psychotherapy if empty) minus `excluded_service_types`. If a type is both
      counted and excluded, the exclusion wins (R9 `excluded_types_removed`). If nothing is left, the result is R9
      `no_counted_types` and the requirement evaluates UNDETERMINED.

@@ -9,12 +9,11 @@ Read this first in a new session, then `AGENTS.md` (invariants, commands, confid
   production designs, the `clinical-qa` skill). Since then a bug-fix campaign has worked through the Codex review
   (#1–#33, tracking issue #34) and its follow-ups (#35–#89). `git log --oneline dadb6e6..main` lists the commits;
   each message says which issues it fixes, which versions it bumped and what it did to the saved answers.
-- **Tests:** `python -m pytest -q` passes 361 tests in about 5 s, with no LLM calls.
+- **Tests:** `python -m pytest -q` passes 365 tests in about 5 s, with no LLM calls.
 - **Saved answers:** `python -m backbone verify-answers` (read-only) reproduces all 11 byte-identically and all pass
   the post-check. Six (DEV-01–05, NEW-02) were regenerated after the post-check was tightened and the DB rebuilt.
-- **Versions:** `EXTRACTOR_VERSION=x1`, `RULESET_VERSION=r8`, `QUERY_VERSION=q12`, `PROMPT_VERSION=a4`.
-- **Git:** all fixes are committed on local `main`; **nothing has been pushed** since `dadb6e6` (the user has not yet
-  approved a push), so no issue has been closed on GitHub.
+- **Versions:** `EXTRACTOR_VERSION=x1`, `RULESET_VERSION=r9`, `QUERY_VERSION=q12`, `PROMPT_VERSION=a4`.
+- **Git:** everything is committed and pushed to `origin/main` (the user approved the push).
 - The user is **reading and reviewing** before contacting Backbone and scheduling the follow-up design call.
   Nothing is public, and nothing should become public until the user says so (Backbone's IP).
 
@@ -67,11 +66,8 @@ Read this first in a new session, then `AGENTS.md` (invariants, commands, confid
 
 ## Open issues
 
-Every issue #1–#89 except #51 is fixed in a local commit; the commit messages name the issues. They are still **open
-on GitHub** because nothing has been pushed: once the user approves a push, close each with a link to its commit.
-
-- **#51 (policy, needs the user's decision):** should unsigned or unknown-finality treatment plans be operative? Today
-  only drafts are excluded (#8).
+None of #1–#89 is open: every one is fixed, pushed and closed with a link to its commit. #51 (policy) was decided
+by the user: unsigned and unknown-finality plans stay operative with a visible R2 note (DECISIONS 47).
 
 **Also offered, not started:** implement the `attendance` and `documentation` operators (highest-priority coverage
 gaps, `docs/CLINICAL_QA_DESIGN.md` §5). Neither needs LLM calls or re-extraction.

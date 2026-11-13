@@ -938,6 +938,7 @@ def _plans(plan_claims: list[Claim], res: Result) -> None:
       metric and start, or two documents sharing a label) is a hash of the document and full identity appended.
     """
     groups: dict[tuple, list[Claim]] = defaultdict(list)
+    noted_docs: set[str] = set()
     for c in plan_claims:
         p = c.payload
         if c.doc.get("finality") == "draft":
@@ -945,6 +946,18 @@ def _plans(plan_claims: list[Claim], res: Result) -> None:
                        f"{c.doc_label} is a draft; its {p['metric']} {p['comparator']} {p['threshold']:g} requirement "
                        "is kept as evidence but does not take effect", [c.claim_id])
             continue
+        # Policy (#51, DECISIONS 47): only drafts are excluded. An unsigned plan, or one whose finality the document
+        # does not state, still takes effect, but a reviewer must be able to see that the plan in effect is not a
+        # signed final one: one R2 note per such document.
+        unsigned, unknown = not c.doc.get("signed", True), c.doc.get("finality") == "unknown"
+        if (unsigned or unknown) and c.sha256 not in noted_docs:
+            noted_docs.add(c.sha256)
+            why = "carries no clinician signature" if unsigned else "does not state whether it is final"
+            res.decide(f"{res.mrn}|plan|{c.doc_label}", "R2", "plan_operative_unsigned" if unsigned
+                       else "plan_operative_unknown_finality",
+                       f"{c.doc_label} {why}; its requirements are applied (only drafts are excluded), so check it "
+                       "before relying on its compliance verdicts",
+                       [x.claim_id for x in plan_claims if x.sha256 == c.sha256])
         k = (c.sha256, p["metric"], p["comparator"], p["threshold"], p["period"], p.get("effective_start"),
              p.get("effective_end"), tuple(_counted_types(p)), bool(p["requires_patient_present"]))
         groups[k].append(c)
